@@ -5,17 +5,17 @@ enum Tier {
   Four,
   Five,
   Six,
-  Seven
+  Seven,
 }
 
 export interface OrderDetails {
   name: string;
   region: string;
   uptime: number;
-  reputation: number; 
+  reputation: number;
   slashes: number;
-  maxPrice: number
-  numOfBlocks: number
+  maxPrice: number;
+  numOfBlocks: number;
   token: string;
   spec: string;
   version: string;

@@ -11,7 +11,7 @@ interface ResourceAttributes {
 
 enum State {
   ACTIVE,
-  TERMINATED
+  TERMINATED,
 }
 
 export interface Lease {

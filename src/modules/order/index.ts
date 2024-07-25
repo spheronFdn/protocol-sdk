@@ -15,15 +15,15 @@ export class OrderModule {
       console.log('Please install MetaMask');
       return;
     }
-  
+
     try {
       await window.ethereum.request({ method: 'eth_requestAccounts' });
-      
+
       const provider = new ethers.BrowserProvider(window.ethereum);
       const signer = await provider.getSigner();
-  
+
       const contract = new ethers.Contract(OrderRequest, OrderRequestAbi, signer);
-  
+
       const tx = await contract.createOrder(orderDetails);
       const receipt = await tx.wait();
       console.log('Order created successfully -> ', receipt);
@@ -32,4 +32,4 @@ export class OrderModule {
       throw error;
     }
   }
-};
+}
