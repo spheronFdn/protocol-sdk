@@ -1,5 +1,5 @@
 {
-  "name": "protocol-sdk",
+  "name": "@spheron/protocol-sdk",
   "version": "1.0.0",
   "description": "Spheron Protocol SDK",
   "repository": {
@@ -49,5 +49,8 @@
   },
   "dependencies": {
     "ethers": "^6.13.1"
+  },
+  "publishConfig": {
+    "access": "restricted"
   }
 }
