@@ -23,7 +23,7 @@ export interface OrderDetails {
   tier: Tier[];
 }
 
-export enum State {
+export enum OrderState {
   OPEN,
   PROVISIONED,
   CLOSED,
@@ -48,6 +48,6 @@ export interface InitialOrder {
   numOfBlocks: number;
   token: string;
   creator: string;
-  state: State;
+  state: OrderState;
   specs: OrderSpecs;
 }

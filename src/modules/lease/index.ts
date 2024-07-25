@@ -38,7 +38,7 @@ export class LeaseModule {
       startBlock: response[6].toString(),
       startTime: Number(response[7]),
       endTime: Number(response[8]),
-      state: response[9],
+      state: Number(response[9]),
     };
 
     return lease;

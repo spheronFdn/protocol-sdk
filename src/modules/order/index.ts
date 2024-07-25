@@ -1,7 +1,7 @@
 import { OrderRequest } from '@contracts/addresses';
 import OrderRequestAbi from '@contracts/abis/OrderRequest.json';
 import { ethers } from 'ethers';
-import { InitialOrder, OrderDetails, State, Tier } from './types';
+import { InitialOrder, OrderDetails, OrderState, Tier } from './types';
 
 export class OrderModule {
   private provider: ethers.Provider;
@@ -58,7 +58,7 @@ export class OrderModule {
       numOfBlocks: Number(response[7]),
       token: response[8],
       creator: response[9],
-      state: Number(response[10]) as State,
+      state: Number(response[10]) as OrderState,
       specs,
     } as InitialOrder;
   }

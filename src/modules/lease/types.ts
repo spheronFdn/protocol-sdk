@@ -9,7 +9,7 @@ interface ResourceAttributes {
   endpointsSequenceNumber: number;
 }
 
-enum State {
+export enum LeaseState {
   ACTIVE,
   TERMINATED,
 }
@@ -24,5 +24,5 @@ export interface Lease {
   startBlock: string;
   startTime: number;
   endTime: number;
-  state: State;
+  state: LeaseState;
 }
