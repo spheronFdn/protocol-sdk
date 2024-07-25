@@ -11,17 +11,17 @@ interface ResourceAttributes {
 
 enum State {
   ACTIVE,
-  TERMINATED
+  TERMINATED,
 }
 
 export interface Lease {
-  leaseId: number;
-  requestId: number;
+  leaseId: string;
+  requestId: string;
   resourceAttribute: ResourceAttributes;
   acceptedPrice: number;
   providerAddress: string;
   tenantAddress: string;
-  startBlock: number;
+  startBlock: string;
   startTime: number;
   endTime: number;
   state: State;
