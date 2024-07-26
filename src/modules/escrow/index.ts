@@ -84,11 +84,11 @@ export class EscrowModule {
       );
       const receipt = await result.wait();
       console.log('Withdraw earnings successfull -> ', receipt);
-      if (onSuccessCallback) onSuccessCallback();
+      if (onSuccessCallback) onSuccessCallback(receipt);
       return receipt;
     } catch (error) {
       console.error('Error withdrawing provider earnings-> ', error);
-      if (onFailureCallback) onFailureCallback();
+      if (onFailureCallback) onFailureCallback(error);
       return error;
     }
   }
@@ -124,11 +124,11 @@ export class EscrowModule {
       );
       const receipt = await result.wait();
       console.log('Deposit balance successfull -> ', receipt);
-      if (onSuccessCallback) onSuccessCallback();
+      if (onSuccessCallback) onSuccessCallback(receipt);
       return receipt;
     } catch (error) {
       console.error('Error balance deposit-> ', error);
-      if (onFailureCallback) onFailureCallback();
+      if (onFailureCallback) onFailureCallback(error);
       return error;
     }
   }
@@ -164,11 +164,11 @@ export class EscrowModule {
       );
       const receipt = await result.wait();
       console.log('Withdraw balance successfull -> ', receipt);
-      if (onSuccessCallback) onSuccessCallback();
+      if (onSuccessCallback) onSuccessCallback(receipt);
       return receipt;
     } catch (error) {
       console.error('Error in balance withdraw-> ', error);
-      if (onFailureCallback) onFailureCallback();
+      if (onFailureCallback) onFailureCallback(error);
       return error;
     }
   }
