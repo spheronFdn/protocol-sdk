@@ -1,5 +1,4 @@
 import { ethers } from 'ethers';
-import dayjs from 'dayjs';
 import { IToken, NetworkType, tokenMap } from '@config/index';
 
 export const isValidEthereumAddress = (address: string): boolean => ethers.isAddress(address);
