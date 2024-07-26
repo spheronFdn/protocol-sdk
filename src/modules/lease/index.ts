@@ -4,6 +4,7 @@ import { OrderModule } from '@modules/order';
 import { getTokenDetails } from '@utils/index';
 import { ethers } from 'ethers';
 import { Lease, LeaseState, LeaseWithOrderDetails } from './types';
+import { getLeaseStateAsString } from '@utils/lease';
 
 export class LeaseModule {
   private provider: ethers.Provider;
@@ -43,7 +44,7 @@ export class LeaseModule {
       startBlock: response[6].toString(),
       startTime: Number(response[7]),
       endTime: Number(response[8]),
-      state: Number(response[9]),
+      state: getLeaseStateAsString(response[9].toString()) as LeaseState,
     };
 
     return lease;
@@ -80,7 +81,7 @@ export class LeaseModule {
     let leaseIds = allLeaseIds;
     let totalCount = allLeaseIds.length;
 
-    if (options?.state !== undefined) {
+    if (options?.state) {
       switch (options.state) {
         case LeaseState.ACTIVE:
           leaseIds = activeLeaseIds;
@@ -105,7 +106,9 @@ export class LeaseModule {
 
     const leaseWithToken: LeaseWithOrderDetails[] = filteredLeases.map((lease, index) => {
       const order = orderDetails[index];
-      const tokenDetails = getTokenDetails(order.token, 'testnet');
+      let tokenDetails;
+      if (order.token?.address) tokenDetails = getTokenDetails(order.token.address, 'testnet');
+
       return {
         ...lease,
         name: order.name,
@@ -114,7 +117,6 @@ export class LeaseModule {
         token: {
           symbol: tokenDetails?.symbol,
           decimal: tokenDetails?.decimal,
-          address: order.token,
         },
       };
     });

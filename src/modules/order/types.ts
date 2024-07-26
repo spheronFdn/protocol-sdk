@@ -24,10 +24,10 @@ export interface OrderDetails {
 }
 
 export enum OrderState {
-  OPEN,
-  PROVISIONED,
-  CLOSED,
-  MATCHED,
+  OPEN = 'open',
+  PROVISIONED = 'provisioned',
+  CLOSED = 'closed',
+  MATCHED = 'matched',
 }
 
 interface OrderSpecs {
@@ -46,7 +46,11 @@ export interface InitialOrder {
   slashes: number;
   maxPrice: number;
   numOfBlocks: number;
-  token: string;
+  token?: {
+    symbol?: string;
+    decimal?: number;
+    address: string;
+  };
   creator: string;
   state: OrderState;
   specs: OrderSpecs;

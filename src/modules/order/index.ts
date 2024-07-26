@@ -1,7 +1,9 @@
 import { OrderRequest } from '@contracts/addresses';
 import OrderRequestAbi from '@contracts/abis/OrderRequest.json';
 import { ethers } from 'ethers';
-import { InitialOrder, OrderDetails, OrderState, Tier } from './types';
+import { InitialOrder, OrderDetails, Tier } from './types';
+import { getTokenDetails } from '@utils/index';
+import { getOrderStateAsString } from '@utils/order';
 
 export class OrderModule {
   private provider: ethers.Provider;
@@ -47,6 +49,13 @@ export class OrderModule {
       tier: response[11][3].map((t: bigint) => Number(t)) as Tier[],
     };
 
+    const tokenDetails = getTokenDetails(response[8], 'testnet');
+    const token = {
+      symbol: tokenDetails?.symbol,
+      decimal: tokenDetails?.decimal,
+      address: tokenDetails?.address,
+    };
+
     return {
       id: response[0].toString(),
       name: response[1],
@@ -56,9 +65,9 @@ export class OrderModule {
       slashes: Number(response[5]),
       maxPrice: Number(response[6]),
       numOfBlocks: Number(response[7]),
-      token: response[8],
+      token,
       creator: response[9],
-      state: Number(response[10]) as OrderState,
+      state: getOrderStateAsString(response[10]),
       specs,
     } as InitialOrder;
   }

@@ -12,8 +12,8 @@ interface ResourceAttributes {
 }
 
 export enum LeaseState {
-  ACTIVE,
-  TERMINATED,
+  ACTIVE = 'active',
+  TERMINATED = 'terminated',
 }
 
 export interface Lease {
@@ -36,6 +36,5 @@ export interface LeaseWithOrderDetails extends Lease {
   token: {
     symbol?: string;
     decimal?: number;
-    address: string;
   };
 }
