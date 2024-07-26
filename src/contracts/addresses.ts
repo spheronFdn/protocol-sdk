@@ -1,4 +1,4 @@
-//  addresses
+// Contract addresses
 export const TokenRegistry = "0x96Ca5955F25648FB44C5D772BAdB4313000C66Fe";
 export const ProviderRegistry = "0xc51F366131924e477a65b05D9ca97333daa3385D";
 export const Escrow = "0x495d613910FdeB29E83d9fb4B25EbFC3ACc8ddc4";
