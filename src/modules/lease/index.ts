@@ -1,13 +1,18 @@
 import ComputeLeaseAbi from '@contracts/abis/ComputeLease.json';
 import { ComputeLease } from '@contracts/addresses';
+import { OrderModule } from '@modules/order';
+import { getTokenDetails } from '@utils/index';
 import { ethers } from 'ethers';
-import { Lease } from './types';
+import { Lease, LeaseState, LeaseWithOrderDetails } from './types';
 
 export class LeaseModule {
   private provider: ethers.Provider;
+  private orderModule: OrderModule;
 
   constructor(provider: ethers.Provider) {
     this.provider = provider;
+    this.getLeaseDetails = this.getLeaseDetails.bind(this);
+    this.orderModule = new OrderModule(provider);
   }
 
   async getLeaseDetails(leaseId: string) {
@@ -44,16 +49,79 @@ export class LeaseModule {
     return lease;
   }
 
-  async getTenantLeases(providerAddress: string) {
+  async getLeaseIds(address: string) {
     const contractAbi = ComputeLeaseAbi;
     const contractAddress = ComputeLease;
 
     const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
-    const response = await contract.getTenantLeases(providerAddress);
+    const response = await contract.getTenantLeases(address);
+
+    const activeLeaseIds = response[0].map((id: bigint) => id.toString()) as string[];
+    const allLeaseIds = response[1].map((id: bigint) => id.toString()) as string[];
+
+    const terminatedLeaseIds = allLeaseIds.filter((lId) => {
+      return !activeLeaseIds.includes(lId);
+    });
 
     return {
-      activeLeases: response[0],
-      allLeases: response[1],
+      activeLeaseIds,
+      allLeaseIds,
+      terminatedLeaseIds,
+    };
+  }
+
+  async getLeasesByState(
+    address: string,
+    options?: { state?: LeaseState; page?: number; pageSize?: number }
+  ) {
+    const { activeLeaseIds, terminatedLeaseIds, allLeaseIds } = await this.getLeaseIds(address);
+
+    let filteredLeases: Lease[] = [];
+    let leaseIds = allLeaseIds;
+    let totalCount = allLeaseIds.length;
+
+    if (options?.state !== undefined) {
+      switch (options.state) {
+        case LeaseState.ACTIVE:
+          leaseIds = activeLeaseIds;
+          totalCount = activeLeaseIds.length;
+          break;
+        case LeaseState.TERMINATED:
+          leaseIds = terminatedLeaseIds;
+          totalCount = terminatedLeaseIds.length;
+          break;
+      }
+    }
+
+    if (options?.page) {
+      const pageSize = options.pageSize || 10;
+      leaseIds = leaseIds.slice((options.page - 1) * pageSize, options.page * pageSize);
+    }
+
+    filteredLeases = await Promise.all(leaseIds.map((lId) => this.getLeaseDetails(lId)));
+    const orderDetails = await Promise.all(
+      leaseIds.map((lId) => this.orderModule.getOrderDetails(lId))
+    );
+
+    const leaseWithToken: LeaseWithOrderDetails[] = filteredLeases.map((lease, index) => {
+      const order = orderDetails[index];
+      const tokenDetails = getTokenDetails(order.token, 'testnet');
+      return {
+        ...lease,
+        name: order.name,
+        tier: order.specs.tier,
+        region: order.region,
+        token: {
+          symbol: tokenDetails?.symbol,
+          decimal: tokenDetails?.decimal,
+          address: order.token,
+        },
+      };
+    });
+
+    return {
+      leases: leaseWithToken,
+      totalCount,
     };
   }
 }

@@ -1,3 +1,5 @@
+import { Tier } from '@modules/order/types';
+
 interface ResourceAttributes {
   cpuUnits: number;
   cpuAttributes: string[];
@@ -25,4 +27,15 @@ export interface Lease {
   startTime: number;
   endTime: number;
   state: LeaseState;
+}
+
+export interface LeaseWithOrderDetails extends Lease {
+  name: string;
+  region: string;
+  tier: Tier[];
+  token: {
+    symbol?: string;
+    decimal?: number;
+    address: string;
+  };
 }
