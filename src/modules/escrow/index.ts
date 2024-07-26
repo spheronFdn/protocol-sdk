@@ -1,6 +1,6 @@
-import { Contract, ContractTransactionResponse, ethers } from 'ethers';
 import EscrowAbi from '@contracts/abis/Escrow.json';
 import { Escrow } from '@contracts/addresses';
+import { ethers } from 'ethers';
 import { TransactionData } from './types';
 
 export class EscrowModule {
@@ -73,12 +73,12 @@ export class EscrowModule {
       const contractABI = EscrowAbi;
       const contractAddress = Escrow;
 
-      const contract: Contract = new ethers.Contract(contractAddress, contractABI, signer);
+      const contract = new ethers.Contract(contractAddress, contractABI, signer);
 
       const finalAmount = (Number(amount.toString()) - 1) / 10 ** decimals;
       const withdrawAmount = ethers.parseUnits(finalAmount.toFixed(decimals), decimals);
 
-      const result: ContractTransactionResponse = await contract.withdrawProviderEarnings(
+      const result = await contract.withdrawProviderEarnings(
         tokenAddress,
         withdrawAmount
       );
@@ -113,12 +113,12 @@ export class EscrowModule {
       const contractABI = EscrowAbi;
       const contractAddress = Escrow;
 
-      const contract: Contract = new ethers.Contract(contractAddress, contractABI, signer);
+      const contract = new ethers.Contract(contractAddress, contractABI, signer);
 
       const finalAmount = (Number(amount.toString()) - 1) / 10 ** decimals;
       const depositAmount = ethers.parseUnits(finalAmount.toFixed(decimals), decimals);
 
-      const result: ContractTransactionResponse = await contract.deposit(
+      const result = await contract.deposit(
         tokenAddress,
         depositAmount
       );
@@ -153,12 +153,12 @@ export class EscrowModule {
       const contractABI = EscrowAbi;
       const contractAddress = Escrow;
 
-      const contract: Contract = new ethers.Contract(contractAddress, contractABI, signer);
+      const contract = new ethers.Contract(contractAddress, contractABI, signer);
 
       const finalAmount = (Number(amount.toString()) - 1) / 10 ** decimals;
       const withdrawAmount = ethers.parseUnits(finalAmount.toFixed(decimals), decimals);
 
-      const result: ContractTransactionResponse = await contract.withdraw(
+      const result = await contract.withdraw(
         tokenAddress,
         withdrawAmount
       );
