@@ -10,7 +10,7 @@ export interface ProviderDetails {
   timestamp: number;
 }
 
-export enum WithdrawStatus {
+export enum TransactionStatus {
   SUCCESS = 'success',
   FAILURE = 'failure',
 }
