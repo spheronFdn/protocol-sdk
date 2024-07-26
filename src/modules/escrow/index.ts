@@ -52,20 +52,20 @@ export class EscrowModule {
     }
   }
 
-  async getProtocolFee() {
-    try {
-      const contractAbi = EscrowAbi;
-      const contractAddress = Escrow;
-      const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
+  //   async getProtocolFee() {
+  //     try {
+  //       const contractAbi = EscrowAbi;
+  //       const contractAddress = Escrow;
+  //       const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
 
-      const response: string = await contract.getProtocolFee();
+  //       const response: string = await contract.getProtocolFee();
 
-      return response.toString();
-    } catch (error) {
-      console.error('Error in getProtocolFee:', error);
-      throw error;
-    }
-  }
+  //       return response.toString();
+  //     } catch (error) {
+  //       console.error('Error in getProtocolFee:', error);
+  //       throw error;
+  //     }
+  //   }
 
   // write operations
   async withdrawProviderEarnings({ tokenAddress, amount, decimals }: TransactionData) {
@@ -161,34 +161,34 @@ export class EscrowModule {
     }
   }
 
-  async withdrawProtocolFees({ tokenAddress, amount, decimals }: TransactionData) {
-    if (typeof window?.ethereum === 'undefined') {
-      console.log('Please install MetaMask');
-      return;
-    }
+  //   async withdrawProtocolFees({ tokenAddress, amount, decimals }: TransactionData) {
+  //     if (typeof window?.ethereum === 'undefined') {
+  //       console.log('Please install MetaMask');
+  //       return;
+  //     }
 
-    try {
-      await window.ethereum.request({ method: 'eth_requestAccounts' });
+  //     try {
+  //       await window.ethereum.request({ method: 'eth_requestAccounts' });
 
-      const provider = new ethers.BrowserProvider(window.ethereum);
-      const signer = await provider.getSigner();
-      const contractABI = EscrowAbi;
-      const contractAddress = Escrow;
+  //       const provider = new ethers.BrowserProvider(window.ethereum);
+  //       const signer = await provider.getSigner();
+  //       const contractABI = EscrowAbi;
+  //       const contractAddress = Escrow;
 
-      const contract: Contract = new ethers.Contract(contractAddress, contractABI, signer);
+  //       const contract: Contract = new ethers.Contract(contractAddress, contractABI, signer);
 
-      const finalAmount = (Number(amount.toString()) - 1) / 10 ** decimals;
-      const withdrawAmount = ethers.parseUnits(finalAmount.toFixed(decimals), decimals);
+  //       const finalAmount = (Number(amount.toString()) - 1) / 10 ** decimals;
+  //       const withdrawAmount = ethers.parseUnits(finalAmount.toFixed(decimals), decimals);
 
-      const result: ContractTransactionResponse = await contract.withdrawProtocolFees(
-        tokenAddress,
-        withdrawAmount
-      );
-      const receipt = await result.wait();
-      console.log('Withdraw protocol fees successfull -> ', receipt);
-    } catch (error) {
-      console.error('Error in protocol fees withdraw-> ', error);
-      throw error;
-    }
-  }
+  //       const result: ContractTransactionResponse = await contract.withdrawProtocolFees(
+  //         tokenAddress,
+  //         withdrawAmount
+  //       );
+  //       const receipt = await result.wait();
+  //       console.log('Withdraw protocol fees successfull -> ', receipt);
+  //     } catch (error) {
+  //       console.error('Error in protocol fees withdraw-> ', error);
+  //       throw error;
+  //     }
+  //   }
 }
