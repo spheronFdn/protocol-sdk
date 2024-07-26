@@ -1,3 +1,5 @@
+import { Tier } from '@modules/order/types';
+
 interface ResourceAttributes {
   cpuUnits: number;
   cpuAttributes: string[];
@@ -9,20 +11,30 @@ interface ResourceAttributes {
   endpointsSequenceNumber: number;
 }
 
-enum State {
-  ACTIVE,
-  TERMINATED
+export enum LeaseState {
+  ACTIVE = 'active',
+  TERMINATED = 'terminated',
 }
 
 export interface Lease {
-  leaseId: number;
-  requestId: number;
+  leaseId: string;
+  requestId: string;
   resourceAttribute: ResourceAttributes;
   acceptedPrice: number;
   providerAddress: string;
   tenantAddress: string;
-  startBlock: number;
+  startBlock: string;
   startTime: number;
   endTime: number;
-  state: State;
+  state: LeaseState;
+}
+
+export interface LeaseWithOrderDetails extends Lease {
+  name: string;
+  region: string;
+  tier: Tier[];
+  token: {
+    symbol?: string;
+    decimal?: number;
+  };
 }

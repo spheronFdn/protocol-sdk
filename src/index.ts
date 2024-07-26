@@ -1,6 +1,6 @@
-import { ethers } from 'ethers';
 import { LeaseModule } from '@modules/lease';
 import { OrderModule } from '@modules/order';
+import { ethers } from 'ethers';
 // import { EscrowModule } from '@modules/escrow';
 import { SPHERON_TESTNET_RPC_URL } from './config';
 
@@ -20,3 +20,10 @@ export class SpheronSDK {
 export * from '@modules/lease/types';
 export * from '@modules/order/types';
 // export * from '@modules/escrow/types';
+
+// const sdk = new SpheronSDK(SPHERON_TESTNET_RPC_URL);
+// sdk.leases.getLeasesByState('0x2c11a76298a111b8ca8db82205dc8f0a2688e6e8', {
+//   state: LeaseState.ACTIVE,
+//   page: 1,
+//   pageSize: 10,
+// });
