@@ -52,23 +52,14 @@ export class EscrowModule {
     }
   }
 
-  //   async getProtocolFee() {
-  //     try {
-  //       const contractAbi = EscrowAbi;
-  //       const contractAddress = Escrow;
-  //       const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
-
-  //       const response: string = await contract.getProtocolFee();
-
-  //       return response.toString();
-  //     } catch (error) {
-  //       console.error('Error in getProtocolFee:', error);
-  //       throw error;
-  //     }
-  //   }
-
   // write operations
-  async withdrawProviderEarnings({ tokenAddress, amount, decimals }: TransactionData) {
+  async withdrawProviderEarnings({
+    tokenAddress,
+    amount,
+    decimals,
+    onSuccessCallback,
+    onFailureCallback,
+  }: TransactionData) {
     if (typeof window?.ethereum === 'undefined') {
       console.log('Please install MetaMask');
       return;
@@ -93,13 +84,22 @@ export class EscrowModule {
       );
       const receipt = await result.wait();
       console.log('Withdraw earnings successfull -> ', receipt);
+      if (onSuccessCallback) onSuccessCallback();
+      return receipt;
     } catch (error) {
       console.error('Error withdrawing provider earnings-> ', error);
-      throw error;
+      if (onFailureCallback) onFailureCallback();
+      return error;
     }
   }
 
-  async depositBalance({ tokenAddress, amount, decimals }: TransactionData) {
+  async depositBalance({
+    tokenAddress,
+    amount,
+    decimals,
+    onSuccessCallback,
+    onFailureCallback,
+  }: TransactionData) {
     if (typeof window?.ethereum === 'undefined') {
       console.log('Please install MetaMask');
       return;
@@ -124,13 +124,22 @@ export class EscrowModule {
       );
       const receipt = await result.wait();
       console.log('Deposit balance successfull -> ', receipt);
+      if (onSuccessCallback) onSuccessCallback();
+      return receipt;
     } catch (error) {
       console.error('Error balance deposit-> ', error);
-      throw error;
+      if (onFailureCallback) onFailureCallback();
+      return error;
     }
   }
 
-  async withdrawBalance({ tokenAddress, amount, decimals }: TransactionData) {
+  async withdrawBalance({
+    tokenAddress,
+    amount,
+    decimals,
+    onSuccessCallback,
+    onFailureCallback,
+  }: TransactionData) {
     if (typeof window?.ethereum === 'undefined') {
       console.log('Please install MetaMask');
       return;
@@ -155,40 +164,12 @@ export class EscrowModule {
       );
       const receipt = await result.wait();
       console.log('Withdraw balance successfull -> ', receipt);
+      if (onSuccessCallback) onSuccessCallback();
+      return receipt;
     } catch (error) {
       console.error('Error in balance withdraw-> ', error);
-      throw error;
+      if (onFailureCallback) onFailureCallback();
+      return error;
     }
   }
-
-  //   async withdrawProtocolFees({ tokenAddress, amount, decimals }: TransactionData) {
-  //     if (typeof window?.ethereum === 'undefined') {
-  //       console.log('Please install MetaMask');
-  //       return;
-  //     }
-
-  //     try {
-  //       await window.ethereum.request({ method: 'eth_requestAccounts' });
-
-  //       const provider = new ethers.BrowserProvider(window.ethereum);
-  //       const signer = await provider.getSigner();
-  //       const contractABI = EscrowAbi;
-  //       const contractAddress = Escrow;
-
-  //       const contract: Contract = new ethers.Contract(contractAddress, contractABI, signer);
-
-  //       const finalAmount = (Number(amount.toString()) - 1) / 10 ** decimals;
-  //       const withdrawAmount = ethers.parseUnits(finalAmount.toFixed(decimals), decimals);
-
-  //       const result: ContractTransactionResponse = await contract.withdrawProtocolFees(
-  //         tokenAddress,
-  //         withdrawAmount
-  //       );
-  //       const receipt = await result.wait();
-  //       console.log('Withdraw protocol fees successfull -> ', receipt);
-  //     } catch (error) {
-  //       console.error('Error in protocol fees withdraw-> ', error);
-  //       throw error;
-  //     }
-  //   }
 }

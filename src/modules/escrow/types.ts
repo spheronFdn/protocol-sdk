@@ -19,4 +19,6 @@ export interface TransactionData {
   tokenAddress: string;
   amount: number;
   decimals: number;
+  onSuccessCallback?: () => void;
+  onFailureCallback?: () => void;
 }
