@@ -1,93 +1,83 @@
-import {
-  BrowserProvider,
-  Contract,
-  ContractTransactionResponse,
-  ethers,
-  JsonRpcProvider,
-} from 'ethers';
+import { Contract, ContractTransactionResponse, ethers } from 'ethers';
 import EscrowAbi from '@contracts/abis/Escrow.json';
 import { Escrow } from '@contracts/addresses';
-import { TransactionStatus } from './types';
+import { TransactionData } from './types';
 
-// read operations
-export const getProviderEarnings = async (
-  providerAddress: string,
-  tokenAddress: string,
-  rpcUrl: string
-) => {
-  try {
-    const provider = new JsonRpcProvider(rpcUrl);
-    const contractAbi = EscrowAbi;
-    const contractAddress = Escrow;
+export class EscrowModule {
+  private provider: ethers.Provider;
 
-    const contract = new ethers.Contract(contractAddress, contractAbi, provider);
-    const response = await contract.getProviderEarnings(providerAddress, tokenAddress);
-
-    const providerEarnings: { earned: string; withdrawn: string; balance: string } = {
-      earned: response[0].toString(),
-      withdrawn: response[1].toString(),
-      balance: response[2].toString(),
-    };
-
-    return providerEarnings;
-  } catch (error) {
-    console.error('Error in getProviderEarnings:', error);
+  constructor(provider: ethers.Provider) {
+    this.provider = provider;
   }
-};
 
-export const getProtocolFee = async (rpcUrl: string) => {
-  try {
-    const provider = new JsonRpcProvider(rpcUrl);
-    const contractAbi = EscrowAbi;
-    const contractAddress = Escrow;
+  // read operations
+  async getProviderEarnings(providerAddress: string, tokenAddress: string) {
+    try {
+      const contractAbi = EscrowAbi;
+      const contractAddress = Escrow;
+      const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
 
-    const contract = new ethers.Contract(contractAddress, contractAbi, provider);
-    const response: string = await contract.getProtocolFee();
+      const response = await contract.getProviderEarnings(providerAddress, tokenAddress);
 
-    return response.toString();
-  } catch (error) {
-    console.error('Error in getProtocolFee:', error);
+      const providerEarnings: { earned: string; withdrawn: string; balance: string } = {
+        earned: response[0].toString(),
+        withdrawn: response[1].toString(),
+        balance: response[2].toString(),
+      };
+
+      return providerEarnings;
+    } catch (error) {
+      console.error('Error in getProviderEarnings:', error);
+      throw error;
+    }
   }
-};
 
-export const getUserData = async (
-  providerAddress: string,
-  tokenAddress: string,
-  rpcUrl: string
-) => {
-  try {
-    const provider = new JsonRpcProvider(rpcUrl);
-    const contractAbi = EscrowAbi;
-    const contractAddress = Escrow;
+  async getUserBalance(providerAddress: string, tokenAddress: string) {
+    try {
+      const contractAbi = EscrowAbi;
+      const contractAddress = Escrow;
+      const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
 
-    const contract = new ethers.Contract(contractAddress, contractAbi, provider);
-    const response = await contract.getUserData(providerAddress, tokenAddress);
+      const response = await contract.getUserData(providerAddress, tokenAddress);
 
-    const userData: { lockedBalance: string; unlockedBalance: string } = {
-      lockedBalance: response[0].toString(),
-      unlockedBalance: response[1].toString(),
-    };
+      const userData: { lockedBalance: string; unlockedBalance: string } = {
+        lockedBalance: response[0].toString(),
+        unlockedBalance: response[1].toString(),
+      };
 
-    return userData;
-  } catch (error) {
-    console.error('Error in getUserData:', error);
+      return userData;
+    } catch (error) {
+      console.error('Error in getUserData:', error);
+      throw error;
+    }
   }
-};
 
-// write operations
-export const withdrawProviderEarnings = async (
-  tokenAddress: string,
-  amount: number,
-  decimals: number,
-  setWithdrawLoading: (loading: boolean) => void,
-  setWithdrawStatus: (status: TransactionStatus) => void
-) => {
-  try {
-    if (typeof window.ethereum !== 'undefined') {
-      setWithdrawLoading(true);
+  async getProtocolFee() {
+    try {
+      const contractAbi = EscrowAbi;
+      const contractAddress = Escrow;
+      const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
 
+      const response: string = await contract.getProtocolFee();
+
+      return response.toString();
+    } catch (error) {
+      console.error('Error in getProtocolFee:', error);
+      throw error;
+    }
+  }
+
+  // write operations
+  async withdrawProviderEarnings({ tokenAddress, amount, decimals }: TransactionData) {
+    if (typeof window?.ethereum === 'undefined') {
+      console.log('Please install MetaMask');
+      return;
+    }
+
+    try {
       await window.ethereum.request({ method: 'eth_requestAccounts' });
-      const provider: BrowserProvider = new ethers.BrowserProvider(window.ethereum);
+
+      const provider = new ethers.BrowserProvider(window.ethereum);
       const signer = await provider.getSigner();
       const contractABI = EscrowAbi;
       const contractAddress = Escrow;
@@ -101,34 +91,24 @@ export const withdrawProviderEarnings = async (
         tokenAddress,
         withdrawAmount
       );
-      await result.wait();
-      setWithdrawLoading(false);
-      setWithdrawStatus(TransactionStatus.SUCCESS);
-    } else {
-      console.error('MetaMask not detected');
-      setWithdrawStatus(TransactionStatus.FAILURE);
-      setWithdrawLoading(false);
+      const receipt = await result.wait();
+      console.log('Withdraw earnings successfull -> ', receipt);
+    } catch (error) {
+      console.error('Error withdrawing provider earnings-> ', error);
+      throw error;
     }
-  } catch (error) {
-    console.error('Error in withdrawProviderEarnings:', error);
-    setWithdrawStatus(TransactionStatus.FAILURE);
-    setWithdrawLoading(false);
   }
-};
 
-export const depositAmount = async (
-  tokenAddress: string,
-  amount: number,
-  decimals: number,
-  setDepositLoading: (loading: boolean) => void,
-  setDepositStatus: (status: TransactionStatus) => void
-) => {
-  try {
-    if (typeof window.ethereum !== 'undefined') {
-      setDepositLoading(true);
+  async depositBalance({ tokenAddress, amount, decimals }: TransactionData) {
+    if (typeof window?.ethereum === 'undefined') {
+      console.log('Please install MetaMask');
+      return;
+    }
 
+    try {
       await window.ethereum.request({ method: 'eth_requestAccounts' });
-      const provider: BrowserProvider = new ethers.BrowserProvider(window.ethereum);
+
+      const provider = new ethers.BrowserProvider(window.ethereum);
       const signer = await provider.getSigner();
       const contractABI = EscrowAbi;
       const contractAddress = Escrow;
@@ -142,34 +122,24 @@ export const depositAmount = async (
         tokenAddress,
         depositAmount
       );
-      await result.wait();
-      setDepositLoading(false);
-      setDepositStatus(TransactionStatus.SUCCESS);
-    } else {
-      console.error('MetaMask not detected');
-      setDepositStatus(TransactionStatus.FAILURE);
-      setDepositLoading(false);
+      const receipt = await result.wait();
+      console.log('Deposit balance successfull -> ', receipt);
+    } catch (error) {
+      console.error('Error balance deposit-> ', error);
+      throw error;
     }
-  } catch (error) {
-    console.error('Error in depositAmount:', error);
-    setDepositStatus(TransactionStatus.FAILURE);
-    setDepositLoading(false);
   }
-};
 
-export const withdrawAmount = async (
-  tokenAddress: string,
-  amount: number,
-  decimals: number,
-  setWithdrawLoading: (loading: boolean) => void,
-  setWithdrawStatus: (status: TransactionStatus) => void
-) => {
-  try {
-    if (typeof window.ethereum !== 'undefined') {
-      setWithdrawLoading(true);
+  async withdrawBalance({ tokenAddress, amount, decimals }: TransactionData) {
+    if (typeof window?.ethereum === 'undefined') {
+      console.log('Please install MetaMask');
+      return;
+    }
 
+    try {
       await window.ethereum.request({ method: 'eth_requestAccounts' });
-      const provider: BrowserProvider = new ethers.BrowserProvider(window.ethereum);
+
+      const provider = new ethers.BrowserProvider(window.ethereum);
       const signer = await provider.getSigner();
       const contractABI = EscrowAbi;
       const contractAddress = Escrow;
@@ -183,34 +153,24 @@ export const withdrawAmount = async (
         tokenAddress,
         withdrawAmount
       );
-      await result.wait();
-      setWithdrawLoading(false);
-      setWithdrawStatus(TransactionStatus.SUCCESS);
-    } else {
-      console.error('MetaMask not detected');
-      setWithdrawStatus(TransactionStatus.FAILURE);
-      setWithdrawLoading(false);
+      const receipt = await result.wait();
+      console.log('Withdraw balance successfull -> ', receipt);
+    } catch (error) {
+      console.error('Error in balance withdraw-> ', error);
+      throw error;
     }
-  } catch (error) {
-    console.error('Error in withdrawAmount:', error);
-    setWithdrawStatus(TransactionStatus.FAILURE);
-    setWithdrawLoading(false);
   }
-};
 
-export const withdrawProtocolFees = async (
-  tokenAddress: string,
-  amount: number,
-  decimals: number,
-  setWithdrawLoading: (loading: boolean) => void,
-  setWithdrawStatus: (status: TransactionStatus) => void
-) => {
-  try {
-    if (typeof window.ethereum !== 'undefined') {
-      setWithdrawLoading(true);
+  async withdrawProtocolFees({ tokenAddress, amount, decimals }: TransactionData) {
+    if (typeof window?.ethereum === 'undefined') {
+      console.log('Please install MetaMask');
+      return;
+    }
 
+    try {
       await window.ethereum.request({ method: 'eth_requestAccounts' });
-      const provider: BrowserProvider = new ethers.BrowserProvider(window.ethereum);
+
+      const provider = new ethers.BrowserProvider(window.ethereum);
       const signer = await provider.getSigner();
       const contractABI = EscrowAbi;
       const contractAddress = Escrow;
@@ -224,17 +184,11 @@ export const withdrawProtocolFees = async (
         tokenAddress,
         withdrawAmount
       );
-      await result.wait();
-      setWithdrawLoading(false);
-      setWithdrawStatus(TransactionStatus.SUCCESS);
-    } else {
-      console.error('MetaMask not detected');
-      setWithdrawStatus(TransactionStatus.FAILURE);
-      setWithdrawLoading(false);
+      const receipt = await result.wait();
+      console.log('Withdraw protocol fees successfull -> ', receipt);
+    } catch (error) {
+      console.error('Error in protocol fees withdraw-> ', error);
+      throw error;
     }
-  } catch (error) {
-    console.error('Error in withdrawProviderEarnings:', error);
-    setWithdrawStatus(TransactionStatus.FAILURE);
-    setWithdrawLoading(false);
   }
-};
+}

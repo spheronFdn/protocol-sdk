@@ -14,3 +14,9 @@ export enum TransactionStatus {
   SUCCESS = 'success',
   FAILURE = 'failure',
 }
+
+export interface TransactionData {
+  tokenAddress: string;
+  amount: number;
+  decimals: number;
+}
