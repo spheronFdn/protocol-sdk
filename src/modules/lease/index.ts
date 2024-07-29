@@ -5,6 +5,7 @@ import { getTokenDetails } from '@utils/index';
 import { ethers } from 'ethers';
 import { Lease, LeaseState, LeaseWithOrderDetails } from './types';
 import { getLeaseStateAsString } from '@utils/lease';
+import { DEFAULT_PAGE_SIZE } from '@config/index';
 
 export class LeaseModule {
   private provider: ethers.Provider;
@@ -95,7 +96,7 @@ export class LeaseModule {
     }
 
     if (options?.page) {
-      const pageSize = options.pageSize || 10;
+      const pageSize = options.pageSize || DEFAULT_PAGE_SIZE;
       leaseIds = leaseIds.slice((options.page - 1) * pageSize, options.page * pageSize);
     }
 
