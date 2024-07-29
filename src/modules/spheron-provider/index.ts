@@ -81,7 +81,7 @@ export class SpheronProviderModule {
     }
 
     if (!serviceName) {
-      console.log('Service na,e not found');
+      console.log('Service name not found');
       return;
     }
     const url = `${providerUrl}/lease/${leaseId}/service/${serviceName}/status`;
