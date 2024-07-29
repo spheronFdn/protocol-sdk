@@ -79,6 +79,7 @@ export class OrderModule {
   }
 
   async listenToOrderCreated(
+    timeoutTime: number = 60000,
     onSuccessCallback: (newOrderId: string) => void,
     onFailureCallback: () => void
   ) {
@@ -92,24 +93,29 @@ export class OrderModule {
 
     const contract = new ethers.Contract(contractAddress, contractAbi, this.websocketProvider);
 
-    this.createTimeoutId = setTimeout(() => {
-      contract.off('OrderCreated');
-      onFailureCallback();
-      return { error: true, msg: 'Order creation Failed' };
-    }, 60000);
-
-    contract.on('OrderCreated', (orderId: string, senderAddress: string) => {
-      if (senderAddress.toString().toLowerCase() === accounts[0].toString().toLowerCase()) {
-        onSuccessCallback(orderId);
-        this.websocketProvider?.destroy();
+    return new Promise((resolve, reject) => {
+      this.createTimeoutId = setTimeout(() => {
         contract.off('OrderCreated');
-        clearTimeout(this.createTimeoutId as NodeJS.Timeout);
-        return;
-      }
+        onFailureCallback();
+        reject();
+        return { error: true, msg: 'Order creation Failed' };
+      }, timeoutTime);
+
+      contract.on('OrderCreated', (orderId: string, senderAddress: string) => {
+        if (senderAddress.toString().toLowerCase() === accounts[0].toString().toLowerCase()) {
+          onSuccessCallback(orderId);
+          this.websocketProvider?.destroy();
+          contract.off('OrderCreated');
+          clearTimeout(this.createTimeoutId as NodeJS.Timeout);
+          resolve(orderId);
+          return;
+        }
+      });
     });
   }
 
   async listenToOrderUpdated(
+    timeoutTime: number = 60000,
     onSuccessCallback: (orderId: string) => void,
     onFailureCallback: () => void
   ) {
@@ -124,20 +130,24 @@ export class OrderModule {
 
     const contract = new ethers.Contract(contractAddress, contractAbi, this.websocketProvider);
 
-    this.updateTimeoutId = setTimeout(() => {
-      contract.off('OrderUpdateRequested');
-      onFailureCallback();
-      return { error: true, msg: 'Order updation Failed' };
-    }, 60000);
-
-    contract.on('OrderUpdateRequested', (orderId, senderAddress) => {
-      if (senderAddress.toString().toLowerCase() === accounts[0].toString().toLowerCase()) {
-        onSuccessCallback(orderId);
-        this.websocketProvider?.destroy();
+    return new Promise((resolve, reject) => {
+      this.updateTimeoutId = setTimeout(() => {
         contract.off('OrderUpdateRequested');
-        clearTimeout(this.updateTimeoutId as NodeJS.Timeout);
-        return;
-      }
+        onFailureCallback();
+        reject();
+        return { error: true, msg: 'Order updation Failed' };
+      }, timeoutTime);
+
+      contract.on('OrderUpdateRequested', (orderId, senderAddress) => {
+        if (senderAddress.toString().toLowerCase() === accounts[0].toString().toLowerCase()) {
+          onSuccessCallback(orderId);
+          this.websocketProvider?.destroy();
+          contract.off('OrderUpdateRequested');
+          clearTimeout(this.updateTimeoutId as NodeJS.Timeout);
+          resolve(orderId);
+          return;
+        }
+      });
     });
   }
 }
