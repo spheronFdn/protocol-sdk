@@ -35,6 +35,7 @@ export class OrderModule {
       const tx = await contract.createOrder(orderDetails);
       const receipt = await tx.wait();
       console.log('Order created successfully -> ', receipt);
+      return receipt;
     } catch (error) {
       console.error('Error creating order -> ', error);
       throw error;

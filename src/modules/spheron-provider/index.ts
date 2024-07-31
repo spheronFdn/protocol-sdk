@@ -1,80 +1,98 @@
 import { requestPipeline } from '@utils/index';
 
 export class SpheronProviderModule {
-  private providerUrl: string;
-  private certificate: string;
-  private leaseId: string;
-  private serviceName: string;
+  private providerHostUrl: string;
+  private proxyUrl: string;
 
-  constructor(
-    providerUrl: string,
-    certificate: string = '',
-    leaseId: string = '',
-    serviceName: string = ''
-  ) {
-    this.certificate = certificate;
-    this.providerUrl = providerUrl;
-    this.leaseId = leaseId;
-    this.serviceName = serviceName;
+  constructor(providerHostUrl: string, proxyUrl: string) {
+    this.providerHostUrl = providerHostUrl;
+    this.proxyUrl = proxyUrl;
   }
 
-  async version(providerUrl: string) {
-    const url = `${providerUrl}/version`;
-    const response = await requestPipeline({ url, method: 'GET' });
+  async closeDeployment(certificate: string) {
+    const url = `${this.proxyUrl}/deployment/close`;
+    const response = await requestPipeline({
+      url,
+      method: 'POST',
+      body: JSON.stringify({ providerHostUrl: this.providerHostUrl, certificate }),
+    });
     return response;
   }
 
-  async submitManfiest(providerUrl: string, certificate: string) {
+  async version() {
+    const url = `${this.proxyUrl}/version`;
+    const response = await requestPipeline({
+      url,
+      method: 'POST',
+      body: JSON.stringify({ providerHostUrl: this.providerHostUrl }),
+    });
+    return response;
+  }
+
+  async submitManfiest(certificate: string) {
     if (!certificate) {
       console.log('Certificate not found');
       return;
     }
 
-    const url = `${providerUrl}/deployment/manifest`;
+    const url = `${this.proxyUrl}/deployment/manifest`;
     const response = await requestPipeline({
       url,
-      method: 'PUT',
+      method: 'POST',
       body: JSON.stringify({
         certificate,
+        providerHostUrl: this.providerHostUrl,
       }),
     });
     return response;
   }
 
-  async getLeaseStatus(providerUrl: string, leaseId: string) {
+  async getLeaseStatus(leaseId: string) {
     if (!leaseId) {
       console.log('Lease ID not found');
       return;
     }
 
-    const url = `${providerUrl}/lease/${leaseId}/status`;
-    const response = await requestPipeline({ url, method: 'GET' });
+    const url = `${this.proxyUrl}/lease/${leaseId}/status`;
+    const response = await requestPipeline({
+      url,
+      method: 'POST',
+      body: JSON.stringify({ providerHostUrl: this.providerHostUrl }),
+    });
     return response;
   }
 
-  async getKubeEvents(providerUrl: string, leaseId: string) {
+  async getKubeEvents(leaseId: string) {
     if (!leaseId) {
       console.log('Lease ID not found');
       return;
     }
 
-    const url = `${providerUrl}/lease/${leaseId}/kubeevents`;
-    const response = await requestPipeline({ url, method: 'GET' });
+    const url = `${this.proxyUrl}/lease/${leaseId}/kubeevents`;
+    const response = await requestPipeline({
+      url,
+      method: 'POST',
+      body: JSON.stringify({ providerHostUrl: this.providerHostUrl }),
+    });
     return response;
   }
 
-  async getLeaseLogs(providerUrl: string, leaseId: string) {
+  async getLeaseLogs(leaseId: string) {
     if (!leaseId) {
       console.log('Lease ID not found');
       return;
     }
 
-    const url = `${providerUrl}/lease/${leaseId}/logs`;
-    const response = await requestPipeline({ url, method: 'GET' });
+    const url = `${this.proxyUrl}/lease/${leaseId}/logs`;
+    const response = await requestPipeline({
+      url,
+      method: 'POST',
+      body: JSON.stringify({ providerHostUrl: this.providerHostUrl }),
+    });
     return response;
   }
 
-  async getLeaseServiceStatus(providerUrl: string, leaseId: string, serviceName: string) {
+  async getLeaseServiceStatus(leaseId: string, serviceName: string) {
     if (!leaseId) {
       console.log('Lease ID not found');
       return;
@@ -84,19 +102,27 @@ export class SpheronProviderModule {
       console.log('Service name not found');
       return;
     }
-    const url = `${providerUrl}/lease/${leaseId}/service/${serviceName}/status`;
-    const response = await requestPipeline({ url, method: 'GET' });
+    const url = `${this.proxyUrl}/lease/${leaseId}/service/${serviceName}/status`;
+    const response = await requestPipeline({
+      url,
+      method: 'POST',
+      body: JSON.stringify({ providerHostUrl: this.providerHostUrl }),
+    });
     return response;
   }
 
-  async leaseShell(providerUrl: string, leaseId: string) {
+  async leaseShell(leaseId: string, certificate: string) {
     if (!leaseId) {
       console.log('Lease ID not found');
       return;
     }
 
-    const url = `${providerUrl}/lease/${leaseId}/shell`;
-    const response = await requestPipeline({ url, method: 'POST' });
+    const url = `${this.proxyUrl}/lease/${leaseId}/shell`;
+    const response = await requestPipeline({
+      url,
+      method: 'POST',
+      body: JSON.stringify({ providerHostUrl: this.providerHostUrl, certificate }),
+    });
     return response;
   }
 }

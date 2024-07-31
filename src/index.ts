@@ -11,13 +11,13 @@ export class SpheronSDK {
   public escrow: EscrowModule;
   public spheronProvider: SpheronProviderModule;
 
-  constructor(providerUrl: string = '') {
+  constructor(providerUrl: string = '', proxyUrl: string = '') {
     const provider = new ethers.JsonRpcProvider(SPHERON_TESTNET_RPC_URL);
     const websocketProvider = new ethers.WebSocketProvider(SPHERON_TESTNET_WSS_URL);
     this.leases = new LeaseModule(provider);
     this.orders = new OrderModule(provider, websocketProvider);
     this.escrow = new EscrowModule(provider);
-    this.spheronProvider = new SpheronProviderModule(providerUrl);
+    this.spheronProvider = new SpheronProviderModule(providerUrl, proxyUrl);
   }
 }
 
