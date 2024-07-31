@@ -7,9 +7,15 @@ import { getOrderStateAsString } from '@utils/order';
 
 export class OrderModule {
   private provider: ethers.Provider;
+  private websocketProvider?: ethers.WebSocketProvider;
+  private createTimeoutId: NodeJS.Timeout | null;
+  private updateTimeoutId: NodeJS.Timeout | null;
 
-  constructor(provider: ethers.Provider) {
+  constructor(provider: ethers.Provider, websocketProvider?: ethers.WebSocketProvider) {
     this.provider = provider;
+    this.websocketProvider = websocketProvider;
+    this.createTimeoutId = null;
+    this.updateTimeoutId = null;
   }
 
   async createOrder(orderDetails: OrderDetails) {
@@ -29,6 +35,7 @@ export class OrderModule {
       const tx = await contract.createOrder(orderDetails);
       const receipt = await tx.wait();
       console.log('Order created successfully -> ', receipt);
+      return receipt;
     } catch (error) {
       console.error('Error creating order -> ', error);
       throw error;
@@ -70,5 +77,74 @@ export class OrderModule {
       state: getOrderStateAsString(response[10]),
       specs,
     } as InitialOrder;
+  }
+
+  async listenToOrderCreated(
+    timeoutTime: number = 60000,
+    onSuccessCallback: (newOrderId: string) => void,
+    onFailureCallback: () => void
+  ) {
+    if (!this.websocketProvider) {
+      console.log('Please pass websocket provider in constructor');
+      return;
+    }
+    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+    const contractAbi = OrderRequestAbi;
+    const contractAddress = OrderRequest;
+
+    const contract = new ethers.Contract(contractAddress, contractAbi, this.websocketProvider);
+
+    return new Promise((resolve, reject) => {
+      this.createTimeoutId = setTimeout(() => {
+        contract.off('OrderCreated');
+        onFailureCallback();
+        reject({ error: true, msg: 'Order creation Failed' });
+      }, timeoutTime);
+
+      contract.on('OrderCreated', (orderId: string, senderAddress: string) => {
+        if (senderAddress.toString().toLowerCase() === accounts[0].toString().toLowerCase()) {
+          onSuccessCallback(orderId);
+          this.websocketProvider?.destroy();
+          contract.off('OrderCreated');
+          clearTimeout(this.createTimeoutId as NodeJS.Timeout);
+          resolve(orderId);
+        }
+      });
+    });
+  }
+
+  async listenToOrderUpdated(
+    timeoutTime: number = 60000,
+    onSuccessCallback: (orderId: string) => void,
+    onFailureCallback: () => void
+  ) {
+    if (typeof window?.ethereum === 'undefined') {
+      console.log('Please install MetaMask');
+      return;
+    }
+
+    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+    const contractAbi = OrderRequestAbi;
+    const contractAddress = OrderRequest;
+
+    const contract = new ethers.Contract(contractAddress, contractAbi, this.websocketProvider);
+
+    return new Promise((resolve, reject) => {
+      this.updateTimeoutId = setTimeout(() => {
+        contract.off('OrderUpdateRequested');
+        onFailureCallback();
+        reject({ error: true, msg: 'Order updation Failed' });
+      }, timeoutTime);
+
+      contract.on('OrderUpdateRequested', (orderId, senderAddress) => {
+        if (senderAddress.toString().toLowerCase() === accounts[0].toString().toLowerCase()) {
+          onSuccessCallback(orderId);
+          this.websocketProvider?.destroy();
+          contract.off('OrderUpdateRequested');
+          clearTimeout(this.updateTimeoutId as NodeJS.Timeout);
+          resolve(orderId);
+        }
+      });
+    });
   }
 }

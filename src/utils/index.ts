@@ -33,3 +33,21 @@ export const mapTokenToId = (token: string) => {
   tokens.set('WXDAI', 9021);
   return tokens.get(token);
 };
+
+export type RequestMethods = 'GET' | 'PUT' | 'PATCH' | 'POST' | 'DELETE';
+
+export const requestPipeline = async ({
+  url,
+  method,
+  body = undefined,
+}: {
+  url: string;
+  method: RequestMethods;
+  body?: string;
+}) => {
+  const res = await fetch(`${url}`, {
+    method,
+    body,
+  });
+  return res.json();
+};
