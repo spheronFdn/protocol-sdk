@@ -98,8 +98,7 @@ export class OrderModule {
       this.createTimeoutId = setTimeout(() => {
         contract.off('OrderCreated');
         onFailureCallback();
-        reject();
-        return { error: true, msg: 'Order creation Failed' };
+        reject({ error: true, msg: 'Order creation Failed' });
       }, timeoutTime);
 
       contract.on('OrderCreated', (orderId: string, senderAddress: string) => {
@@ -109,7 +108,6 @@ export class OrderModule {
           contract.off('OrderCreated');
           clearTimeout(this.createTimeoutId as NodeJS.Timeout);
           resolve(orderId);
-          return;
         }
       });
     });
@@ -135,8 +133,7 @@ export class OrderModule {
       this.updateTimeoutId = setTimeout(() => {
         contract.off('OrderUpdateRequested');
         onFailureCallback();
-        reject();
-        return { error: true, msg: 'Order updation Failed' };
+        reject({ error: true, msg: 'Order updation Failed' });
       }, timeoutTime);
 
       contract.on('OrderUpdateRequested', (orderId, senderAddress) => {
@@ -146,7 +143,6 @@ export class OrderModule {
           contract.off('OrderUpdateRequested');
           clearTimeout(this.updateTimeoutId as NodeJS.Timeout);
           resolve(orderId);
-          return;
         }
       });
     });
