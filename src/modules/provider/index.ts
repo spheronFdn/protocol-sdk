@@ -11,6 +11,10 @@ export class ProviderModule {
   }
 
   async getProviderDetails(providerAddress: string) {
+    if (!providerAddress) {
+      console.log('Pass Provider Address');
+      return;
+    }
     const contractAbi = ProviderRegistryAbi;
     const contractAddress = ProviderRegistry;
 
@@ -33,6 +37,11 @@ export class ProviderModule {
   }
 
   async getProviderPendingAttributes(providerAddress: string, category: Category) {
+    if (!providerAddress) {
+      console.log('Pass Provider Address');
+      return;
+    }
+
     if (!category) {
       console.log('Please pass a category');
       return;
@@ -47,6 +56,11 @@ export class ProviderModule {
   }
 
   async getProviderAttributes(providerAddress: string, category: Category) {
+    if (!providerAddress) {
+      console.log('Pass Provider Address');
+      return;
+    }
+
     if (!category) {
       console.log('Please pass a category');
       return;
