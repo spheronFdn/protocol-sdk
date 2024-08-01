@@ -43,7 +43,7 @@ export class ProviderModule {
       return providerDetailsData;
     } catch (error) {
       console.log('Error in get Provider Details ->', error);
-      return;
+      return error;
     }
   }
 
@@ -72,7 +72,7 @@ export class ProviderModule {
       return response;
     } catch (error) {
       console.log('Error in get Provider Pending Attrs ->', error);
-      return;
+      return error;
     }
   }
 
@@ -101,7 +101,7 @@ export class ProviderModule {
       return response;
     } catch (error) {
       console.log('Error in get Provider Attrs ->', error);
-      return;
+      return error;
     }
   }
 }
