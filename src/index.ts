@@ -16,7 +16,7 @@ export class SpheronSDK {
   constructor(providerUrl: string = '', proxyUrl: string = '') {
     const provider = new ethers.JsonRpcProvider(SPHERON_TESTNET_RPC_URL);
     const websocketProvider = new ethers.WebSocketProvider(SPHERON_TESTNET_WSS_URL);
-    this.leases = new LeaseModule(provider);
+    this.leases = new LeaseModule(provider, websocketProvider);
     this.orders = new OrderModule(provider, websocketProvider);
     this.escrow = new EscrowModule(provider);
     this.provider = new ProviderModule(provider);
