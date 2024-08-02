@@ -10,11 +10,15 @@ import { DEFAULT_PAGE_SIZE } from '@config/index';
 export class LeaseModule {
   private provider: ethers.Provider;
   private orderModule: OrderModule;
+  private websocketProvider?: ethers.Provider;
+  private leaseCloseTimeoutId: NodeJS.Timeout | null;
 
-  constructor(provider: ethers.Provider) {
+  constructor(provider: ethers.Provider, websocketProvider?: ethers.Provider) {
     this.provider = provider;
+    this.websocketProvider = websocketProvider;
     this.getLeaseDetails = this.getLeaseDetails.bind(this);
     this.orderModule = new OrderModule(provider);
+    this.leaseCloseTimeoutId = null;
   }
 
   async getLeaseDetails(leaseId: string) {
@@ -126,5 +130,67 @@ export class LeaseModule {
       leases: leaseWithToken,
       totalCount,
     };
+  }
+
+  async closeLease(leaseId: string) {
+    const contractAbi = ComputeLeaseAbi;
+    const contractAddress = ComputeLease;
+    try {
+      const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
+      const tx = await contract.closeLease(leaseId);
+      const receipt = await tx.wait();
+      return receipt;
+    } catch (error) {
+      console.log('Error in close lease ->', error);
+      throw error;
+    }
+  }
+
+  async listenToLeaseClosedEvent(
+    onSuccessCallback: ({
+      orderId,
+      providerAddress,
+      tenantAddress,
+    }: {
+      orderId: string;
+      providerAddress: string;
+      tenantAddress: string;
+    }) => void,
+    onFailureCallback: () => void,
+    timeout: number = 60000
+  ) {
+    if (!this.websocketProvider) {
+      console.log('Please pass websocket provider in constructor');
+      return;
+    }
+    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+    const contractAbi = ComputeLeaseAbi;
+    const contractAddress = ComputeLease;
+
+    const contract = new ethers.Contract(contractAddress, contractAbi, this.websocketProvider);
+
+    return new Promise((resolve, reject) => {
+      this.leaseCloseTimeoutId = setTimeout(() => {
+        contract.off('LeaseClosed');
+        onFailureCallback();
+        reject({ error: true, msg: 'Order Updation Failed' });
+      }, timeout);
+
+      contract.on(
+        'LeaseClosed',
+        (orderId: string, providerAddress: string, tenantAddress: string) => {
+          if (
+            providerAddress.toString().toLowerCase() === accounts[0].toString().toLowerCase() ||
+            tenantAddress.toString().toLowerCase() === accounts[0].toString().toLowerCase()
+          ) {
+            onSuccessCallback({ orderId, providerAddress, tenantAddress });
+            this.websocketProvider?.destroy();
+            contract.off('LeaseClosed');
+            clearTimeout(this.leaseCloseTimeoutId as NodeJS.Timeout);
+            resolve({ orderId, providerAddress, tenantAddress });
+          }
+        }
+      );
+    });
   }
 }
