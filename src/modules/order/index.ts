@@ -141,7 +141,7 @@ export class OrderModule {
 
   async listenToOrderUpdated(
     timeoutTime = 60000,
-    onSuccessCallback: (orderId: string) => void,
+    onSuccessCallback: (orderId: string, providerAddress: string) => void,
     onFailureCallback: () => void
   ) {
     if (typeof window?.ethereum === 'undefined') {
@@ -164,9 +164,44 @@ export class OrderModule {
 
       contract.on('leaseUpdated', (orderId, providerAddress, tenantAddress) => {
         if (tenantAddress.toString().toLowerCase() === accounts[0].toString().toLowerCase()) {
-          onSuccessCallback(orderId);
+          onSuccessCallback(orderId, providerAddress);
           this.websocketProvider?.destroy();
           contract.off('leaseUpdated');
+          clearTimeout(this.updateTimeoutId as NodeJS.Timeout);
+          resolve(orderId);
+        }
+      });
+    });
+  }
+
+  async listenToOrderUpdateAccepted(
+    timeoutTime = 60000,
+    onSuccessCallback: (orderId: string, providerAddress: string) => void,
+    onFailureCallback: () => void
+  ) {
+    if (typeof window?.ethereum === 'undefined') {
+      console.log('Please install MetaMask');
+      return;
+    }
+
+    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+    const contractAbi = OrderRequestAbi;
+    const contractAddress = OrderRequest;
+
+    const contract = new ethers.Contract(contractAddress, contractAbi, this.websocketProvider);
+
+    return new Promise((resolve, reject) => {
+      this.updateTimeoutId = setTimeout(() => {
+        contract.off('UpdateRequestAccepted');
+        onFailureCallback();
+        reject({ error: true, msg: 'Order updation Failed' });
+      }, timeoutTime);
+
+      contract.on('UpdateRequestAccepted', (orderId, providerAddress, tenantAddress) => {
+        if (tenantAddress.toString().toLowerCase() === accounts[0].toString().toLowerCase()) {
+          onSuccessCallback(orderId, providerAddress);
+          this.websocketProvider?.destroy();
+          contract.off('UpdateRequestAccepted');
           clearTimeout(this.updateTimeoutId as NodeJS.Timeout);
           resolve(orderId);
         }
