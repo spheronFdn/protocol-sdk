@@ -42,6 +42,32 @@ export class OrderModule {
     }
   }
 
+  async updateOrder(orderId: string, orderDetails: OrderDetails) {
+    if (typeof window?.ethereum === 'undefined') {
+      console.log('Please install metamask');
+      return;
+    }
+
+    try {
+      await window.ethereum.request({ method: 'eth_requestAccounts' });
+
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      const signer = await provider.getSigner();
+
+      const contract = new ethers.Contract(OrderRequest, OrderRequestAbi, signer);
+
+      const tx = await contract.updateInitialOrder(orderId, orderDetails);
+
+      const receipt = await tx.wait();
+
+      console.log('Order Update Request Sent');
+      return receipt;
+    } catch (error) {
+      console.error('Error in updating order -> ', error);
+      throw error;
+    }
+  }
+
   async getOrderDetails(leaseId: string) {
     const contractAbi = OrderRequestAbi;
     const contractAddress = OrderRequest;
@@ -80,7 +106,7 @@ export class OrderModule {
   }
 
   async listenToOrderCreated(
-    timeoutTime: number = 60000,
+    timeoutTime = 60000,
     onSuccessCallback: (newOrderId: string) => void,
     onFailureCallback: () => void
   ) {
@@ -114,7 +140,7 @@ export class OrderModule {
   }
 
   async listenToOrderUpdated(
-    timeoutTime: number = 60000,
+    timeoutTime = 60000,
     onSuccessCallback: (orderId: string) => void,
     onFailureCallback: () => void
   ) {
@@ -131,16 +157,16 @@ export class OrderModule {
 
     return new Promise((resolve, reject) => {
       this.updateTimeoutId = setTimeout(() => {
-        contract.off('OrderUpdateRequested');
+        contract.off('leaseUpdated');
         onFailureCallback();
         reject({ error: true, msg: 'Order updation Failed' });
       }, timeoutTime);
 
-      contract.on('OrderUpdateRequested', (orderId, senderAddress) => {
-        if (senderAddress.toString().toLowerCase() === accounts[0].toString().toLowerCase()) {
+      contract.on('leaseUpdated', (orderId, providerAddress, tenantAddress) => {
+        if (tenantAddress.toString().toLowerCase() === accounts[0].toString().toLowerCase()) {
           onSuccessCallback(orderId);
           this.websocketProvider?.destroy();
-          contract.off('OrderUpdateRequested');
+          contract.off('leaseUpdated');
           clearTimeout(this.updateTimeoutId as NodeJS.Timeout);
           resolve(orderId);
         }
