@@ -1,3 +1,4 @@
+import { GSEQ, OSEQ } from '@config/index';
 import { LeaseModule } from '@modules/lease';
 import { requestPipeline } from '@utils/index';
 import { ethers } from 'ethers';
@@ -20,8 +21,8 @@ export class SpheronProviderModule {
         body: JSON.stringify({
           certificate,
           authToken,
-          url: `${this.providerHostUrl}/deployment/close`,
-          method: 'POST',
+          url: `${this.providerHostUrl}/spheron/deployment/close`,
+          method: 'PUT',
         }),
       });
       return response;
@@ -48,7 +49,7 @@ export class SpheronProviderModule {
     }
   }
 
-  async submitManfiest(certificate: string, authToken: string, sdlManifest: any) {
+  async submitManfiest(leaseId: string, certificate: string, authToken: string, sdlManifest: any) {
     if (!certificate) {
       console.log('Certificate not found');
       return;
@@ -60,7 +61,7 @@ export class SpheronProviderModule {
         certificate,
         authToken,
         method: 'PUT',
-        url: `${this.providerHostUrl}/deployment/manifest`,
+        url: `${this.providerHostUrl}/deployment/${leaseId}/manifest`,
         body: JSON.stringify(sdlManifest),
       };
       const response = await requestPipeline({
@@ -85,7 +86,7 @@ export class SpheronProviderModule {
       certificate,
       authToken,
       method: 'GET',
-      url: `${this.providerHostUrl}/lease/${leaseId}/status`,
+      url: `${this.providerHostUrl}/lease/${leaseId}/${GSEQ}/${OSEQ}/status`,
     };
 
     const url = `${this.proxyUrl}`;
@@ -109,7 +110,7 @@ export class SpheronProviderModule {
     }
 
     const reqBody = {
-      url: `${this.providerHostUrl}/lease/${leaseId}/kubeevents`,
+      url: `${this.providerHostUrl}/lease/${leaseId}/${GSEQ}/${OSEQ}/kubeevents`,
       method: 'GET',
       authToken,
       certificate,
@@ -136,7 +137,7 @@ export class SpheronProviderModule {
     }
 
     const reqBody = {
-      url: `${this.providerHostUrl}/lease/${leaseId}/logs`,
+      url: `${this.providerHostUrl}/lease/${leaseId}/${GSEQ}/${OSEQ}/logs`,
       method: 'GET',
       authToken,
       certificate,
@@ -173,7 +174,7 @@ export class SpheronProviderModule {
     }
 
     const reqBody = {
-      url: `${this.providerHostUrl}/lease/${leaseId}/service/${serviceName}/status`,
+      url: `${this.providerHostUrl}/lease/${leaseId}/${GSEQ}/${OSEQ}/service/${serviceName}/status`,
       method: 'GET',
       authToken,
       certificate,
@@ -200,7 +201,7 @@ export class SpheronProviderModule {
     }
 
     const reqBody = {
-      url: `${this.providerHostUrl}/lease/${leaseId}/shell`,
+      url: `${this.providerHostUrl}/lease/${leaseId}/${GSEQ}/${OSEQ}/shell`,
       method: 'POST',
       certificate,
       authToken,

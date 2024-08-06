@@ -96,3 +96,7 @@ export const tokenMap: Record<NetworkType, IToken[]> = {
 export const networkType = (process.env.NEXT_PUBLIC_NETWORK_TYPE as string) || 'testnet';
 
 export const DEFAULT_PAGE_SIZE = 10;
+
+export const GSEQ = '1';
+
+export const OSEQ = '1';
