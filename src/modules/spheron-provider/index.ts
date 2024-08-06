@@ -49,7 +49,8 @@ export class SpheronProviderModule {
     }
   }
 
-  async submitManfiest(leaseId: string, certificate: string, authToken: string, sdlManifest: any) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  async submitManfiest(certificate: string, authToken: string, leaseId: string, sdlManifest: any) {
     if (!certificate) {
       console.log('Certificate not found');
       return;
@@ -222,10 +223,10 @@ export class SpheronProviderModule {
   }
 
   async closeDeploymentAndLease(
-    provider: ethers.Provider,
-    leaseId: string,
     certificate: string,
-    authToken: string
+    authToken: string,
+    provider: ethers.Provider,
+    leaseId: string
   ) {
     try {
       const lease = new LeaseModule(provider);
