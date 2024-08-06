@@ -102,7 +102,7 @@ export class SpheronProviderModule {
     }
   }
 
-  async getKubeEvents(leaseId: string, authToken: string) {
+  async getKubeEvents(certificate: string, authToken: string, leaseId: string) {
     if (!leaseId) {
       console.log('Lease ID not found');
       return;
@@ -112,6 +112,7 @@ export class SpheronProviderModule {
       url: `${this.providerHostUrl}/lease/${leaseId}/kubeevents`,
       method: 'GET',
       authToken,
+      certificate,
     };
 
     const url = `${this.proxyUrl}`;
@@ -128,7 +129,7 @@ export class SpheronProviderModule {
     }
   }
 
-  async getLeaseLogs(leaseId: string, authToken: string) {
+  async getLeaseLogs(certificate: string, authToken: string, leaseId: string) {
     if (!leaseId) {
       console.log('Lease ID not found');
       return;
@@ -138,6 +139,7 @@ export class SpheronProviderModule {
       url: `${this.providerHostUrl}/lease/${leaseId}/logs`,
       method: 'GET',
       authToken,
+      certificate,
     };
 
     const url = `${this.proxyUrl}`;
@@ -154,7 +156,12 @@ export class SpheronProviderModule {
     }
   }
 
-  async getLeaseServiceStatus(leaseId: string, serviceName: string, authToken: string) {
+  async getLeaseServiceStatus(
+    certificate: string,
+    authToken: string,
+    leaseId: string,
+    serviceName: string
+  ) {
     if (!leaseId) {
       console.log('Lease ID not found');
       return;
@@ -169,6 +176,7 @@ export class SpheronProviderModule {
       url: `${this.providerHostUrl}/lease/${leaseId}/service/${serviceName}/status`,
       method: 'GET',
       authToken,
+      certificate,
     };
 
     const url = `${this.proxyUrl}`;
@@ -185,7 +193,7 @@ export class SpheronProviderModule {
     }
   }
 
-  async leaseShell(leaseId: string, certificate: string, authToken: string) {
+  async leaseShell(certificate: string, authToken: string, leaseId: string) {
     if (!leaseId) {
       console.log('Lease ID not found');
       return;
