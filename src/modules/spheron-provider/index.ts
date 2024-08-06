@@ -102,18 +102,24 @@ export class SpheronProviderModule {
     }
   }
 
-  async getKubeEvents(leaseId: string) {
+  async getKubeEvents(leaseId: string, authToken: string) {
     if (!leaseId) {
       console.log('Lease ID not found');
       return;
     }
 
-    const url = `${this.proxyUrl}/lease/${leaseId}/kubeevents`;
+    const reqBody = {
+      url: `${this.providerHostUrl}/lease/${leaseId}/kubeevents`,
+      method: 'GET',
+      authToken,
+    };
+
+    const url = `${this.proxyUrl}`;
     try {
       const response = await requestPipeline({
-        url,
         method: 'POST',
-        body: JSON.stringify({ providerHostUrl: this.providerHostUrl }),
+        body: JSON.stringify(reqBody),
+        url,
       });
       return response;
     } catch (error) {
@@ -122,18 +128,24 @@ export class SpheronProviderModule {
     }
   }
 
-  async getLeaseLogs(leaseId: string) {
+  async getLeaseLogs(leaseId: string, authToken: string) {
     if (!leaseId) {
       console.log('Lease ID not found');
       return;
     }
 
-    const url = `${this.proxyUrl}/lease/${leaseId}/logs`;
+    const reqBody = {
+      url: `${this.providerHostUrl}/lease/${leaseId}/logs`,
+      method: 'GET',
+      authToken,
+    };
+
+    const url = `${this.proxyUrl}`;
     try {
       const response = await requestPipeline({
         url,
         method: 'POST',
-        body: JSON.stringify({ providerHostUrl: this.providerHostUrl }),
+        body: JSON.stringify(reqBody),
       });
       return response;
     } catch (error) {
@@ -142,7 +154,7 @@ export class SpheronProviderModule {
     }
   }
 
-  async getLeaseServiceStatus(leaseId: string, serviceName: string) {
+  async getLeaseServiceStatus(leaseId: string, serviceName: string, authToken: string) {
     if (!leaseId) {
       console.log('Lease ID not found');
       return;
@@ -152,12 +164,19 @@ export class SpheronProviderModule {
       console.log('Service name not found');
       return;
     }
-    const url = `${this.proxyUrl}/lease/${leaseId}/service/${serviceName}/status`;
+
+    const reqBody = {
+      url: `${this.providerHostUrl}/lease/${leaseId}/service/${serviceName}/status`,
+      method: 'GET',
+      authToken,
+    };
+
+    const url = `${this.proxyUrl}`;
     try {
       const response = await requestPipeline({
         url,
         method: 'POST',
-        body: JSON.stringify({ providerHostUrl: this.providerHostUrl }),
+        body: JSON.stringify(reqBody),
       });
       return response;
     } catch (error) {
@@ -166,18 +185,25 @@ export class SpheronProviderModule {
     }
   }
 
-  async leaseShell(leaseId: string, certificate: string) {
+  async leaseShell(leaseId: string, certificate: string, authToken: string) {
     if (!leaseId) {
       console.log('Lease ID not found');
       return;
     }
 
-    const url = `${this.proxyUrl}/lease/${leaseId}/shell`;
+    const reqBody = {
+      url: `${this.providerHostUrl}/lease/${leaseId}/shell`,
+      method: 'POST',
+      certificate,
+      authToken,
+    };
+
+    const url = `${this.proxyUrl}`;
     try {
       const response = await requestPipeline({
         url,
         method: 'POST',
-        body: JSON.stringify({ providerHostUrl: this.providerHostUrl, certificate }),
+        body: JSON.stringify(reqBody),
       });
       return response;
     } catch (error) {
