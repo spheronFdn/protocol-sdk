@@ -11,13 +11,18 @@ export class SpheronProviderModule {
     this.proxyUrl = proxyUrl;
   }
 
-  async closeDeployment(certificate: string) {
-    const url = `${this.proxyUrl}/deployment/close`;
+  async closeDeployment(certificate: string, authToken: string) {
+    const url = `${this.proxyUrl}`;
     try {
       const response = await requestPipeline({
         url,
         method: 'POST',
-        body: JSON.stringify({ providerHostUrl: this.providerHostUrl, certificate }),
+        body: JSON.stringify({
+          certificate,
+          authToken,
+          url: `${this.providerHostUrl}/deployment/close`,
+          method: 'POST',
+        }),
       });
       return response;
     } catch (error) {
@@ -27,12 +32,14 @@ export class SpheronProviderModule {
   }
 
   async version() {
-    const url = `${this.proxyUrl}/version`;
+    const url = `${this.proxyUrl}`;
     try {
       const response = await requestPipeline({
         url,
         method: 'POST',
-        body: JSON.stringify({ providerHostUrl: this.providerHostUrl }),
+        body: JSON.stringify({
+          url: `${this.providerHostUrl}/version`,
+        }),
       });
       return response;
     } catch (error) {
@@ -41,22 +48,25 @@ export class SpheronProviderModule {
     }
   }
 
-  async submitManfiest(certificate: string, sdlManifest: any) {
+  async submitManfiest(certificate: string, authToken: string, sdlManifest: any) {
     if (!certificate) {
       console.log('Certificate not found');
       return;
     }
 
-    const url = `${this.proxyUrl}/deployment/manifest`;
+    const url = `${this.proxyUrl}`;
     try {
+      const reqBody = {
+        certificate,
+        authToken,
+        method: 'PUT',
+        url: `${this.providerHostUrl}/deployment/manifest`,
+        body: JSON.stringify(sdlManifest),
+      };
       const response = await requestPipeline({
         url,
         method: 'POST',
-        body: JSON.stringify({
-          certificate,
-          sdlManifest,
-          providerHostUrl: this.providerHostUrl,
-        }),
+        body: JSON.stringify(reqBody),
       });
       return response;
     } catch (error) {
@@ -65,18 +75,25 @@ export class SpheronProviderModule {
     }
   }
 
-  async getLeaseStatus(leaseId: string) {
+  async getLeaseStatus(certificate: string, authToken: string, leaseId: string) {
     if (!leaseId) {
       console.log('Lease ID not found');
       return;
     }
 
-    const url = `${this.proxyUrl}/lease/${leaseId}/status`;
+    const reqBody = {
+      certificate,
+      authToken,
+      method: 'GET',
+      url: `${this.providerHostUrl}/lease/${leaseId}/status`,
+    };
+
+    const url = `${this.proxyUrl}`;
     try {
       const response = await requestPipeline({
         url,
         method: 'POST',
-        body: JSON.stringify({ providerHostUrl: this.providerHostUrl }),
+        body: JSON.stringify(reqBody),
       });
       return response;
     } catch (error) {
@@ -169,11 +186,16 @@ export class SpheronProviderModule {
     }
   }
 
-  async closeDeploymentAndLease(provider: ethers.Provider, leaseId: string, certificate: string) {
+  async closeDeploymentAndLease(
+    provider: ethers.Provider,
+    leaseId: string,
+    certificate: string,
+    authToken: string
+  ) {
     try {
       const lease = new LeaseModule(provider);
       const leaseResponse = await lease.closeLease(leaseId);
-      const closeDeployment = await this.closeDeployment(certificate);
+      const closeDeployment = await this.closeDeployment(certificate, authToken);
       return { lease: leaseResponse, closeDeployment };
     } catch (error) {
       console.log('Error in close deployment and Lease ->', error);
