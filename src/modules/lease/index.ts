@@ -103,8 +103,6 @@ export class LeaseModule {
 
     leaseIds.sort((a, b) => Number(b) - Number(a));
 
-    console.log({ leaseIds });
-
     if (options?.page) {
       const pageSize = options.pageSize || DEFAULT_PAGE_SIZE;
       leaseIds = leaseIds.slice((options.page - 1) * pageSize, options.page * pageSize);
