@@ -45,7 +45,10 @@ export const requestPipeline = async ({
   method: RequestMethods;
   body?: string;
 }) => {
+  const headers = new Headers();
+  headers.append('Content-Type', 'application/json');
   const res = await fetch(`${url}`, {
+    headers,
     method,
     body,
   });
