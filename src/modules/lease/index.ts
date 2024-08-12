@@ -85,6 +85,8 @@ export class LeaseModule {
     let filteredLeases: Lease[] = [];
     let leaseIds = allLeaseIds;
     let totalCount = allLeaseIds.length;
+    const terminatedCount = terminatedLeaseIds.length;
+    const activeCount = activeLeaseIds.length;
 
     if (options?.state) {
       switch (options.state) {
@@ -98,6 +100,10 @@ export class LeaseModule {
           break;
       }
     }
+
+    leaseIds.sort((a, b) => Number(b) - Number(a));
+
+    console.log({ leaseIds });
 
     if (options?.page) {
       const pageSize = options.pageSize || DEFAULT_PAGE_SIZE;
@@ -128,6 +134,8 @@ export class LeaseModule {
 
     return {
       leases: leaseWithToken,
+      activeCount,
+      terminatedCount,
       totalCount,
     };
   }
