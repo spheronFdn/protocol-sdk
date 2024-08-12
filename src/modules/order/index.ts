@@ -1,5 +1,7 @@
 import { OrderRequest } from '@contracts/addresses';
+import { Bid } from '@contracts/addresses';
 import OrderRequestAbi from '@contracts/abis/OrderRequest.json';
+import BidAbi from '@contracts/abis/Bid.json';
 import { ethers } from 'ethers';
 import { InitialOrder, OrderDetails, Tier } from './types';
 import { getTokenDetails } from '@utils/index';
@@ -121,8 +123,8 @@ export class OrderModule {
       return;
     }
     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-    const contractAbi = OrderRequestAbi;
-    const contractAddress = OrderRequest;
+    const contractAbi = BidAbi;
+    const contractAddress = Bid;
 
     const contract = new ethers.Contract(contractAddress, contractAbi, this.websocketProvider);
 
