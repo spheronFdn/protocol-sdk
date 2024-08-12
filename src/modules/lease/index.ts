@@ -84,7 +84,7 @@ export class LeaseModule {
 
     let filteredLeases: Lease[] = [];
     let leaseIds = allLeaseIds;
-    let totalCount = allLeaseIds.length;
+    const totalCount = allLeaseIds.length;
     const terminatedCount = terminatedLeaseIds.length;
     const activeCount = activeLeaseIds.length;
 
@@ -92,11 +92,9 @@ export class LeaseModule {
       switch (options.state) {
         case LeaseState.ACTIVE:
           leaseIds = activeLeaseIds;
-          totalCount = activeLeaseIds.length;
           break;
         case LeaseState.TERMINATED:
           leaseIds = terminatedLeaseIds;
-          totalCount = terminatedLeaseIds.length;
           break;
       }
     }
