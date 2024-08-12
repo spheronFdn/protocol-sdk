@@ -108,8 +108,8 @@ export class SpheronProviderModule {
     certificate: string,
     authToken: string,
     leaseId: string,
-    service: string,
-    tail: number
+    service = '',
+    tail = 100000
   ) {
     if (!leaseId) {
       console.log('Lease ID not found');
@@ -117,7 +117,8 @@ export class SpheronProviderModule {
     }
 
     const reqBody = {
-      url: `${this.providerHostUrl}/lease/${leaseId}/${GSEQ}/${OSEQ}/kubeevents?follow=false&tail=${tail}&service=${service}`,
+      // eslint-disable-next-line prettier/prettier
+      url: `${this.providerHostUrl}/lease/${leaseId}/${GSEQ}/${OSEQ}/kubeevents?follow=false&tail=${tail}${service ? `&service=${service}` : ''}`,
       method: 'GET',
       authToken,
       certificate,
@@ -141,8 +142,8 @@ export class SpheronProviderModule {
     certificate: string,
     authToken: string,
     leaseId: string,
-    service: string,
-    tail: number
+    service = '',
+    tail = 100000
   ) {
     if (!leaseId) {
       console.log('Lease ID not found');
@@ -150,7 +151,8 @@ export class SpheronProviderModule {
     }
 
     const reqBody = {
-      url: `${this.providerHostUrl}/lease/${leaseId}/${GSEQ}/${OSEQ}/logs?follow=false&tail=${tail}&service=${service}`,
+      // eslint-disable-next-line prettier/prettier
+      url: `${this.providerHostUrl}/lease/${leaseId}/${GSEQ}/${OSEQ}/logs?follow=false&tail=${tail}${service ? `&service=${service}` : ''}`,
       method: 'GET',
       authToken,
       certificate,

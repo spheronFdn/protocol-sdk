@@ -161,7 +161,7 @@ export class LeaseModule {
       tenantAddress: string;
     }) => void,
     onFailureCallback: () => void,
-    timeout: number = 60000
+    timeout = 60000
   ) {
     if (!this.websocketProvider) {
       console.log('Please pass websocket provider in constructor');
