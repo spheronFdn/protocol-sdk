@@ -84,20 +84,22 @@ export class LeaseModule {
 
     let filteredLeases: Lease[] = [];
     let leaseIds = allLeaseIds;
-    let totalCount = allLeaseIds.length;
+    const totalCount = allLeaseIds.length;
+    const terminatedCount = terminatedLeaseIds.length;
+    const activeCount = activeLeaseIds.length;
 
     if (options?.state) {
       switch (options.state) {
         case LeaseState.ACTIVE:
           leaseIds = activeLeaseIds;
-          totalCount = activeLeaseIds.length;
           break;
         case LeaseState.TERMINATED:
           leaseIds = terminatedLeaseIds;
-          totalCount = terminatedLeaseIds.length;
           break;
       }
     }
+
+    leaseIds.sort((a, b) => Number(b) - Number(a));
 
     if (options?.page) {
       const pageSize = options.pageSize || DEFAULT_PAGE_SIZE;
@@ -128,6 +130,8 @@ export class LeaseModule {
 
     return {
       leases: leaseWithToken,
+      activeCount,
+      terminatedCount,
       totalCount,
     };
   }
