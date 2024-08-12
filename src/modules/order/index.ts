@@ -107,7 +107,13 @@ export class OrderModule {
 
   async listenToOrderCreated(
     timeoutTime = 60000,
-    onSuccessCallback: (newOrderId: string) => void,
+    onSuccessCallback: (
+      orderId: string,
+      providerAddress: string,
+      providerId: string | number | bigint,
+      acceptedPrice: string | number | bigint,
+      creatorAddress: string
+    ) => void,
     onFailureCallback: () => void
   ) {
     if (!this.websocketProvider) {
@@ -122,20 +128,29 @@ export class OrderModule {
 
     return new Promise((resolve, reject) => {
       this.createTimeoutId = setTimeout(() => {
-        contract.off('OrderCreated');
+        contract.off('OrderMatched');
         onFailureCallback();
         reject({ error: true, msg: 'Order creation Failed' });
       }, timeoutTime);
 
-      contract.on('OrderCreated', (orderId: string, senderAddress: string) => {
-        if (senderAddress.toString().toLowerCase() === accounts[0].toString().toLowerCase()) {
-          onSuccessCallback(orderId);
-          this.websocketProvider?.destroy();
-          contract.off('OrderCreated');
-          clearTimeout(this.createTimeoutId as NodeJS.Timeout);
-          resolve(orderId);
+      contract.on(
+        'OrderMatched',
+        (
+          orderId: string,
+          providerAddress: string,
+          providerId: string | number | bigint,
+          acceptedPrice: string | number | bigint,
+          creatorAddress: string
+        ) => {
+          if (creatorAddress.toString().toLowerCase() === accounts[0].toString().toLowerCase()) {
+            onSuccessCallback(orderId, providerAddress, providerId, acceptedPrice, creatorAddress);
+            this.websocketProvider?.destroy();
+            contract.off('OrderMatched');
+            clearTimeout(this.createTimeoutId as NodeJS.Timeout);
+            resolve({ orderId, providerAddress, providerId, acceptedPrice, creatorAddress });
+          }
         }
-      });
+      );
     });
   }
 

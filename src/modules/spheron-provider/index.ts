@@ -104,14 +104,20 @@ export class SpheronProviderModule {
     }
   }
 
-  async getKubeEvents(certificate: string, authToken: string, leaseId: string) {
+  async getKubeEvents(
+    certificate: string,
+    authToken: string,
+    leaseId: string,
+    service: string,
+    tail: number
+  ) {
     if (!leaseId) {
       console.log('Lease ID not found');
       return;
     }
 
     const reqBody = {
-      url: `${this.providerHostUrl}/lease/${leaseId}/${GSEQ}/${OSEQ}/kubeevents`,
+      url: `${this.providerHostUrl}/lease/${leaseId}/${GSEQ}/${OSEQ}/kubeevents?follow=false&tail=${tail}&service=${service}`,
       method: 'GET',
       authToken,
       certificate,
@@ -131,14 +137,20 @@ export class SpheronProviderModule {
     }
   }
 
-  async getLeaseLogs(certificate: string, authToken: string, leaseId: string) {
+  async getLeaseLogs(
+    certificate: string,
+    authToken: string,
+    leaseId: string,
+    service: string,
+    tail: number
+  ) {
     if (!leaseId) {
       console.log('Lease ID not found');
       return;
     }
 
     const reqBody = {
-      url: `${this.providerHostUrl}/lease/${leaseId}/${GSEQ}/${OSEQ}/logs`,
+      url: `${this.providerHostUrl}/lease/${leaseId}/${GSEQ}/${OSEQ}/logs?follow=false&tail=${tail}&service=${service}`,
       method: 'GET',
       authToken,
       certificate,
