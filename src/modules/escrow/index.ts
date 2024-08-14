@@ -1,4 +1,5 @@
 import EscrowAbi from '@contracts/abis/Escrow.json';
+import TokenAbi from '@contracts/abis/TestToken.json';
 import { Escrow } from '@contracts/addresses';
 import { ethers } from 'ethers';
 import { TransactionData } from './types';
@@ -78,10 +79,7 @@ export class EscrowModule {
       const finalAmount = (Number(amount.toString()) - 1) / 10 ** decimals;
       const withdrawAmount = ethers.parseUnits(finalAmount.toFixed(decimals), decimals);
 
-      const result = await contract.withdrawProviderEarnings(
-        tokenAddress,
-        withdrawAmount
-      );
+      const result = await contract.withdrawProviderEarnings(tokenAddress, withdrawAmount);
       const receipt = await result.wait();
       console.log('Withdraw earnings successfull -> ', receipt);
       if (onSuccessCallback) onSuccessCallback(receipt);
@@ -112,16 +110,18 @@ export class EscrowModule {
       const signer = await provider.getSigner();
       const contractABI = EscrowAbi;
       const contractAddress = Escrow;
+      const tokenABI = TokenAbi;
 
       const contract = new ethers.Contract(contractAddress, contractABI, signer);
+      const tokenContract = new ethers.Contract(tokenAddress, tokenABI, signer);
 
       const finalAmount = (Number(amount.toString()) - 1) / 10 ** decimals;
       const depositAmount = ethers.parseUnits(finalAmount.toFixed(decimals), decimals);
 
-      const result = await contract.deposit(
-        tokenAddress,
-        depositAmount
-      );
+      const approvalTxn = await tokenContract.approve(contractAddress, depositAmount);
+      await approvalTxn.wait();
+
+      const result = await contract.deposit(tokenAddress, depositAmount);
       const receipt = await result.wait();
       console.log('Deposit balance successfull -> ', receipt);
       if (onSuccessCallback) onSuccessCallback(receipt);
@@ -158,10 +158,7 @@ export class EscrowModule {
       const finalAmount = (Number(amount.toString()) - 1) / 10 ** decimals;
       const withdrawAmount = ethers.parseUnits(finalAmount.toFixed(decimals), decimals);
 
-      const result = await contract.withdraw(
-        tokenAddress,
-        withdrawAmount
-      );
+      const result = await contract.withdraw(tokenAddress, withdrawAmount);
       const receipt = await result.wait();
       console.log('Withdraw balance successfull -> ', receipt);
       if (onSuccessCallback) onSuccessCallback(receipt);
