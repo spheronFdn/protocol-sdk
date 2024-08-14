@@ -1,7 +1,9 @@
 import { DAI, USDC, USDT, WETH } from '@contracts/addresses';
 
 // Testnet URLs
-export const SPHERON_TESTNET_RPC_URL = 'https://sepolia-rollup.arbitrum.io/rpc';
+// export const SPHERON_TESTNET_RPC_URL = 'https://sepolia-rollup.arbitrum.io/rpc';
+export const SPHERON_TESTNET_RPC_URL =
+  'https://arbitrum-sepolia.core.chainstack.com/f89a40155b4b82dc5c601286fcac4ffb';
 export const SPHERON_TESTNET_EXPLORER_URL = 'https://sepolia.arbiscan.io/';
 export const SPHERON_TESTNET_WSS_URL =
   'wss://arbitrum-sepolia.core.chainstack.com/f89a40155b4b82dc5c601286fcac4ffb';
