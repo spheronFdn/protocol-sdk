@@ -140,7 +140,9 @@ export class LeaseModule {
     const contractAbi = ComputeLeaseAbi;
     const contractAddress = ComputeLease;
     try {
-      const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      const signer = await provider.getSigner();
+      const contract = new ethers.Contract(contractAddress, contractAbi, signer);
       const tx = await contract.closeLease(leaseId);
       const receipt = await tx.wait();
       return receipt;

@@ -51,10 +51,10 @@ export class SpheronProviderModule {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async submitManfiest(certificate: string, authToken: string, leaseId: string, sdlManifest: any) {
-    if (!certificate) {
-      console.log('Certificate not found');
-      return;
-    }
+    // if (!certificate) {
+    //   console.log('Certificate not found');
+    //   return;
+    // }
 
     const url = `${this.proxyUrl}`;
     try {
