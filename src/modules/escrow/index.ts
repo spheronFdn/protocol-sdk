@@ -115,7 +115,7 @@ export class EscrowModule {
       const contract = new ethers.Contract(contractAddress, contractABI, signer);
       const tokenContract = new ethers.Contract(tokenAddress, tokenABI, signer);
 
-      const finalAmount = (Number(amount.toString()) - 1) / 10 ** decimals;
+      const finalAmount = Number(amount.toString()) / 10 ** decimals;
       const depositAmount = ethers.parseUnits(finalAmount.toFixed(decimals), decimals);
 
       const approvalTxn = await tokenContract.approve(contractAddress, depositAmount);
