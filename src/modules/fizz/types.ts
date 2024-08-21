@@ -8,17 +8,6 @@ export interface FizzParams {
   rewardWallet: string;
 }
 
-// export interface FizzNode {
-//   providerId: bigint;
-//   name: string;
-//   region: string;
-//   spec: string;
-//   paymentsAccepted: string[];
-//   status: number;
-//   joinTimestamp: bigint;
-//   rewardWallet: string;
-// }
-
 export interface FizzNode {
   fizzId: bigint;
   providerId: bigint;
@@ -34,8 +23,8 @@ export interface FizzNode {
 
 export interface ResourceCategory {
   name: string;
-  registry: string; // address
-  baseReward: bigint; // uint256
+  registry: string;
+  baseReward: bigint;
 }
 
 export interface Attribute {
@@ -93,7 +82,6 @@ export enum FizzProviderTrustTier {
   Seven,
 }
 
-// Define Provider type
 export interface FizzProvider {
   providerId: bigint;
   name: string;
