@@ -1,0 +1,480 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import EscrowAbi from '@contracts/abis/devnet/Escrow.json';
+import FizzRegistryAbi from '@contracts/abis/devnet/FizzRegistry.json';
+import ProviderRegistryAbi from '@contracts/abis/devnet/ProviderRegistry.json';
+import FizzAttributeRegistryAbi from '@contracts/abis/devnet/FizzAttributeRegistry.json';
+import ResourceRegistryAbi from '@contracts/abis/devnet/ResourceRegistry.json';
+import ComputeLeaseAbi from '@contracts/abis/devnet/ComputeLease.json';
+import {
+  EscrowDev,
+  FizzRegistryDev,
+  FizzAttributeRegistryDev,
+  ResourceRegistryCPUDev,
+  ResourceRegistryGPUDev,
+  ProviderRegistryDev,
+  ComputeLeaseDev,
+} from '@contracts/addresses';
+import { ethers } from 'ethers';
+import {
+  Attribute,
+  FizzNode,
+  FizzParams,
+  FizzLease,
+  Resource,
+  FizzProvider,
+  FizzProviderStatus,
+  // FizzProviderTrustTier,
+} from './types';
+import { TransactionData } from '@modules/escrow/types';
+
+export class FizzModule {
+  private provider: ethers.Provider;
+
+  constructor(provider: ethers.Provider) {
+    this.provider = provider;
+  }
+
+  async withdrawFizzEarnings({
+    tokenAddress,
+    amount,
+    decimals,
+    onSuccessCallback,
+    onFailureCallback,
+  }: TransactionData) {
+    if (typeof window?.ethereum === 'undefined') {
+      console.log('Please install MetaMask');
+      return;
+    }
+
+    try {
+      await window.ethereum.request({ method: 'eth_requestAccounts' });
+
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      const signer = await provider.getSigner();
+
+      const contractABI = EscrowAbi;
+      const contractAddress = EscrowDev;
+      const contract = new ethers.Contract(contractAddress, contractABI, signer);
+
+      const finalAmount = (Number(amount.toString()) - 1) / 10 ** decimals;
+      const withdrawAmount = ethers.parseUnits(finalAmount.toFixed(decimals), decimals);
+
+      const result = await contract.withdrawFizzNodeEarnings(tokenAddress, withdrawAmount);
+      const receipt = await result.wait();
+      console.log('Withdraw earnings successful -> ', receipt);
+      if (onSuccessCallback) onSuccessCallback(receipt);
+      return receipt;
+    } catch (error) {
+      console.error('Error withdrawing fizz earnings -> ', error);
+      if (onFailureCallback) onFailureCallback(error);
+      throw error;
+    }
+  }
+
+  async getFizzEarnings(fizzAddress: string, tokenAddress: string) {
+    try {
+      const contractAbi = EscrowAbi;
+      const contractAddress = EscrowDev;
+      const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
+
+      const response = await contract.getFizzNodeEarnings(fizzAddress, tokenAddress);
+
+      const fizzEarnings: { earned: string; withdrawn: string; balance: string } = {
+        earned: response[0].toString(),
+        withdrawn: response[1].toString(),
+        balance: response[2].toString(),
+      };
+
+      return fizzEarnings;
+    } catch (error) {
+      console.error('Error in getFizzEarnings:', error);
+      throw error;
+    }
+  }
+
+  async addFizzNode(fizzParams: FizzParams, regFee: bigint): Promise<unknown> {
+    try {
+      if (typeof window?.ethereum === 'undefined') {
+        console.log('Please install MetaMask');
+        return 'MetaMask not installed';
+      }
+
+      await window.ethereum.request({ method: 'eth_requestAccounts' });
+
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      const signer = await provider.getSigner();
+
+      const contractAddress = FizzRegistryDev;
+      const abi = FizzRegistryAbi;
+      const contract = new ethers.Contract(contractAddress, abi, signer);
+
+      const tx = await contract.addFizzNode(fizzParams, {
+        value: regFee,
+      });
+      const receipt = await tx.wait();
+
+      console.log('Fizz registration successful: ', receipt);
+      return tx;
+    } catch (error) {
+      console.error('Fizz registration failed: ', error);
+      throw error;
+    }
+  }
+
+  async updateFizzName(newName: string): Promise<unknown> {
+    try {
+      if (typeof window?.ethereum === 'undefined') {
+        console.log('Please install MetaMask');
+        return 'MetaMask not installed';
+      }
+
+      await window.ethereum.request({ method: 'eth_requestAccounts' });
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      const signer = await provider.getSigner();
+
+      // Contract address (hardcoded or retrieved from an environment variable)
+      const contractAddress = FizzRegistryDev;
+      const abi = FizzRegistryAbi;
+      const contract = new ethers.Contract(contractAddress, abi, signer);
+
+      const tx = await contract.updateFizzName(newName);
+
+      const receipt = await tx.wait();
+
+      console.log('Update Fizz Name successful: ', receipt);
+      return tx;
+    } catch (error) {
+      console.error('Update Fizz Name failed: ', error);
+      throw error;
+    }
+  }
+
+  async getFizzById(fizzId: bigint): Promise<unknown> {
+    try {
+      const contractAddress = FizzRegistryDev;
+      const contractAbi = FizzRegistryAbi;
+
+      const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
+
+      const fizzDetails = await contract.getFizz(fizzId);
+
+      const {
+        providerId,
+        name,
+        region,
+        spec,
+        paymentsAccepted,
+        status,
+        joinTimestamp,
+        walletAddress,
+        rewardWallet,
+      } = fizzDetails;
+
+      return {
+        providerId,
+        name,
+        region,
+        spec,
+        paymentsAccepted,
+        status,
+        joinTimestamp,
+        walletAddress,
+        rewardWallet,
+      };
+    } catch (error) {
+      console.error('Failed to retrieve Fizz details: ', error);
+      throw error;
+    }
+  }
+
+  async getFizzNodeByAddress(walletAddress: string): Promise<FizzNode | unknown> {
+    try {
+      const contractAddress = FizzRegistryDev;
+      const contractAbi = FizzRegistryAbi;
+
+      const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
+
+      const fizzId = await contract.addressToFizzId(walletAddress);
+      const fizzNode = await contract.fizzes(fizzId);
+
+      const result: FizzNode = {
+        fizzId: fizzNode.fizzId,
+        providerId: fizzNode.providerId,
+        name: fizzNode.name,
+        region: fizzNode.region,
+        spec: fizzNode.spec,
+        walletAddress: fizzNode.walletAddress,
+        paymentsAccepted: fizzNode.paymentsAccepted,
+        status: Number(fizzNode.status.toString()),
+        joinTimestamp: fizzNode.joinTimestamp,
+        rewardWallet: fizzNode.rewardWallet,
+      };
+
+      console.log('Fizz Node details: ', result);
+      return result;
+    } catch (error) {
+      console.error('Failed to fetch Fizz Node details: ', error);
+      throw error;
+    }
+  }
+
+  async getAllFizzNodes(): Promise<FizzNode[] | unknown> {
+    try {
+      const contractAddress = FizzRegistryDev;
+      const contractAbi = FizzRegistryAbi;
+
+      const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
+
+      const allFizzNodes = await contract.getAllFizzNodes();
+
+      const fizzNodes: FizzNode[] = allFizzNodes.map((fizzNode: any) => ({
+        fizzId: fizzNode[0],
+        providerId: fizzNode[1],
+        name: fizzNode[2],
+        region: fizzNode[3],
+        spec: fizzNode[4],
+        walletAddress: fizzNode[5],
+        paymentsAccepted: fizzNode[6],
+        status: fizzNode[7],
+        joinTimestamp: fizzNode[8],
+        rewardWallet: fizzNode[9],
+      }));
+
+      console.log('All Fizz Nodes: ', fizzNodes);
+      return fizzNodes;
+    } catch (error) {
+      console.error('Failed to fetch all Fizz Nodes: ', error);
+      throw error;
+    }
+  }
+
+  async submitAttributes(category: string, ids: bigint[], units: bigint[]): Promise<void> {
+    try {
+      const provider = new ethers.BrowserProvider(window.ethereum);
+
+      await provider.send('eth_requestAccounts', []);
+
+      const signer = await provider.getSigner();
+
+      const contractAddress = FizzAttributeRegistryDev;
+      const contractAbi = FizzAttributeRegistryAbi;
+
+      const contract = new ethers.Contract(contractAddress, contractAbi, signer);
+
+      const tx = await contract.submitAttributes(category, ids, units);
+      const result = await tx.wait();
+
+      console.log('Attributes submitted successfully.');
+
+      return result;
+    } catch (error) {
+      console.error('Failed to submit attributes: ', error);
+    }
+  }
+
+  async getAttributes(fizzAddress: string, category: string): Promise<Attribute[]> {
+    try {
+      const contractAddress = FizzAttributeRegistryDev;
+      const contractAbi = FizzAttributeRegistryAbi;
+
+      const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
+
+      const attributes: Attribute[] = await contract.getAttributes(fizzAddress, category);
+
+      const decoratedAttributes = attributes.map((attr: any) => ({
+        id: attr[0],
+        units: attr[1],
+      }));
+      console.log(
+        `Attributes for ${fizzAddress} in category ${category} retrieved successfully:`,
+        decoratedAttributes
+      );
+      return decoratedAttributes;
+    } catch (error) {
+      console.error('Failed to retrieve attributes: ', error);
+      throw error;
+    }
+  }
+
+  async getPendingAttributes(fizzAddress: string, category: string): Promise<Attribute[]> {
+    try {
+      const contractAddress = FizzAttributeRegistryDev;
+      const contractAbi = FizzAttributeRegistryAbi;
+
+      const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
+
+      const attributes: Attribute[] = await contract.getPendingAttributes(fizzAddress, category);
+
+      const decoratedAttributes = attributes.map((attr: any) => ({
+        id: attr[0],
+        units: attr[1],
+      }));
+      console.log(
+        `Pending Attributes for ${fizzAddress} in category ${category} retrieved successfully:`,
+        decoratedAttributes
+      );
+      return decoratedAttributes;
+    } catch (error) {
+      console.error('Failed to retrieve pending attributes: ', error);
+      throw error;
+    }
+  }
+
+  async getResource(resourceID: bigint, category: string): Promise<Resource> {
+    try {
+      const contractAbi = ResourceRegistryAbi;
+      const contractAddress = category === 'CPU' ? ResourceRegistryCPUDev : ResourceRegistryGPUDev;
+
+      const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
+
+      const [name, tier, multiplier]: [string, string, bigint] = await contract.getResource(
+        resourceID
+      );
+
+      const resource: Resource = { name, tier, multiplier };
+
+      console.log(`Resource with ID ${resourceID} retrieved successfully:`, resource);
+
+      return resource;
+    } catch (error) {
+      console.error('Failed to retrieve resource: ', error);
+      throw error;
+    }
+  }
+
+  async getProvider(providerId: bigint): Promise<any> {
+    try {
+      const contractAddress = ProviderRegistryDev;
+      const contractAbi = ProviderRegistryAbi;
+
+      const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
+      const providerData = await contract.getProvider(providerId);
+
+      return {
+        name: providerData[0],
+        region: providerData[1],
+        attributes: providerData[2],
+        hostUri: providerData[3],
+        certificate: providerData[4],
+        paymentsAccepted: providerData[5],
+        status: providerData[6],
+        tier: providerData[7],
+        joinTimestamp: providerData[8],
+        walletAddress: providerData[9],
+        rewardWallet: providerData[10],
+      };
+    } catch (error) {
+      console.error('Failed to retrieve provider details: ', error);
+      throw error;
+    }
+  }
+
+  async getProviderByAddress(walletAddress: string): Promise<any> {
+    try {
+      const contractAddress = ProviderRegistryDev;
+      const contractAbi = ProviderRegistryAbi;
+
+      const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
+
+      const providerData = await contract.getProviderByAddress(walletAddress);
+
+      return {
+        name: providerData[0],
+        region: providerData[1],
+        attributes: providerData[2],
+        hostUri: providerData[3],
+        certificate: providerData[4],
+        paymentsAccepted: providerData[5],
+        status: providerData[6],
+        tier: providerData[7],
+        joinTimestamp: providerData[8],
+        rewardWallet: providerData[9],
+      };
+    } catch (error) {
+      console.error('Failed to retrieve provider details by address: ', error);
+      throw error;
+    }
+  }
+
+  async getAllProviders(): Promise<FizzProvider[]> {
+    try {
+      const contractAddress = ProviderRegistryDev;
+      const contractAbi = ProviderRegistryAbi;
+
+      const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
+      const providersData = await contract.getAllProviders();
+
+      const providers: FizzProvider[] = providersData.map((provider: any) => ({
+        providerId: provider.providerId.toString(),
+        name: provider.name,
+        region: provider.region,
+        walletAddress: provider.walletAddress,
+        paymentsAccepted: provider.paymentsAccepted,
+        attributes: provider.attributes,
+        hostUri: provider.hostUri,
+        certificate: provider.certificate,
+        status: FizzProviderStatus[provider.status],
+        // tier: FizzProviderTrustTier[provider.tier],
+        tier: Number(provider.tier.toString()),
+        joinTimestamp: Number(provider.joinTimestamp.toString()),
+        rewardWallet: provider.rewardWallet,
+      }));
+
+      return providers;
+    } catch (error) {
+      console.error('Failed to retrieve all providers: ', error);
+      throw error;
+    }
+  }
+
+  async getFizzLeases(
+    fizzId: bigint,
+    providerId: bigint,
+    state?: string
+  ): Promise<FizzLease[] | unknown> {
+    try {
+      const providerData = await this.getProvider(providerId);
+      const walletAddress = providerData.walletAddress;
+
+      const leaseContractAddress = ComputeLeaseDev;
+      const leaseContractAbi = ComputeLeaseAbi;
+      const leaseContract = new ethers.Contract(
+        leaseContractAddress,
+        leaseContractAbi,
+        this.provider
+      );
+      const [activeLeases, allLeases] = await leaseContract.getProviderLeases(walletAddress);
+
+      const selectedLeases = state === 'ACTIVE' ? activeLeases : allLeases;
+      const leases: FizzLease[] = [];
+
+      for (const leaseId of selectedLeases) {
+        const leaseData = await leaseContract.leases(leaseId);
+
+        // Filter by fizzId
+        if (leaseData.fizzId === fizzId) {
+          const lease: FizzLease = {
+            leaseId: leaseData.leaseId,
+            fizzId: leaseData.fizzId,
+            requestId: leaseData.requestId,
+            resourceAttribute: leaseData.resourceAttributes,
+            acceptedPrice: leaseData.acceptedPrice,
+            providerAddress: leaseData.providerAddress,
+            tenantAddress: leaseData.tenantAddress,
+            startBlock: leaseData.startBlock,
+            startTime: leaseData.startTime,
+            endTime: leaseData.endTime,
+            state: leaseData.state,
+          };
+
+          leases.push(lease);
+        }
+      }
+
+      return leases;
+    } catch (error) {
+      console.error('Failed to retrieve fizz leases: ', error);
+      throw error;
+    }
+  }
+}

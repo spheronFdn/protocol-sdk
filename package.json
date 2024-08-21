@@ -1,11 +1,12 @@
 {
   "name": "@spheron/protocol-sdk",
-  "version": "1.0.0",
+  "version": "1.0.0-fizz.11",
   "description": "Spheron Protocol SDK",
   "repository": {
     "type": "git",
     "url": "https://github.com/spheronFdn/protocol-sdk"
   },
+  "type": "module",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
   "types": "dist/index.d.ts",
@@ -17,7 +18,8 @@
     "test": "jest",
     "lint": "eslint --ext .js,.ts,.cjs src",
     "lint:fix": "eslint --ext .js,.ts,.cjs src --fix",
-    "format": "prettier --write 'src/**/*.{js,ts}'"
+    "format": "prettier --write 'src/**/*.{js,ts}'",
+    "dev": "node dist/esm/index.js"
   },
   "author": "Spheron",
   "keywords": [
