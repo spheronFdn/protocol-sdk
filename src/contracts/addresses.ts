@@ -32,7 +32,7 @@ export const BidDev = '0xe3D625Ba060d8735ed0F86688Fb0d0CA3Dae4462';
 export const ResourceRegistryCPUDev = '0x7aEEE296044c955A707A3A0BB6E1A505bbD15585';
 export const ResourceRegistryGPUDev = '0x01e909Ac5E5D833998bA84a1BB2a16d227A9b3ea';
 export const ResourceRegistryFactoryDev = '0xd6d4C265B3549c4425DF1a15CCEA0634EcB351D2';
-export const RewardManagerDev = '0xF2Ac0e5e8ab388cF849568033FAb45ce77Ab8942';
+export const RewardManagerDev = '0xD1dE471d6B5788CB69464b5b9eC573d1D4ebC9b5';
 export const RewardTokenDev = '0x270d622149F46fFc72A9fD5A8cF92D1FdE5AD5E0';
 
 // Devnet Token addresses
