@@ -1,5 +1,5 @@
-import ProviderRegistryAbi from '@contracts/abis/ProviderRegistry.json';
-import { ProviderRegistry } from '@contracts/addresses';
+import ProviderRegistryAbi from '@contracts/abis/devnet/ProviderRegistry.json';
+import { ProviderRegistryDev as ProviderRegistry } from '@contracts/addresses';
 import { ethers } from 'ethers';
 import { Category, IProvider } from './types';
 import { isValidEthereumAddress } from '@utils/index';

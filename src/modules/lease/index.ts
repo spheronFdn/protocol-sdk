@@ -1,5 +1,5 @@
-import ComputeLeaseAbi from '@contracts/abis/ComputeLease.json';
-import { ComputeLease } from '@contracts/addresses';
+import ComputeLeaseAbi from '@contracts/abis/devnet/ComputeLease.json';
+import { ComputeLeaseDev as ComputeLease } from '@contracts/addresses';
 import { OrderModule } from '@modules/order';
 import { getTokenDetails } from '@utils/index';
 import { ethers } from 'ethers';
@@ -127,6 +127,8 @@ export class LeaseModule {
         },
       };
     });
+
+    console.log("leases -> ", leaseWithToken);
 
     return {
       leases: leaseWithToken,

@@ -281,6 +281,8 @@ export class FizzModule {
 
       const attributes: Attribute[] = await contract.getAttributes(fizzAddress, category);
 
+      console.log("attributes raw -> ", attributes);
+
       const decoratedAttributes = attributes.map((attr: any) => ({
         id: attr[0],
         units: attr[1],
