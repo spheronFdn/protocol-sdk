@@ -208,6 +208,25 @@
       },
       {
         "indexed": false,
+        "internalType": "uint256",
+        "name": "providerId",
+        "type": "uint256"
+      }
+    ],
+    "name": "FizzNodeProviderIdUpdated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "fizzId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
         "internalType": "string",
         "name": "region",
         "type": "string"
@@ -1305,6 +1324,19 @@
       }
     ],
     "name": "updateFizzName",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_providerId",
+        "type": "uint256"
+      }
+    ],
+    "name": "updateFizzProviderId",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

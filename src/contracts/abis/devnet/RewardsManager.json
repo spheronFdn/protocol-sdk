@@ -144,7 +144,13 @@
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "baseReward",
+        "name": "baseRewardProvider",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "baseRewardFizz",
         "type": "uint256"
       }
     ],
@@ -169,7 +175,13 @@
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "baseReward",
+        "name": "baseRewardProvider",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "baseRewardFizz",
         "type": "uint256"
       }
     ],
@@ -200,19 +212,6 @@
       }
     ],
     "name": "EraCountUnpaused",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "minimumRewardsMultiplierPoint",
-        "type": "uint256"
-      }
-    ],
-    "name": "MinimumMultiplierPointUpdated",
     "type": "event"
   },
   {
@@ -514,7 +513,12 @@
       },
       {
         "internalType": "uint256",
-        "name": "_baseReward",
+        "name": "_baseRewardProvider",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_baseRewardFizz",
         "type": "uint256"
       }
     ],
@@ -563,7 +567,12 @@
       },
       {
         "internalType": "uint256",
-        "name": "baseReward",
+        "name": "baseRewardProvider",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "baseRewardFizz",
         "type": "uint256"
       }
     ],
@@ -646,13 +655,31 @@
           },
           {
             "internalType": "uint256",
-            "name": "baseReward",
+            "name": "baseRewardProvider",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "baseRewardFizz",
             "type": "uint256"
           }
         ],
         "internalType": "struct RewardsManager.Category[]",
         "name": "",
         "type": "tuple[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getCurrentEra",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -666,20 +693,7 @@
         "type": "string"
       }
     ],
-    "name": "getBaseRewardsPerEra",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "getCurrentEra",
+    "name": "getFizzBaseRewardsPerEra",
     "outputs": [
       {
         "internalType": "uint256",
@@ -736,6 +750,25 @@
         "internalType": "struct RewardsManager.Provider",
         "name": "",
         "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "category",
+        "type": "string"
+      }
+    ],
+    "name": "getProviderBaseRewardsPerEra",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -917,19 +950,6 @@
         "internalType": "bool",
         "name": "",
         "type": "bool"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "minimumRewardsMultiplierPoint",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -1128,24 +1148,6 @@
   {
     "inputs": [
       {
-        "internalType": "address[]",
-        "name": "_providers",
-        "type": "address[]"
-      },
-      {
-        "internalType": "uint256[]",
-        "name": "_eras",
-        "type": "uint256[]"
-      }
-    ],
-    "name": "removeSlashErasForMultipleProviders",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "address",
         "name": "_provider",
         "type": "address"
@@ -1243,19 +1245,6 @@
       }
     ],
     "name": "setDenied",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "_minimumRewardsMultiplierPoint",
-        "type": "uint256"
-      }
-    ],
-    "name": "setMinimumMultiplierPoints",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -1387,32 +1376,6 @@
       }
     ],
     "name": "updatePendingRewards",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_providerAttributeRegistry",
-        "type": "address"
-      }
-    ],
-    "name": "updateProviderAttributeAddress",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_providerAttributeRegistry",
-        "type": "address"
-      }
-    ],
-    "name": "updateProviderAttributeAddress",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
