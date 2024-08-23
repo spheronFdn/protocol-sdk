@@ -1,7 +1,9 @@
-import { OrderRequest } from '@contracts/addresses';
-import { Bid } from '@contracts/addresses';
-import OrderRequestAbi from '@contracts/abis/OrderRequest.json';
-import BidAbi from '@contracts/abis/Bid.json';
+import {
+  OrderRequestDev as OrderRequest,
+  BidDev as Bid,
+} from '@contracts/addresses';
+import OrderRequestAbi from '@contracts/abis/devnet/OrderRequest.json';
+import BidAbi from '@contracts/abis/devnet/Bid.json';
 import { ethers } from 'ethers';
 import { InitialOrder, OrderDetails, Tier } from './types';
 import { getTokenDetails } from '@utils/index';
