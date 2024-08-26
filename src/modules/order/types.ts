@@ -8,18 +8,19 @@ export enum Tier {
   Seven,
 }
 
+export enum Mode {
+  Fizz,
+  Provider,
+}
+
 export interface OrderDetails {
-  name: string;
-  region: string;
-  uptime: number;
-  reputation: number;
-  slashes: number;
-  maxPrice: number;
-  numOfBlocks: number;
+  metrics: [bigint, bigint, bigint]; // [0: uptime, 1: reputation, 2: slashes]
+  maxPrice: bigint;
+  numOfBlocks: bigint;
   token: string;
   spec: string;
-  version: string;
-  mode: string;
+  version: number;
+  mode: Mode;
   tier: Tier[];
 }
 

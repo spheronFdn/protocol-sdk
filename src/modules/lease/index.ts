@@ -6,18 +6,21 @@ import { ethers } from 'ethers';
 import { Lease, LeaseState, LeaseWithOrderDetails } from './types';
 import { getLeaseStateAsString } from '@utils/lease';
 import { DEFAULT_PAGE_SIZE } from '@config/index';
+import { FizzModule } from '@modules/fizz';
 
 export class LeaseModule {
   private provider: ethers.Provider;
   private orderModule: OrderModule;
-  private websocketProvider?: ethers.Provider;
+  private fizzModule: FizzModule;
+  private websocketProvider?: ethers.WebSocketProvider;
   private leaseCloseTimeoutId: NodeJS.Timeout | null;
 
-  constructor(provider: ethers.Provider, websocketProvider?: ethers.Provider) {
+  constructor(provider: ethers.Provider, websocketProvider?: ethers.WebSocketProvider) {
     this.provider = provider;
     this.websocketProvider = websocketProvider;
     this.getLeaseDetails = this.getLeaseDetails.bind(this);
     this.orderModule = new OrderModule(provider);
+    this.fizzModule = new FizzModule(provider, websocketProvider);
     this.leaseCloseTimeoutId = null;
   }
 
@@ -29,27 +32,28 @@ export class LeaseModule {
     const response = await contract.leases(leaseId);
 
     const resourceAttribute = {
-      cpuUnits: Number(response[2][0]),
-      cpuAttributes: response[2][1],
-      ramUnits: Number(response[2][2]),
-      ramAttributes: response[2][3],
-      gpuUnits: Number(response[2][4]),
-      gpuAttributes: response[2][5],
-      endpointsKind: Number(response[2][6]),
-      endpointsSequenceNumber: Number(response[2][7]),
+      cpuUnits: Number(response.resourceAttribute[0]),
+      cpuAttributes: response.resourceAttribute[1],
+      ramUnits: Number(response.resourceAttribute[2]),
+      ramAttributes: response.resourceAttribute[3],
+      gpuUnits: Number(response.resourceAttribute[4]),
+      gpuAttributes: response.resourceAttribute[5],
+      endpointsKind: Number(response.resourceAttribute[6]),
+      endpointsSequenceNumber: Number(response.resourceAttribute[7]),
     };
 
     const lease: Lease = {
-      leaseId: response[0].toString(),
-      requestId: response[1].toString(),
+      leaseId: response.leaseId.toString(),
+      fizzId: response.fizzId.toString(),
+      requestId: response.requestId.toString(),
       resourceAttribute,
-      acceptedPrice: Number(response[3]),
-      providerAddress: response[4].toString(),
-      tenantAddress: response[5].toString(),
-      startBlock: response[6].toString(),
-      startTime: Number(response[7]),
-      endTime: Number(response[8]),
-      state: getLeaseStateAsString(response[9].toString()) as LeaseState,
+      acceptedPrice: Number(response.acceptedPrice),
+      providerAddress: response.providerAddress.toString(),
+      tenantAddress: response.tenantAddress.toString(),
+      startBlock: response.startBlock.toString(),
+      startTime: Number(response.startTime),
+      endTime: Number(response.endTime),
+      state: getLeaseStateAsString(response.state.toString()) as LeaseState,
     };
 
     return lease;
@@ -82,7 +86,6 @@ export class LeaseModule {
   ) {
     const { activeLeaseIds, terminatedLeaseIds, allLeaseIds } = await this.getLeaseIds(address);
 
-    let filteredLeases: Lease[] = [];
     let leaseIds = allLeaseIds;
     const totalCount = allLeaseIds.length;
     const terminatedCount = terminatedLeaseIds.length;
@@ -106,27 +109,38 @@ export class LeaseModule {
       leaseIds = leaseIds.slice((options.page - 1) * pageSize, options.page * pageSize);
     }
 
-    filteredLeases = await Promise.all(leaseIds.map((lId) => this.getLeaseDetails(lId)));
+    const filteredLeases = await Promise.all(leaseIds.map((lId) => this.getLeaseDetails(lId)));
     const orderDetails = await Promise.all(
       leaseIds.map((lId) => this.orderModule.getOrderDetails(lId))
     );
 
-    const leaseWithToken: LeaseWithOrderDetails[] = filteredLeases.map((lease, index) => {
-      const order = orderDetails[index];
-      let tokenDetails;
-      if (order.token?.address) tokenDetails = getTokenDetails(order.token.address, 'testnet');
+    const leaseWithToken: LeaseWithOrderDetails[] = await Promise.all(
+      filteredLeases.map(async (lease, index) => {
+        const order = orderDetails[index];
+        let tokenDetails;
+        if (order.token?.address) tokenDetails = getTokenDetails(order.token.address, 'testnet');
 
-      return {
-        ...lease,
-        name: order.name,
-        tier: order.specs.tier,
-        region: order.region,
-        token: {
-          symbol: tokenDetails?.symbol,
-          decimal: tokenDetails?.decimal,
-        },
-      };
-    });
+        let region;
+        if (lease.fizzId.toString() !== '0') {
+          const fizz: any = await this.fizzModule.getFizzById(BigInt(lease.fizzId));
+          region = fizz?.region;
+        } else {
+          const provider: any = await this.fizzModule.getProviderByAddress(lease.providerAddress);
+          region = provider?.region;
+        }
+
+        return {
+          ...lease,
+          name: order.name,
+          tier: order.specs.tier,
+          region: region,
+          token: {
+            symbol: tokenDetails?.symbol,
+            decimal: tokenDetails?.decimal,
+          },
+        };
+      })
+    );
 
     console.log("leases -> ", leaseWithToken);
 

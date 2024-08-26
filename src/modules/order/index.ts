@@ -80,13 +80,13 @@ export class OrderModule {
     const response = await contract.getOrderById(leaseId);
 
     const specs = {
-      specs: response[11][0],
-      version: response[11][1],
-      mode: response[11][2],
-      tier: response[11][3].map((t: bigint) => Number(t)) as Tier[],
+      specs: response.specs.specs,
+      version: response.specs.version,
+      mode: response.specs.mode,
+      tier: response.specs.tier.map((t: bigint) => Number(t)) as Tier[],
     };
 
-    const tokenDetails = getTokenDetails(response[8], 'testnet');
+    const tokenDetails = getTokenDetails(response.token, 'testnet');
     const token = {
       symbol: tokenDetails?.symbol,
       decimal: tokenDetails?.decimal,
@@ -94,17 +94,15 @@ export class OrderModule {
     };
 
     return {
-      id: response[0].toString(),
-      name: response[1],
-      region: response[2],
-      uptime: Number(response[3]),
-      reputation: Number(response[4]),
-      slashes: Number(response[5]),
-      maxPrice: Number(response[6]),
-      numOfBlocks: Number(response[7]),
+      id: response.id.toString(),
+      uptime: Number(response.metrics[0]),
+      reputation: Number(response.metrics[1]),
+      slashes: Number(response.metrics[2]),
+      maxPrice: Number(response.maxPrice),
+      numOfBlocks: Number(response.numOfBlocks),
       token,
-      creator: response[9],
-      state: getOrderStateAsString(response[10]),
+      creator: response.creator,
+      state: getOrderStateAsString(response.state),
       specs,
     } as InitialOrder;
   }
