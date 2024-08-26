@@ -506,7 +506,7 @@ export class FizzModule {
           if (walletAddress.toString().toLowerCase() === accounts[0].toString().toLowerCase()) {
             onSuccessCallback(fizzId, walletAddress);
             this.webSocketProvider?.destroy();
-            contract.off('UpdateRequestAccepted');
+            contract.off('FizzNodeAdded');
             clearTimeout(this.timeoutId as NodeJS.Timeout);
             resolve({ fizzId, walletAddress });
           }
