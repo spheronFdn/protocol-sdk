@@ -29,9 +29,12 @@ import { TransactionData } from '@modules/escrow/types';
 
 export class FizzModule {
   private provider: ethers.Provider;
+  private webSocketProvider: ethers.WebSocketProvider | undefined;
+  private timeoutId: NodeJS.Timeout | undefined;
 
-  constructor(provider: ethers.Provider) {
+  constructor(provider: ethers.Provider, webSocketProvider?: ethers.WebSocketProvider) {
     this.provider = provider;
+    this.webSocketProvider = webSocketProvider;
   }
 
   async withdrawFizzEarnings({
@@ -281,7 +284,7 @@ export class FizzModule {
 
       const attributes: Attribute[] = await contract.getAttributes(fizzAddress, category);
 
-      console.log("attributes raw -> ", attributes);
+      console.log('attributes raw -> ', attributes);
 
       const decoratedAttributes = attributes.map((attr: any) => ({
         id: attr[0],
@@ -476,6 +479,41 @@ export class FizzModule {
       return leases;
     } catch (error) {
       console.error('Failed to retrieve fizz leases: ', error);
+      throw error;
+    }
+  }
+
+  async listenToFizzCreated(
+    onSuccessCallback: (fizzId: bigint, walletAddress: string) => void,
+    onFailureCallback: () => void,
+    timeoutTime = 60000
+  ) {
+    const contractAddress = FizzRegistryDev;
+    const contractAbi = FizzRegistryAbi;
+
+    try {
+      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      const contract = new ethers.Contract(contractAddress, contractAbi, this.webSocketProvider);
+
+      return new Promise((resolve, reject) => {
+        this.timeoutId = setTimeout(() => {
+          contract.off('FizzNodeAdded');
+          onFailureCallback();
+          reject({ error: true, msg: 'Fizz creation failed' });
+        }, timeoutTime);
+
+        contract.on('FizzNodeAdded', (fizzId: bigint, walletAddress: string) => {
+          if (walletAddress.toString().toLowerCase() === accounts[0].toString().toLowerCase()) {
+            onSuccessCallback(fizzId, walletAddress);
+            this.webSocketProvider?.destroy();
+            contract.off('UpdateRequestAccepted');
+            clearTimeout(this.timeoutId as NodeJS.Timeout);
+            resolve({ fizzId, walletAddress });
+          }
+        });
+      });
+    } catch (error) {
+      console.log('Error in listenToFizzCreated -> ', error);
       throw error;
     }
   }
