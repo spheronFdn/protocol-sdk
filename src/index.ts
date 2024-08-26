@@ -29,7 +29,7 @@ export class SpheronSDK {
     this.orders = new OrderModule(provider, websocketProvider);
     this.escrow = new EscrowModule(provider);
     this.provider = new ProviderModule(provider);
-    this.fizz = new FizzModule(provider);
+    this.fizz = new FizzModule(provider, websocketProvider);
     this.spheronProvider = new SpheronProviderModule(providerUrl, proxyUrl);
   }
 }
