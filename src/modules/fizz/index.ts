@@ -517,4 +517,294 @@ export class FizzModule {
       throw error;
     }
   }
+
+  async updateFizzSpecs(specs: string) {
+    try {
+      const contractAddress = FizzRegistryDev;
+      const contractAbi = FizzRegistryAbi;
+
+      const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
+
+      const tx = await contract.updateFizzSpec(specs);
+
+      const receipt = await tx.wait();
+
+      return receipt;
+    } catch (error) {
+      console.log('Error in updateFizzSpecs -> ', error);
+      throw error;
+    }
+  }
+
+  async listenSpecUpdated(
+    onSuccessCallback: (fizzId: bigint, specs: string, walletAddress: string) => void,
+    onFailureCallback: () => void,
+    timeoutTime = 60000
+  ) {
+    const contractAddress = FizzRegistryDev;
+    const contractAbi = FizzRegistryAbi;
+
+    try {
+      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      const contract = new ethers.Contract(contractAddress, contractAbi, this.webSocketProvider);
+
+      let timeoutId: NodeJS.Timeout | undefined;
+
+      return new Promise((resolve, reject) => {
+        timeoutId = setTimeout(() => {
+          contract.off('FizzNodeSpecUpdated');
+          onFailureCallback();
+          reject({ error: true, msg: 'Fizz update failed' });
+        }, timeoutTime);
+
+        contract.on('FizzNodeSpecUpdated', (fizzId: bigint, specs: string) => {
+          const fizz: any = this.getFizzById(fizzId);
+          if (
+            fizz.walletAddress.toString().toLowerCase() === accounts[0].toString().toLowerCase()
+          ) {
+            onSuccessCallback(fizzId, specs, fizz.walletAddress);
+            this.webSocketProvider?.destroy();
+            contract.off('FizzNodeSpecUpdated');
+            clearTimeout(timeoutId as NodeJS.Timeout);
+            resolve({ fizzId, specs, walletAddress: fizz.walletAddress });
+          }
+        });
+      });
+    } catch (error) {
+      console.log('Error in listenToFizzNodeUpdated -> ', error);
+      throw error;
+    }
+  }
+
+  async updateFizzRegion(region: string) {
+    try {
+      const contractAddress = FizzRegistryDev;
+      const contractAbi = FizzRegistryAbi;
+
+      const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
+
+      const tx = await contract.updateFizzRegion(region);
+
+      const receipt = await tx.wait();
+
+      return receipt;
+    } catch (error) {
+      console.log('Error in updateFizzRegion -> ', error);
+      throw error;
+    }
+  }
+
+  async listenRegionUpdated(
+    onSuccessCallback: (fizzId: bigint, region: string, walletAddress: string) => void,
+    onFailureCallback: () => void,
+    timeoutTime = 60000
+  ) {
+    const contractAddress = FizzRegistryDev;
+    const contractAbi = FizzRegistryAbi;
+
+    try {
+      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      const contract = new ethers.Contract(contractAddress, contractAbi, this.webSocketProvider);
+
+      let timeoutId: NodeJS.Timeout | undefined;
+
+      return new Promise((resolve, reject) => {
+        timeoutId = setTimeout(() => {
+          contract.off('FizzNodeRegionUpdated');
+          onFailureCallback();
+          reject({ error: true, msg: 'Fizz update failed' });
+        }, timeoutTime);
+
+        contract.on('FizzNodeRegionUpdated', (fizzId: bigint, region: string) => {
+          const fizz: any = this.getFizzById(fizzId);
+          if (
+            fizz.walletAddress.toString().toLowerCase() === accounts[0].toString().toLowerCase()
+          ) {
+            onSuccessCallback(fizzId, region, fizz.walletAddress);
+            this.webSocketProvider?.destroy();
+            contract.off('FizzNodeRegionUpdated');
+            clearTimeout(timeoutId as NodeJS.Timeout);
+            resolve({ fizzId, region, walletAddress: fizz.walletAddress });
+          }
+        });
+      });
+    } catch (error) {
+      console.log('Error in listenToFizzNodeUpdated -> ', error);
+      throw error;
+    }
+  }
+
+  async updateFizzProvider(providerId: bigint) {
+    try {
+      const contractAddress = FizzRegistryDev;
+      const contractAbi = FizzRegistryAbi;
+
+      const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
+
+      const tx = await contract.updateFizzProvider(providerId);
+
+      const receipt = await tx.wait();
+
+      return receipt;
+    } catch (error) {
+      console.log('Error in updateFizzProvider -> ', error);
+      throw error;
+    }
+  }
+
+  async listenProviderUpdated(
+    onSuccessCallback: (fizzId: bigint, providerId: bigint, walletAddress: string) => void,
+    onFailureCallback: () => void,
+    timeoutTime = 60000
+  ) {
+    const contractAddress = FizzRegistryDev;
+    const contractAbi = FizzRegistryAbi;
+
+    try {
+      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      const contract = new ethers.Contract(contractAddress, contractAbi, this.webSocketProvider);
+
+      let timeoutId: NodeJS.Timeout | undefined;
+
+      return new Promise((resolve, reject) => {
+        timeoutId = setTimeout(() => {
+          contract.off('FizzNodeProviderIdUpdated');
+          onFailureCallback();
+          reject({ error: true, msg: 'Fizz update failed' });
+        }, timeoutTime);
+
+        contract.on('FizzNodeProviderIdUpdated', (fizzId: bigint, providerId: bigint) => {
+          const fizz: any = this.getFizzById(fizzId);
+          if (
+            fizz.walletAddress.toString().toLowerCase() === accounts[0].toString().toLowerCase()
+          ) {
+            onSuccessCallback(fizzId, providerId, fizz.walletAddress);
+            this.webSocketProvider?.destroy();
+            contract.off('FizzNodeProviderIdUpdated');
+            clearTimeout(timeoutId as NodeJS.Timeout);
+            resolve({ fizzId, providerId, walletAddress: fizz.walletAddress });
+          }
+        });
+      });
+    } catch (error) {
+      console.log('Error in listenToFizzNodeUpdated -> ', error);
+      throw error;
+    }
+  }
+
+  async addAcceptedPayment(tokenAddress: string) {
+    try {
+      const contractAddress = FizzRegistryDev;
+      const contractAbi = FizzRegistryAbi;
+
+      const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
+
+      const tx = await contract.addAcceptedPayment(tokenAddress);
+
+      const receipt = await tx.wait();
+
+      return receipt;
+    } catch (error) {
+      console.log('Error in addAcceptedPayment -> ', error);
+      throw error;
+    }
+  }
+
+  async listenToAddAcceptedPayment(
+    onSuccessCallback: (fizzId: bigint, tokenAddress: string, walletAddress: string) => void,
+    onFailureCallback: () => void,
+    timeoutTime = 60000
+  ) {
+    const contractAddress = FizzRegistryDev;
+    const contractAbi = FizzRegistryAbi;
+
+    try {
+      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      const contract = new ethers.Contract(contractAddress, contractAbi, this.webSocketProvider);
+
+      let timeoutId: NodeJS.Timeout | undefined;
+
+      return new Promise((resolve, reject) => {
+        timeoutId = setTimeout(() => {
+          contract.off('PaymentAdded');
+          onFailureCallback();
+          reject({ error: true, msg: 'Fizz update failed' });
+        }, timeoutTime);
+
+        contract.on('PaymentAdded', (fizzId: bigint, tokenAddress: string) => {
+          const fizz: any = this.getFizzById(fizzId);
+          if (
+            fizz.walletAddress.toString().toLowerCase() === accounts[0].toString().toLowerCase()
+          ) {
+            onSuccessCallback(fizzId, tokenAddress, fizz.walletAddress);
+            this.webSocketProvider?.destroy();
+            contract.off('PaymentAdded');
+            clearTimeout(timeoutId as NodeJS.Timeout);
+            resolve({ fizzId, tokenAddress, walletAddress: fizz.walletAddress });
+          }
+        });
+      });
+    } catch (error) {
+      console.log('Error in listenToAddAcceptedPayment -> ', error);
+      throw error;
+    }
+  }
+
+  async removeAcceptedPayment(tokenAddress: string) {
+    try {
+      const contractAddress = FizzRegistryDev;
+      const contractAbi = FizzRegistryAbi;
+
+      const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
+
+      const tx = await contract.removeAcceptedPayment(tokenAddress);
+
+      const receipt = await tx.wait();
+
+      return receipt;
+    } catch (error) {
+      console.log('Error in removeAcceptedPayment -> ', error);
+      throw error;
+    }
+  }
+
+  async listenToRemoveAcceptedPayment(
+    onSuccessCallback: (fizzId: bigint, tokenAddress: string, walletAddress: string) => void,
+    onFailureCallback: () => void,
+    timeoutTime = 60000
+  ) {
+    const contractAddress = FizzRegistryDev;
+    const contractAbi = FizzRegistryAbi;
+
+    try {
+      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      const contract = new ethers.Contract(contractAddress, contractAbi, this.webSocketProvider);
+
+      let timeoutId: NodeJS.Timeout | undefined;
+
+      return new Promise((resolve, reject) => {
+        timeoutId = setTimeout(() => {
+          contract.off('PaymentRemoved');
+          onFailureCallback();
+          reject({ error: true, msg: 'Fizz update failed' });
+        }, timeoutTime);
+
+        contract.on('PaymentRemoved', (fizzId: bigint, tokenAddress: string) => {
+          const fizz: any = this.getFizzById(fizzId);
+          if (
+            fizz.walletAddress.toString().toLowerCase() === accounts[0].toString().toLowerCase()
+          ) {
+            onSuccessCallback(fizzId, tokenAddress, fizz.walletAddress);
+            this.webSocketProvider?.destroy();
+            contract.off('PaymentRemoved');
+            clearTimeout(timeoutId as NodeJS.Timeout);
+            resolve({ fizzId, tokenAddress, walletAddress: fizz.walletAddress });
+          }
+        });
+      });
+    } catch (error) {
+      console.log('Error in listenToRemoveAcceptedPayment -> ', error);
+      throw error;
+    }
+  }
 }
