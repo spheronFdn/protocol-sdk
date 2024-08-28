@@ -1,7 +1,4 @@
-import {
-  OrderRequestDev as OrderRequest,
-  BidDev as Bid,
-} from '@contracts/addresses';
+import { OrderRequestDev as OrderRequest, BidDev as Bid } from '@contracts/addresses';
 import OrderRequestAbi from '@contracts/abis/devnet/OrderRequest.json';
 import BidAbi from '@contracts/abis/devnet/Bid.json';
 import { ethers } from 'ethers';
@@ -167,8 +164,8 @@ export class OrderModule {
     }
 
     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-    const contractAbi = OrderRequestAbi;
-    const contractAddress = OrderRequest;
+    const contractAbi = BidAbi;
+    const contractAddress = Bid;
 
     const contract = new ethers.Contract(contractAddress, contractAbi, this.websocketProvider);
 
@@ -202,8 +199,8 @@ export class OrderModule {
     }
 
     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-    const contractAbi = OrderRequestAbi;
-    const contractAddress = OrderRequest;
+    const contractAbi = BidAbi;
+    const contractAddress = Bid;
 
     const contract = new ethers.Contract(contractAddress, contractAbi, this.websocketProvider);
 
