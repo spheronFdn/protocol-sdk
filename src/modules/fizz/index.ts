@@ -520,10 +520,14 @@ export class FizzModule {
 
   async updateFizzSpecs(specs: string) {
     try {
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      await provider.send('eth_requestAccounts', []);
+      const signer = await provider.getSigner();
+
       const contractAddress = FizzRegistryDev;
       const contractAbi = FizzRegistryAbi;
 
-      const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
+      const contract = new ethers.Contract(contractAddress, contractAbi, signer);
 
       const tx = await contract.updateFizzSpec(specs);
 
@@ -578,10 +582,14 @@ export class FizzModule {
 
   async updateFizzRegion(region: string) {
     try {
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      await provider.send('eth_requestAccounts', []);
+      const signer = await provider.getSigner();
+
       const contractAddress = FizzRegistryDev;
       const contractAbi = FizzRegistryAbi;
 
-      const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
+      const contract = new ethers.Contract(contractAddress, contractAbi, signer);
 
       const tx = await contract.updateFizzRegion(region);
 
@@ -636,12 +644,16 @@ export class FizzModule {
 
   async updateFizzProvider(providerId: bigint) {
     try {
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      await provider.send('eth_requestAccounts', []);
+      const signer = await provider.getSigner();
+
       const contractAddress = FizzRegistryDev;
       const contractAbi = FizzRegistryAbi;
 
-      const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
+      const contract = new ethers.Contract(contractAddress, contractAbi, signer);
 
-      const tx = await contract.updateFizzProvider(providerId);
+      const tx = await contract.updateFizzProviderId(providerId);
 
       const receipt = await tx.wait();
 
@@ -694,10 +706,14 @@ export class FizzModule {
 
   async addAcceptedPayment(tokenAddress: string) {
     try {
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      await provider.send('eth_requestAccounts', []);
+      const signer = await provider.getSigner();
+
       const contractAddress = FizzRegistryDev;
       const contractAbi = FizzRegistryAbi;
 
-      const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
+      const contract = new ethers.Contract(contractAddress, contractAbi, signer);
 
       const tx = await contract.addAcceptedPayment(tokenAddress);
 
@@ -752,10 +768,14 @@ export class FizzModule {
 
   async removeAcceptedPayment(tokenAddress: string) {
     try {
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      await provider.send('eth_requestAccounts', []);
+      const signer = await provider.getSigner();
+
       const contractAddress = FizzRegistryDev;
       const contractAbi = FizzRegistryAbi;
 
-      const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
+      const contract = new ethers.Contract(contractAddress, contractAbi, signer);
 
       const tx = await contract.removeAcceptedPayment(tokenAddress);
 
