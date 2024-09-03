@@ -198,10 +198,10 @@ export class FizzModule {
       const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
 
       const fizzId = await contract.addressToFizzId(walletAddress);
-      const fizzNode = await contract.fizzes(fizzId);
+      const fizzNode: any = await this.getFizzById(fizzId);
 
       const result: FizzNode = {
-        fizzId: fizzNode.fizzId,
+        fizzId,
         providerId: fizzNode.providerId,
         name: fizzNode.name,
         region: fizzNode.region,
