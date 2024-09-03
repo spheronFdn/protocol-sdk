@@ -6,9 +6,11 @@ import { TransactionData } from './types';
 
 export class EscrowModule {
   private provider: ethers.Provider;
+  private wallet: ethers.Wallet | undefined;
 
-  constructor(provider: ethers.Provider) {
+  constructor(provider: ethers.Provider, wallet?: ethers.Wallet) {
     this.provider = provider;
+    this.wallet = wallet;
   }
 
   // read operations
