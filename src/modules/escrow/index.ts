@@ -72,7 +72,7 @@ export class EscrowModule {
       await window.ethereum.request({ method: 'eth_requestAccounts' });
 
       const provider = new ethers.BrowserProvider(window.ethereum);
-      const signer = await provider.getSigner();
+      const signer = this.wallet ? this.wallet : await provider.getSigner();
       const contractABI = EscrowAbi;
       const contractAddress = Escrow;
 
@@ -109,7 +109,7 @@ export class EscrowModule {
       await window.ethereum.request({ method: 'eth_requestAccounts' });
 
       const provider = new ethers.BrowserProvider(window.ethereum);
-      const signer = await provider.getSigner();
+      const signer = this.wallet ? this.wallet : await provider.getSigner();
       const contractABI = EscrowAbi;
       const contractAddress = Escrow;
       const tokenABI = TokenAbi;
@@ -151,7 +151,7 @@ export class EscrowModule {
       await window.ethereum.request({ method: 'eth_requestAccounts' });
 
       const provider = new ethers.BrowserProvider(window.ethereum);
-      const signer = await provider.getSigner();
+      const signer = this.wallet ? this.wallet : await provider.getSigner();
       const contractABI = EscrowAbi;
       const contractAddress = Escrow;
 
