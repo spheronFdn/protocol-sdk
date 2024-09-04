@@ -21,11 +21,11 @@ export class SpheronSDK {
     const websocketProvider = new ethers.WebSocketProvider(rpcUrls[networkType].WSS_URL);
     const wallet = privateKey ? new ethers.Wallet(privateKey, provider) : undefined;
 
-    this.leases = new LeaseModule(provider, websocketProvider);
-    this.orders = new OrderModule(provider, websocketProvider);
+    this.leases = new LeaseModule(provider, websocketProvider, wallet);
+    this.orders = new OrderModule(provider, websocketProvider, wallet);
     this.escrow = new EscrowModule(provider, wallet);
     this.provider = new ProviderModule(provider);
-    this.fizz = new FizzModule(provider, websocketProvider);
+    this.fizz = new FizzModule(provider, websocketProvider, wallet);
     // this.spheronProvider = new SpheronProviderModule(providerUrl, proxyUrl);
   }
 }
