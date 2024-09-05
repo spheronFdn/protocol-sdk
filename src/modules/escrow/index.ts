@@ -3,6 +3,7 @@ import TokenAbi from '@contracts/abis/devnet/TestToken.json';
 import { EscrowDev as Escrow } from '@contracts/addresses';
 import { ethers } from 'ethers';
 import { TransactionData } from './types';
+import { initializeSigner } from '@utils/index';
 
 export class EscrowModule {
   private provider: ethers.Provider;
@@ -63,16 +64,8 @@ export class EscrowModule {
     onSuccessCallback,
     onFailureCallback,
   }: TransactionData) {
-    if (typeof window?.ethereum === 'undefined') {
-      console.log('Please install MetaMask');
-      return;
-    }
-
     try {
-      await window.ethereum.request({ method: 'eth_requestAccounts' });
-
-      const provider = new ethers.BrowserProvider(window.ethereum);
-      const signer = await provider.getSigner();
+      const { signer } = await initializeSigner({ wallet: this.wallet });
       const contractABI = EscrowAbi;
       const contractAddress = Escrow;
 
@@ -100,16 +93,9 @@ export class EscrowModule {
     onSuccessCallback,
     onFailureCallback,
   }: TransactionData) {
-    if (typeof window?.ethereum === 'undefined') {
-      console.log('Please install MetaMask');
-      return;
-    }
-
     try {
-      await window.ethereum.request({ method: 'eth_requestAccounts' });
+      const { signer } = await initializeSigner({ wallet: this.wallet });
 
-      const provider = new ethers.BrowserProvider(window.ethereum);
-      const signer = await provider.getSigner();
       const contractABI = EscrowAbi;
       const contractAddress = Escrow;
       const tokenABI = TokenAbi;
@@ -142,16 +128,8 @@ export class EscrowModule {
     onSuccessCallback,
     onFailureCallback,
   }: TransactionData) {
-    if (typeof window?.ethereum === 'undefined') {
-      console.log('Please install MetaMask');
-      return;
-    }
-
     try {
-      await window.ethereum.request({ method: 'eth_requestAccounts' });
-
-      const provider = new ethers.BrowserProvider(window.ethereum);
-      const signer = await provider.getSigner();
+      const { signer } = await initializeSigner({ wallet: this.wallet });
       const contractABI = EscrowAbi;
       const contractAddress = Escrow;
 
