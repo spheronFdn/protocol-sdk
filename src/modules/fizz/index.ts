@@ -1,14 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import EscrowAbi from '@contracts/abis/devnet/Escrow.json';
 import FizzRegistryAbi from '@contracts/abis/devnet/FizzRegistry.json';
-import ProviderRegistryAbi from '@contracts/abis/devnet/ProviderRegistry.json';
-import FizzAttributeRegistryAbi from '@contracts/abis/devnet/FizzAttributeRegistry.json';
 import ResourceRegistryAbi from '@contracts/abis/devnet/ResourceRegistry.json';
 import ComputeLeaseAbi from '@contracts/abis/devnet/ComputeLease.json';
 import {
   EscrowDev,
   FizzRegistryDev,
-  FizzAttributeRegistryDev,
   ResourceRegistryCPUDev,
   ResourceRegistryGPUDev,
   ProviderRegistryDev,
@@ -16,23 +13,22 @@ import {
 } from '@contracts/addresses';
 import { ethers } from 'ethers';
 import {
-  Attribute,
   FizzNode,
   FizzParams,
   FizzLease,
   Resource,
-  FizzProvider,
-  FizzProviderStatus,
   // FizzProviderTrustTier,
 } from './types';
 import { TransactionData } from '@modules/escrow/types';
 import { initializeSigner } from '@utils/index';
+import { ProviderModule } from '@modules/provider';
 
 export class FizzModule {
   private provider: ethers.Provider;
   private webSocketProvider: ethers.WebSocketProvider | undefined;
   private timeoutId: NodeJS.Timeout | undefined;
   private wallet: ethers.Wallet | undefined;
+  private providerModule: ProviderModule;
 
   constructor(
     provider: ethers.Provider,
@@ -42,6 +38,7 @@ export class FizzModule {
     this.provider = provider;
     this.webSocketProvider = webSocketProvider;
     this.wallet = wallet;
+    this.providerModule = new ProviderModule(provider);
   }
 
   async withdrawFizzEarnings({
@@ -240,76 +237,6 @@ export class FizzModule {
     }
   }
 
-  async submitAttributes(category: string, ids: bigint[], units: bigint[]): Promise<void> {
-    try {
-      const { signer } = await initializeSigner({ wallet: this.wallet });
-
-      const contractAddress = FizzAttributeRegistryDev;
-      const contractAbi = FizzAttributeRegistryAbi;
-
-      const contract = new ethers.Contract(contractAddress, contractAbi, signer);
-
-      const tx = await contract.submitAttributes(category, ids, units);
-      const result = await tx.wait();
-
-      console.log('Attributes submitted successfully.');
-
-      return result;
-    } catch (error) {
-      console.error('Failed to submit attributes: ', error);
-    }
-  }
-
-  async getAttributes(fizzAddress: string, category: string): Promise<Attribute[]> {
-    try {
-      const contractAddress = FizzAttributeRegistryDev;
-      const contractAbi = FizzAttributeRegistryAbi;
-
-      const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
-
-      const attributes: Attribute[] = await contract.getAttributes(fizzAddress, category);
-
-      console.log('attributes raw -> ', attributes);
-
-      const decoratedAttributes = attributes.map((attr: any) => ({
-        id: attr[0],
-        units: attr[1],
-      }));
-      console.log(
-        `Attributes for ${fizzAddress} in category ${category} retrieved successfully:`,
-        decoratedAttributes
-      );
-      return decoratedAttributes;
-    } catch (error) {
-      console.error('Failed to retrieve attributes: ', error);
-      throw error;
-    }
-  }
-
-  async getPendingAttributes(fizzAddress: string, category: string): Promise<Attribute[]> {
-    try {
-      const contractAddress = FizzAttributeRegistryDev;
-      const contractAbi = FizzAttributeRegistryAbi;
-
-      const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
-
-      const attributes: Attribute[] = await contract.getPendingAttributes(fizzAddress, category);
-
-      const decoratedAttributes = attributes.map((attr: any) => ({
-        id: attr[0],
-        units: attr[1],
-      }));
-      console.log(
-        `Pending Attributes for ${fizzAddress} in category ${category} retrieved successfully:`,
-        decoratedAttributes
-      );
-      return decoratedAttributes;
-    } catch (error) {
-      console.error('Failed to retrieve pending attributes: ', error);
-      throw error;
-    }
-  }
-
   async getResource(resourceID: bigint, category: string): Promise<Resource> {
     try {
       const contractAbi = ResourceRegistryAbi;
@@ -332,98 +259,13 @@ export class FizzModule {
     }
   }
 
-  async getProvider(providerId: bigint): Promise<any> {
-    try {
-      const contractAddress = ProviderRegistryDev;
-      const contractAbi = ProviderRegistryAbi;
-
-      const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
-      const providerData = await contract.getProvider(providerId);
-
-      return {
-        name: providerData[0],
-        region: providerData[1],
-        attributes: providerData[2],
-        hostUri: providerData[3],
-        certificate: providerData[4],
-        paymentsAccepted: providerData[5],
-        status: providerData[6],
-        tier: providerData[7],
-        joinTimestamp: providerData[8],
-        walletAddress: providerData[9],
-        rewardWallet: providerData[10],
-      };
-    } catch (error) {
-      console.error('Failed to retrieve provider details: ', error);
-      throw error;
-    }
-  }
-
-  async getProviderByAddress(walletAddress: string): Promise<any> {
-    try {
-      const contractAddress = ProviderRegistryDev;
-      const contractAbi = ProviderRegistryAbi;
-
-      const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
-
-      const providerData = await contract.getProviderByAddress(walletAddress);
-
-      return {
-        name: providerData[0],
-        region: providerData[1],
-        attributes: providerData[2],
-        hostUri: providerData[3],
-        certificate: providerData[4],
-        paymentsAccepted: providerData[5],
-        status: providerData[6],
-        tier: providerData[7],
-        joinTimestamp: providerData[8],
-        rewardWallet: providerData[9],
-      };
-    } catch (error) {
-      console.error('Failed to retrieve provider details by address: ', error);
-      throw error;
-    }
-  }
-
-  async getAllProviders(): Promise<FizzProvider[]> {
-    try {
-      const contractAddress = ProviderRegistryDev;
-      const contractAbi = ProviderRegistryAbi;
-
-      const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
-      const providersData = await contract.getAllProviders();
-
-      const providers: FizzProvider[] = providersData.map((provider: any) => ({
-        providerId: provider.providerId.toString(),
-        name: provider.name,
-        region: provider.region,
-        walletAddress: provider.walletAddress,
-        paymentsAccepted: provider.paymentsAccepted,
-        attributes: provider.attributes,
-        hostUri: provider.hostUri,
-        certificate: provider.certificate,
-        status: FizzProviderStatus[provider.status],
-        // tier: FizzProviderTrustTier[provider.tier],
-        tier: Number(provider.tier.toString()),
-        joinTimestamp: Number(provider.joinTimestamp.toString()),
-        rewardWallet: provider.rewardWallet,
-      }));
-
-      return providers;
-    } catch (error) {
-      console.error('Failed to retrieve all providers: ', error);
-      throw error;
-    }
-  }
-
   async getFizzLeases(
     fizzId: bigint,
     providerId: bigint,
     state?: string
   ): Promise<FizzLease[] | unknown> {
     try {
-      const providerData = await this.getProvider(providerId);
+      const providerData = await this.providerModule.getProvider(providerId);
       const walletAddress = providerData.walletAddress;
 
       const leaseContractAddress = ComputeLeaseDev;
