@@ -1,7 +1,7 @@
 import ComputeLeaseAbi from '@contracts/abis/devnet/ComputeLease.json';
 import { ComputeLeaseDev as ComputeLease } from '@contracts/addresses';
 import { OrderModule } from '@modules/order';
-import { getTokenDetails } from '@utils/index';
+import { getTokenDetails, initializeSigner } from '@utils/index';
 import { ethers } from 'ethers';
 import { Lease, LeaseState, LeaseWithOrderDetails } from './types';
 import { getLeaseStateAsString } from '@utils/lease';
@@ -14,14 +14,20 @@ export class LeaseModule {
   private fizzModule: FizzModule;
   private websocketProvider?: ethers.WebSocketProvider;
   private leaseCloseTimeoutId: NodeJS.Timeout | null;
+  private wallet: ethers.Wallet | undefined;
 
-  constructor(provider: ethers.Provider, websocketProvider?: ethers.WebSocketProvider) {
+  constructor(
+    provider: ethers.Provider,
+    websocketProvider?: ethers.WebSocketProvider,
+    wallet?: ethers.Wallet
+  ) {
     this.provider = provider;
     this.websocketProvider = websocketProvider;
     this.getLeaseDetails = this.getLeaseDetails.bind(this);
     this.orderModule = new OrderModule(provider);
     this.fizzModule = new FizzModule(provider, websocketProvider);
     this.leaseCloseTimeoutId = null;
+    this.wallet = wallet;
   }
 
   async getLeaseDetails(leaseId: string) {
@@ -142,7 +148,7 @@ export class LeaseModule {
       })
     );
 
-    console.log("leases -> ", leaseWithToken);
+    console.log('leases -> ', leaseWithToken);
 
     return {
       leases: leaseWithToken,
@@ -156,8 +162,7 @@ export class LeaseModule {
     const contractAbi = ComputeLeaseAbi;
     const contractAddress = ComputeLease;
     try {
-      const provider = new ethers.BrowserProvider(window.ethereum);
-      const signer = await provider.getSigner();
+      const { signer } = await initializeSigner({ wallet: this.wallet });
       const contract = new ethers.Contract(contractAddress, contractAbi, signer);
       const tx = await contract.closeLease(leaseId);
       const receipt = await tx.wait();

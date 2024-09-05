@@ -26,15 +26,22 @@ import {
   // FizzProviderTrustTier,
 } from './types';
 import { TransactionData } from '@modules/escrow/types';
+import { initializeSigner } from '@utils/index';
 
 export class FizzModule {
   private provider: ethers.Provider;
   private webSocketProvider: ethers.WebSocketProvider | undefined;
   private timeoutId: NodeJS.Timeout | undefined;
+  private wallet: ethers.Wallet | undefined;
 
-  constructor(provider: ethers.Provider, webSocketProvider?: ethers.WebSocketProvider) {
+  constructor(
+    provider: ethers.Provider,
+    webSocketProvider?: ethers.WebSocketProvider,
+    wallet?: ethers.Wallet
+  ) {
     this.provider = provider;
     this.webSocketProvider = webSocketProvider;
+    this.wallet = wallet;
   }
 
   async withdrawFizzEarnings({
@@ -50,10 +57,7 @@ export class FizzModule {
     }
 
     try {
-      await window.ethereum.request({ method: 'eth_requestAccounts' });
-
-      const provider = new ethers.BrowserProvider(window.ethereum);
-      const signer = await provider.getSigner();
+      const { signer } = await initializeSigner({ wallet: this.wallet });
 
       const contractABI = EscrowAbi;
       const contractAddress = EscrowDev;
@@ -97,15 +101,7 @@ export class FizzModule {
 
   async addFizzNode(fizzParams: FizzParams, regFee: bigint): Promise<unknown> {
     try {
-      if (typeof window?.ethereum === 'undefined') {
-        console.log('Please install MetaMask');
-        return 'MetaMask not installed';
-      }
-
-      await window.ethereum.request({ method: 'eth_requestAccounts' });
-
-      const provider = new ethers.BrowserProvider(window.ethereum);
-      const signer = await provider.getSigner();
+      const { signer } = await initializeSigner({ wallet: this.wallet });
 
       const contractAddress = FizzRegistryDev;
       const abi = FizzRegistryAbi;
@@ -126,14 +122,7 @@ export class FizzModule {
 
   async updateFizzName(newName: string): Promise<unknown> {
     try {
-      if (typeof window?.ethereum === 'undefined') {
-        console.log('Please install MetaMask');
-        return 'MetaMask not installed';
-      }
-
-      await window.ethereum.request({ method: 'eth_requestAccounts' });
-      const provider = new ethers.BrowserProvider(window.ethereum);
-      const signer = await provider.getSigner();
+      const { signer } = await initializeSigner({ wallet: this.wallet });
 
       // Contract address (hardcoded or retrieved from an environment variable)
       const contractAddress = FizzRegistryDev;
@@ -253,11 +242,7 @@ export class FizzModule {
 
   async submitAttributes(category: string, ids: bigint[], units: bigint[]): Promise<void> {
     try {
-      const provider = new ethers.BrowserProvider(window.ethereum);
-
-      await provider.send('eth_requestAccounts', []);
-
-      const signer = await provider.getSigner();
+      const { signer } = await initializeSigner({ wallet: this.wallet });
 
       const contractAddress = FizzAttributeRegistryDev;
       const contractAbi = FizzAttributeRegistryAbi;
@@ -520,9 +505,7 @@ export class FizzModule {
 
   async updateFizzSpecs(specs: string) {
     try {
-      const provider = new ethers.BrowserProvider(window.ethereum);
-      await provider.send('eth_requestAccounts', []);
-      const signer = await provider.getSigner();
+      const { signer } = await initializeSigner({ wallet: this.wallet });
 
       const contractAddress = FizzRegistryDev;
       const contractAbi = FizzRegistryAbi;
@@ -582,9 +565,7 @@ export class FizzModule {
 
   async updateFizzRegion(region: string) {
     try {
-      const provider = new ethers.BrowserProvider(window.ethereum);
-      await provider.send('eth_requestAccounts', []);
-      const signer = await provider.getSigner();
+      const { signer } = await initializeSigner({ wallet: this.wallet });
 
       const contractAddress = FizzRegistryDev;
       const contractAbi = FizzRegistryAbi;
@@ -644,9 +625,7 @@ export class FizzModule {
 
   async updateFizzProvider(providerId: bigint) {
     try {
-      const provider = new ethers.BrowserProvider(window.ethereum);
-      await provider.send('eth_requestAccounts', []);
-      const signer = await provider.getSigner();
+      const { signer } = await initializeSigner({ wallet: this.wallet });
 
       const contractAddress = FizzRegistryDev;
       const contractAbi = FizzRegistryAbi;
@@ -706,9 +685,7 @@ export class FizzModule {
 
   async addAcceptedPayment(tokenAddress: string) {
     try {
-      const provider = new ethers.BrowserProvider(window.ethereum);
-      await provider.send('eth_requestAccounts', []);
-      const signer = await provider.getSigner();
+      const { signer } = await initializeSigner({ wallet: this.wallet });
 
       const contractAddress = FizzRegistryDev;
       const contractAbi = FizzRegistryAbi;
@@ -768,9 +745,7 @@ export class FizzModule {
 
   async removeAcceptedPayment(tokenAddress: string) {
     try {
-      const provider = new ethers.BrowserProvider(window.ethereum);
-      await provider.send('eth_requestAccounts', []);
-      const signer = await provider.getSigner();
+      const { signer } = await initializeSigner({ wallet: this.wallet });
 
       const contractAddress = FizzRegistryDev;
       const contractAbi = FizzRegistryAbi;

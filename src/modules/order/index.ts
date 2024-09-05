@@ -3,7 +3,7 @@ import OrderRequestAbi from '@contracts/abis/devnet/OrderRequest.json';
 import BidAbi from '@contracts/abis/devnet/Bid.json';
 import { ethers } from 'ethers';
 import { InitialOrder, OrderDetails, Tier } from './types';
-import { getTokenDetails } from '@utils/index';
+import { getTokenDetails, initializeSigner } from '@utils/index';
 import { getOrderStateAsString } from '@utils/order';
 
 export class OrderModule {
@@ -11,12 +11,18 @@ export class OrderModule {
   private websocketProvider?: ethers.WebSocketProvider;
   private createTimeoutId: NodeJS.Timeout | null;
   private updateTimeoutId: NodeJS.Timeout | null;
+  private wallet: ethers.Wallet | undefined;
 
-  constructor(provider: ethers.Provider, websocketProvider?: ethers.WebSocketProvider) {
+  constructor(
+    provider: ethers.Provider,
+    websocketProvider?: ethers.WebSocketProvider,
+    wallet?: ethers.Wallet
+  ) {
     this.provider = provider;
     this.websocketProvider = websocketProvider;
     this.createTimeoutId = null;
     this.updateTimeoutId = null;
+    this.wallet = wallet;
   }
 
   async createOrder(orderDetails: OrderDetails) {
@@ -26,10 +32,7 @@ export class OrderModule {
     }
 
     try {
-      await window.ethereum.request({ method: 'eth_requestAccounts' });
-
-      const provider = new ethers.BrowserProvider(window.ethereum);
-      const signer = await provider.getSigner();
+      const { signer } = await initializeSigner({ wallet: this.wallet });
 
       const contract = new ethers.Contract(OrderRequest, OrderRequestAbi, signer);
 
@@ -50,10 +53,7 @@ export class OrderModule {
     }
 
     try {
-      await window.ethereum.request({ method: 'eth_requestAccounts' });
-
-      const provider = new ethers.BrowserProvider(window.ethereum);
-      const signer = await provider.getSigner();
+      const { signer } = await initializeSigner({ wallet: this.wallet });
 
       const contract = new ethers.Contract(OrderRequest, OrderRequestAbi, signer);
 

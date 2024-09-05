@@ -65,3 +65,24 @@ export const requestPipeline = async ({
     return res.text();
   }
 };
+
+export const initializeSigner = async ({ wallet }: { wallet?: ethers.Wallet }) => {
+  if (wallet) {
+    return { signer: wallet };
+  }
+
+  if (typeof window?.ethereum === 'undefined') {
+    throw new Error('Please install MetaMask');
+  }
+
+  try {
+    await window.ethereum.request({ method: 'eth_requestAccounts' });
+  } catch (error) {
+    throw new Error('Failed to request Ethereum accounts ->' + error);
+  }
+
+  const provider = new ethers.BrowserProvider(window.ethereum);
+  const signer = await provider.getSigner();
+
+  return { signer };
+};
