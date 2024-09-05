@@ -66,7 +66,7 @@ export const requestPipeline = async ({
   }
 };
 
-export const initializeSigner = async ({ wallet = undefined }: { wallet?: ethers.Wallet }) => {
+export const initializeSigner = async ({ wallet }: { wallet?: ethers.Wallet }) => {
   if (wallet) {
     return { signer: wallet };
   }
