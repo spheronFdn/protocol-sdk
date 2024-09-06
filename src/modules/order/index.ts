@@ -5,6 +5,7 @@ import { ethers } from 'ethers';
 import { InitialOrder, OrderDetails, Tier } from './types';
 import { getTokenDetails, initializeSigner } from '@utils/index';
 import { getOrderStateAsString } from '@utils/order';
+import { handleContractError } from '@utils/errors';
 
 export class OrderModule {
   private provider: ethers.Provider;
@@ -26,11 +27,6 @@ export class OrderModule {
   }
 
   async createOrder(orderDetails: OrderDetails) {
-    if (typeof window?.ethereum === 'undefined') {
-      console.log('Please install MetaMask');
-      return;
-    }
-
     try {
       const { signer } = await initializeSigner({ wallet: this.wallet });
 
@@ -42,7 +38,8 @@ export class OrderModule {
       return receipt;
     } catch (error) {
       console.error('Error creating order -> ', error);
-      throw error;
+      const errorMessage = handleContractError(error, OrderRequestAbi);
+      throw errorMessage;
     }
   }
 

@@ -7,6 +7,7 @@ import { Lease, LeaseState, LeaseWithOrderDetails } from './types';
 import { getLeaseStateAsString } from '@utils/lease';
 import { DEFAULT_PAGE_SIZE } from '@config/index';
 import { FizzModule } from '@modules/fizz';
+import { handleContractError } from '@utils/errors';
 
 export class LeaseModule {
   private provider: ethers.Provider;
@@ -169,7 +170,8 @@ export class LeaseModule {
       return receipt;
     } catch (error) {
       console.log('Error in close lease ->', error);
-      throw error;
+      const errorMessage = handleContractError(error, contractAbi);
+      throw errorMessage;
     }
   }
 
