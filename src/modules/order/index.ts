@@ -44,11 +44,6 @@ export class OrderModule {
   }
 
   async updateOrder(orderId: string, orderDetails: OrderDetails) {
-    if (typeof window?.ethereum === 'undefined') {
-      console.log('Please install metamask');
-      return;
-    }
-
     try {
       const { signer } = await initializeSigner({ wallet: this.wallet });
 

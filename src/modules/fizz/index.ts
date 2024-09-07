@@ -51,11 +51,6 @@ export class FizzModule {
     onSuccessCallback,
     onFailureCallback,
   }: TransactionData) {
-    if (typeof window?.ethereum === 'undefined') {
-      console.log('Please install MetaMask');
-      return;
-    }
-
     try {
       const { signer } = await initializeSigner({ wallet: this.wallet });
 
