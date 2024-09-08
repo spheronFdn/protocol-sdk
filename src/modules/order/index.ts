@@ -57,7 +57,8 @@ export class OrderModule {
       return receipt;
     } catch (error) {
       console.error('Error in updating order -> ', error);
-      throw error;
+      const errorMessage = handleContractError(error, OrderRequestAbi);
+      throw errorMessage;
     }
   }
 

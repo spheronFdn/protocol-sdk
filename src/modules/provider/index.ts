@@ -3,6 +3,7 @@ import { ProviderRegistryDev as ProviderRegistry } from '@contracts/addresses';
 import { ethers } from 'ethers';
 import { Category, IProvider } from './types';
 import { isValidEthereumAddress } from '@utils/index';
+import { handleContractError } from '@utils/errors';
 
 export class ProviderModule {
   private provider: ethers.Provider;
@@ -43,7 +44,8 @@ export class ProviderModule {
       return providerDetailsData;
     } catch (error) {
       console.log('Error in get Provider Details ->', error);
-      return error;
+      const errorMessage = handleContractError(error, ProviderRegistryAbi);
+      throw errorMessage;
     }
   }
 
@@ -72,7 +74,8 @@ export class ProviderModule {
       return response;
     } catch (error) {
       console.log('Error in get Provider Pending Attrs ->', error);
-      return error;
+      const errorMessage = handleContractError(error, ProviderRegistryAbi);
+      throw errorMessage;
     }
   }
 
@@ -101,7 +104,8 @@ export class ProviderModule {
       return response;
     } catch (error) {
       console.log('Error in get Provider Attrs ->', error);
-      return error;
+      const errorMessage = handleContractError(error, ProviderRegistryAbi);
+      throw errorMessage;
     }
   }
 }

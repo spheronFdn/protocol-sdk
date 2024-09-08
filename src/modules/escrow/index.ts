@@ -4,6 +4,7 @@ import { EscrowDev as Escrow } from '@contracts/addresses';
 import { ethers } from 'ethers';
 import { TransactionData } from './types';
 import { initializeSigner } from '@utils/index';
+import { handleContractError } from '@utils/errors';
 
 export class EscrowModule {
   private provider: ethers.Provider;
@@ -32,7 +33,8 @@ export class EscrowModule {
       return providerEarnings;
     } catch (error) {
       console.error('Error in getProviderEarnings:', error);
-      throw error;
+      const errorMessage = handleContractError(error, EscrowAbi);
+      throw errorMessage;
     }
   }
 
@@ -52,7 +54,8 @@ export class EscrowModule {
       return userData;
     } catch (error) {
       console.error('Error in getUserData:', error);
-      throw error;
+      const errorMessage = handleContractError(error, EscrowAbi);
+      throw errorMessage;
     }
   }
 
@@ -82,7 +85,8 @@ export class EscrowModule {
     } catch (error) {
       console.error('Error withdrawing provider earnings-> ', error);
       if (onFailureCallback) onFailureCallback(error);
-      return error;
+      const errorMessage = handleContractError(error, EscrowAbi);
+      throw errorMessage;
     }
   }
 
@@ -117,7 +121,8 @@ export class EscrowModule {
     } catch (error) {
       console.error('Error balance deposit-> ', error);
       if (onFailureCallback) onFailureCallback(error);
-      return error;
+      const errorMessage = handleContractError(error, EscrowAbi);
+      throw errorMessage;
     }
   }
 
@@ -146,7 +151,8 @@ export class EscrowModule {
     } catch (error) {
       console.error('Error in balance withdraw-> ', error);
       if (onFailureCallback) onFailureCallback(error);
-      return error;
+      const errorMessage = handleContractError(error, EscrowAbi);
+      throw errorMessage;
     }
   }
 }
