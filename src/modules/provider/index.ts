@@ -1,7 +1,11 @@
 import ProviderRegistryAbi from '@contracts/abis/devnet/ProviderRegistry.json';
-import { ProviderRegistryDev as ProviderRegistry } from '@contracts/addresses';
+import {
+  FizzAttributeRegistryDev,
+  ProviderRegistryDev as ProviderRegistry,
+  ProviderRegistryDev,
+} from '@contracts/addresses';
 import { ethers } from 'ethers';
-import { Category, IProvider } from './types';
+import { Attribute, Category, IProvider, Provider, ProviderStatus } from './types';
 import { isValidEthereumAddress } from '@utils/index';
 import { handleContractError } from '@utils/errors';
 
@@ -104,6 +108,149 @@ export class ProviderModule {
       return response;
     } catch (error) {
       console.log('Error in get Provider Attrs ->', error);
+      const errorMessage = handleContractError(error, ProviderRegistryAbi);
+      throw errorMessage;
+    }
+  }
+
+  async getProvider(providerId: bigint): Promise<any> {
+    try {
+      const contractAddress = ProviderRegistryDev;
+      const contractAbi = ProviderRegistryAbi;
+
+      const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
+      const providerData = await contract.getProvider(providerId);
+
+      return {
+        name: providerData[0],
+        region: providerData[1],
+        attributes: providerData[2],
+        hostUri: providerData[3],
+        certificate: providerData[4],
+        paymentsAccepted: providerData[5],
+        status: providerData[6],
+        tier: providerData[7],
+        joinTimestamp: providerData[8],
+        walletAddress: providerData[9],
+        rewardWallet: providerData[10],
+      };
+    } catch (error) {
+      console.error('Failed to retrieve provider details: ', error);
+      const errorMessage = handleContractError(error, ProviderRegistryAbi);
+      throw errorMessage;
+    }
+  }
+
+  async getProviderByAddress(walletAddress: string): Promise<any> {
+    try {
+      const contractAddress = ProviderRegistryDev;
+      const contractAbi = ProviderRegistryAbi;
+
+      const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
+
+      const providerData = await contract.getProviderByAddress(walletAddress);
+
+      return {
+        name: providerData[0],
+        region: providerData[1],
+        attributes: providerData[2],
+        hostUri: providerData[3],
+        certificate: providerData[4],
+        paymentsAccepted: providerData[5],
+        status: providerData[6],
+        tier: providerData[7],
+        joinTimestamp: providerData[8],
+        rewardWallet: providerData[9],
+      };
+    } catch (error) {
+      console.error('Failed to retrieve provider details by address: ', error);
+      const errorMessage = handleContractError(error, ProviderRegistryAbi);
+      throw errorMessage;
+    }
+  }
+
+  async getAllProviders(): Promise<Provider[]> {
+    try {
+      const contractAddress = ProviderRegistryDev;
+      const contractAbi = ProviderRegistryAbi;
+
+      const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
+      const providersData = await contract.getAllProviders();
+
+      const providers: Provider[] = providersData.map((provider: any) => ({
+        providerId: provider.providerId.toString(),
+        name: provider.name,
+        region: provider.region,
+        walletAddress: provider.walletAddress,
+        paymentsAccepted: provider.paymentsAccepted,
+        attributes: provider.attributes,
+        hostUri: provider.hostUri,
+        certificate: provider.certificate,
+        status: ProviderStatus[provider.status],
+        // tier: ProviderTrustTier[provider.tier],
+        tier: Number(provider.tier.toString()),
+        joinTimestamp: Number(provider.joinTimestamp.toString()),
+        rewardWallet: provider.rewardWallet,
+      }));
+
+      return providers;
+    } catch (error) {
+      console.error('Failed to retrieve all providers: ', error);
+      const errorMessage = handleContractError(error, ProviderRegistryAbi);
+      throw errorMessage;
+    }
+  }
+
+  async getAttributes(providerAddress: string, category: string): Promise<Attribute[]> {
+    try {
+      const contractAddress = FizzAttributeRegistryDev;
+      const contractAbi = ProviderRegistryAbi;
+
+      const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
+
+      const attributes: Attribute[] = await contract.getAttributes(providerAddress, category);
+
+      console.log('attributes raw -> ', attributes);
+
+      const decoratedAttributes = attributes.map((attr: any) => ({
+        id: attr[0],
+        units: attr[1],
+      }));
+      console.log(
+        `Attributes for ${providerAddress} in category ${category} retrieved successfully:`,
+        decoratedAttributes
+      );
+      return decoratedAttributes;
+    } catch (error) {
+      console.error('Failed to retrieve attributes: ', error);
+      const errorMessage = handleContractError(error, ProviderRegistryAbi);
+      throw errorMessage;
+    }
+  }
+
+  async getPendingAttributes(providerAddress: string, category: string): Promise<Attribute[]> {
+    try {
+      const contractAddress = FizzAttributeRegistryDev;
+      const contractAbi = ProviderRegistryAbi;
+
+      const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
+
+      const attributes: Attribute[] = await contract.getPendingAttributes(
+        providerAddress,
+        category
+      );
+
+      const decoratedAttributes = attributes.map((attr: any) => ({
+        id: attr[0],
+        units: attr[1],
+      }));
+      console.log(
+        `Pending Attributes for ${providerAddress} in category ${category} retrieved successfully:`,
+        decoratedAttributes
+      );
+      return decoratedAttributes;
+    } catch (error) {
+      console.error('Failed to retrieve pending attributes: ', error);
       const errorMessage = handleContractError(error, ProviderRegistryAbi);
       throw errorMessage;
     }

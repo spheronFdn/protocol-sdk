@@ -7,12 +7,14 @@ import { Lease, LeaseState, LeaseWithOrderDetails } from './types';
 import { getLeaseStateAsString } from '@utils/lease';
 import { DEFAULT_PAGE_SIZE } from '@config/index';
 import { FizzModule } from '@modules/fizz';
+import { ProviderModule } from '@modules/provider';
 import { handleContractError } from '@utils/errors';
 
 export class LeaseModule {
   private provider: ethers.Provider;
   private orderModule: OrderModule;
   private fizzModule: FizzModule;
+  private providerModule: ProviderModule;
   private websocketProvider?: ethers.WebSocketProvider;
   private leaseCloseTimeoutId: NodeJS.Timeout | null;
   private wallet: ethers.Wallet | undefined;
@@ -27,6 +29,7 @@ export class LeaseModule {
     this.getLeaseDetails = this.getLeaseDetails.bind(this);
     this.orderModule = new OrderModule(provider);
     this.fizzModule = new FizzModule(provider, websocketProvider);
+    this.providerModule = new ProviderModule(provider);
     this.leaseCloseTimeoutId = null;
     this.wallet = wallet;
   }
@@ -132,7 +135,9 @@ export class LeaseModule {
           const fizz: any = await this.fizzModule.getFizzById(BigInt(lease.fizzId));
           region = fizz?.region;
         } else {
-          const provider: any = await this.fizzModule.getProviderByAddress(lease.providerAddress);
+          const provider: any = await this.providerModule.getProviderByAddress(
+            lease.providerAddress
+          );
           region = provider?.region;
         }
 

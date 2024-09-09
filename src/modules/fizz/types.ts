@@ -27,11 +27,6 @@ export interface ResourceCategory {
   baseReward: bigint;
 }
 
-export interface Attribute {
-  id: bigint;
-  units: bigint;
-}
-
 export interface Resource {
   name: string;
   tier: string;
@@ -61,38 +56,4 @@ export interface FizzLease {
   startTime: bigint;
   endTime: bigint;
   state: string;
-}
-
-export enum FizzProviderStatus {
-  Unregistered,
-  Registered,
-  Active,
-  Maintenance,
-  Suspended,
-  Deactivated,
-}
-
-export enum FizzProviderTrustTier {
-  One,
-  Two,
-  Three,
-  Four,
-  Five,
-  Six,
-  Seven,
-}
-
-export interface FizzProvider {
-  providerId: bigint;
-  name: string;
-  region: string;
-  walletAddress: string;
-  paymentsAccepted: string[];
-  attributes: string;
-  hostUri: string;
-  certificate: string;
-  status: FizzProviderStatus;
-  tier: FizzProviderTrustTier;
-  joinTimestamp: bigint;
-  rewardWallet: string;
 }

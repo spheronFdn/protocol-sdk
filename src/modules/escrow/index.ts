@@ -1,6 +1,6 @@
 import EscrowAbi from '@contracts/abis/devnet/Escrow.json';
 import TokenAbi from '@contracts/abis/devnet/TestToken.json';
-import { EscrowDev as Escrow } from '@contracts/addresses';
+import { EscrowDev as Escrow, EscrowDev } from '@contracts/addresses';
 import { ethers } from 'ethers';
 import { DepositData, TransactionData } from './types';
 import { networkType, tokenMap } from '@config/index';
@@ -102,7 +102,8 @@ export class EscrowModule {
     } catch (error) {
       console.error('Error balance deposit -> ', error);
       if (onFailureCallback) onFailureCallback(error);
-      return error;
+      const errorMessage = handleContractError(error, EscrowAbi);
+      throw errorMessage;
     }
   }
 
@@ -131,7 +132,8 @@ export class EscrowModule {
     } catch (error) {
       console.error('Error in balance withdraw -> ', error);
       if (onFailureCallback) onFailureCallback(error);
-      return error;
+      const errorMessage = handleContractError(error, EscrowAbi);
+      throw errorMessage;
     }
   }
 
@@ -160,6 +162,58 @@ export class EscrowModule {
     } catch (error) {
       console.error('Error withdrawing provider earnings-> ', error);
       if (onFailureCallback) onFailureCallback(error);
+      const errorMessage = handleContractError(error, EscrowAbi);
+      throw errorMessage;
+    }
+  }
+
+  async withdrawFizzEarnings({
+    tokenAddress,
+    amount,
+    decimals,
+    onSuccessCallback,
+    onFailureCallback,
+  }: TransactionData) {
+    try {
+      const { signer } = await initializeSigner({ wallet: this.wallet });
+
+      const contractABI = EscrowAbi;
+      const contractAddress = EscrowDev;
+      const contract = new ethers.Contract(contractAddress, contractABI, signer);
+
+      const finalAmount = (Number(amount.toString()) - 1) / 10 ** decimals;
+      const withdrawAmount = ethers.parseUnits(finalAmount.toFixed(decimals), decimals);
+
+      const result = await contract.withdrawFizzNodeEarnings(tokenAddress, withdrawAmount);
+      const receipt = await result.wait();
+      console.log('Withdraw earnings successful -> ', receipt);
+      if (onSuccessCallback) onSuccessCallback(receipt);
+      return receipt;
+    } catch (error) {
+      console.error('Error withdrawing fizz earnings -> ', error);
+      if (onFailureCallback) onFailureCallback(error);
+      const errorMessage = handleContractError(error, EscrowAbi);
+      throw errorMessage;
+    }
+  }
+
+  async getFizzEarnings(fizzAddress: string, tokenAddress: string) {
+    try {
+      const contractAbi = EscrowAbi;
+      const contractAddress = EscrowDev;
+      const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
+
+      const response = await contract.getFizzNodeEarnings(fizzAddress, tokenAddress);
+
+      const fizzEarnings: { earned: string; withdrawn: string; balance: string } = {
+        earned: response[0].toString(),
+        withdrawn: response[1].toString(),
+        balance: response[2].toString(),
+      };
+
+      return fizzEarnings;
+    } catch (error) {
+      console.error('Error in getFizzEarnings:', error);
       const errorMessage = handleContractError(error, EscrowAbi);
       throw errorMessage;
     }
