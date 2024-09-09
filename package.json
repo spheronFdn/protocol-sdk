@@ -1,6 +1,6 @@
 {
   "name": "@spheron/protocol-sdk",
-  "version": "1.0.0-devnet.4",
+  "version": "1.0.0-rc.0",
   "description": "Spheron Protocol SDK",
   "repository": {
     "type": "git",
@@ -27,7 +27,7 @@
     "sdk",
     "protocol"
   ],
-  "license": "ISC",
+  "license": "Apache-2.0",
   "devDependencies": {
     "@rollup/plugin-alias": "^5.1.0",
     "@rollup/plugin-commonjs": "^26.0.1",
