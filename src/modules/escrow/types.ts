@@ -22,3 +22,10 @@ export interface TransactionData {
   onSuccessCallback?: (data: unknown) => void;
   onFailureCallback?: (data: unknown) => void;
 }
+
+export interface DepositData {
+  token: string;
+  amount: number;
+  onSuccessCallback?: (data: unknown) => void;
+  onFailureCallback?: (data: unknown) => void;
+}
