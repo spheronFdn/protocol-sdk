@@ -48,6 +48,9 @@ export class EscrowModule {
       const tokenDetails = tokenMap[networkType].find(
         (eachToken) => eachToken.symbol.toLowerCase() === token.toLowerCase()
       );
+      if (!tokenDetails) {
+        throw new Error('Provided token symbol is invalid.');
+      }
       const tokenAddress: any = tokenDetails?.address;
 
       const response = await contract.getUserData(walletAddress, tokenAddress);
@@ -82,6 +85,9 @@ export class EscrowModule {
       const tokenDetails = tokenMap[networkType].find(
         (eachToken) => eachToken.symbol.toLowerCase() === token.toLowerCase()
       );
+      if (!tokenDetails) {
+        throw new Error('Provided token symbol is invalid.');
+      }
       const decimals = tokenDetails?.decimal ?? 18;
       const tokenAddress: any = tokenDetails?.address;
 
@@ -116,6 +122,9 @@ export class EscrowModule {
       const tokenDetails = tokenMap[networkType].find(
         (eachToken) => eachToken.symbol.toLowerCase() === token.toLowerCase()
       );
+      if (!tokenDetails) {
+        throw new Error('Provided token symbol is invalid.');
+      }
       const decimals = tokenDetails?.decimal ?? 18;
       const tokenAddress: any = tokenDetails?.address;
 
