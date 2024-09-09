@@ -1,14 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import EscrowAbi from '@contracts/abis/devnet/Escrow.json';
 import FizzRegistryAbi from '@contracts/abis/devnet/FizzRegistry.json';
 import ResourceRegistryAbi from '@contracts/abis/devnet/ResourceRegistry.json';
 import ComputeLeaseAbi from '@contracts/abis/devnet/ComputeLease.json';
 import {
-  EscrowDev,
   FizzRegistryDev,
   ResourceRegistryCPUDev,
   ResourceRegistryGPUDev,
-  ProviderRegistryDev,
   ComputeLeaseDev,
 } from '@contracts/addresses';
 import { ethers } from 'ethers';
@@ -19,7 +16,6 @@ import {
   Resource,
   // FizzProviderTrustTier,
 } from './types';
-import { TransactionData } from '@modules/escrow/types';
 import { initializeSigner } from '@utils/index';
 import { ProviderModule } from '@modules/provider';
 
@@ -39,61 +35,6 @@ export class FizzModule {
     this.webSocketProvider = webSocketProvider;
     this.wallet = wallet;
     this.providerModule = new ProviderModule(provider);
-  }
-
-  async withdrawFizzEarnings({
-    tokenAddress,
-    amount,
-    decimals,
-    onSuccessCallback,
-    onFailureCallback,
-  }: TransactionData) {
-    if (typeof window?.ethereum === 'undefined') {
-      console.log('Please install MetaMask');
-      return;
-    }
-
-    try {
-      const { signer } = await initializeSigner({ wallet: this.wallet });
-
-      const contractABI = EscrowAbi;
-      const contractAddress = EscrowDev;
-      const contract = new ethers.Contract(contractAddress, contractABI, signer);
-
-      const finalAmount = (Number(amount.toString()) - 1) / 10 ** decimals;
-      const withdrawAmount = ethers.parseUnits(finalAmount.toFixed(decimals), decimals);
-
-      const result = await contract.withdrawFizzNodeEarnings(tokenAddress, withdrawAmount);
-      const receipt = await result.wait();
-      console.log('Withdraw earnings successful -> ', receipt);
-      if (onSuccessCallback) onSuccessCallback(receipt);
-      return receipt;
-    } catch (error) {
-      console.error('Error withdrawing fizz earnings -> ', error);
-      if (onFailureCallback) onFailureCallback(error);
-      throw error;
-    }
-  }
-
-  async getFizzEarnings(fizzAddress: string, tokenAddress: string) {
-    try {
-      const contractAbi = EscrowAbi;
-      const contractAddress = EscrowDev;
-      const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
-
-      const response = await contract.getFizzNodeEarnings(fizzAddress, tokenAddress);
-
-      const fizzEarnings: { earned: string; withdrawn: string; balance: string } = {
-        earned: response[0].toString(),
-        withdrawn: response[1].toString(),
-        balance: response[2].toString(),
-      };
-
-      return fizzEarnings;
-    } catch (error) {
-      console.error('Error in getFizzEarnings:', error);
-      throw error;
-    }
   }
 
   async addFizzNode(fizzParams: FizzParams, regFee: bigint): Promise<unknown> {
