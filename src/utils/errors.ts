@@ -20,13 +20,13 @@ export const handleContractError = (error: any, abi: any[]) => {
     try {
       const iface = new ethers.Interface(abi);
       const decodedError: any = iface.parseError(error.data);
-      const errorMessage = errorMessages[decodedError.name];
+      const errorMessage = decodedError ? errorMessages[decodedError?.name] : '';
       if (errorMessage) {
         console.error(errorMessage);
         return errorMessage;
       } else {
-        console.error("Unhandled error:", decodedError.name);
-        return `Unhandled error: ${decodedError.name}`;
+        console.error("Unhandled error: ", decodedError?.name || '');
+        return "An error occurred while processing your transaction.";
       }
     } catch (decodeError) {
       console.error("Failed to decode the error:", decodeError);
