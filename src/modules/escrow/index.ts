@@ -5,6 +5,7 @@ import { ethers } from 'ethers';
 import { DepositData, TransactionData } from './types';
 import { networkType, tokenMap } from '@config/index';
 import { initializeSigner } from '@utils/index';
+import { handleContractError } from '@utils/errors';
 
 export class EscrowModule {
   private provider: ethers.Provider;
@@ -33,7 +34,8 @@ export class EscrowModule {
       return providerEarnings;
     } catch (error) {
       console.error('Error in getProviderEarnings:', error);
-      throw error;
+      const errorMessage = handleContractError(error, EscrowAbi);
+      throw errorMessage;
     }
   }
 
@@ -46,6 +48,9 @@ export class EscrowModule {
       const tokenDetails = tokenMap[networkType].find(
         (eachToken) => eachToken.symbol.toLowerCase() === token.toLowerCase()
       );
+      if (!tokenDetails) {
+        throw new Error('Provided token symbol is invalid.');
+      }
       const tokenAddress: any = tokenDetails?.address;
 
       const response = await contract.getUserData(walletAddress, tokenAddress);
@@ -63,7 +68,8 @@ export class EscrowModule {
       return userData;
     } catch (error) {
       console.error('Error in getUserData:', error);
-      throw error;
+      const errorMessage = handleContractError(error, EscrowAbi);
+      throw errorMessage;
     }
   }
 
@@ -79,6 +85,9 @@ export class EscrowModule {
       const tokenDetails = tokenMap[networkType].find(
         (eachToken) => eachToken.symbol.toLowerCase() === token.toLowerCase()
       );
+      if (!tokenDetails) {
+        throw new Error('Provided token symbol is invalid.');
+      }
       const decimals = tokenDetails?.decimal ?? 18;
       const tokenAddress: any = tokenDetails?.address;
 
@@ -99,7 +108,8 @@ export class EscrowModule {
     } catch (error) {
       console.error('Error balance deposit -> ', error);
       if (onFailureCallback) onFailureCallback(error);
-      return error;
+      const errorMessage = handleContractError(error, EscrowAbi);
+      throw errorMessage;
     }
   }
 
@@ -112,6 +122,9 @@ export class EscrowModule {
       const tokenDetails = tokenMap[networkType].find(
         (eachToken) => eachToken.symbol.toLowerCase() === token.toLowerCase()
       );
+      if (!tokenDetails) {
+        throw new Error('Provided token symbol is invalid.');
+      }
       const decimals = tokenDetails?.decimal ?? 18;
       const tokenAddress: any = tokenDetails?.address;
 
@@ -128,7 +141,8 @@ export class EscrowModule {
     } catch (error) {
       console.error('Error in balance withdraw -> ', error);
       if (onFailureCallback) onFailureCallback(error);
-      return error;
+      const errorMessage = handleContractError(error, EscrowAbi);
+      throw errorMessage;
     }
   }
 
@@ -157,7 +171,8 @@ export class EscrowModule {
     } catch (error) {
       console.error('Error withdrawing provider earnings-> ', error);
       if (onFailureCallback) onFailureCallback(error);
-      return error;
+      const errorMessage = handleContractError(error, EscrowAbi);
+      throw errorMessage;
     }
   }
 
@@ -168,11 +183,6 @@ export class EscrowModule {
     onSuccessCallback,
     onFailureCallback,
   }: TransactionData) {
-    if (typeof window?.ethereum === 'undefined') {
-      console.log('Please install MetaMask');
-      return;
-    }
-
     try {
       const { signer } = await initializeSigner({ wallet: this.wallet });
 
@@ -191,7 +201,8 @@ export class EscrowModule {
     } catch (error) {
       console.error('Error withdrawing fizz earnings -> ', error);
       if (onFailureCallback) onFailureCallback(error);
-      throw error;
+      const errorMessage = handleContractError(error, EscrowAbi);
+      throw errorMessage;
     }
   }
 
@@ -212,7 +223,8 @@ export class EscrowModule {
       return fizzEarnings;
     } catch (error) {
       console.error('Error in getFizzEarnings:', error);
-      throw error;
+      const errorMessage = handleContractError(error, EscrowAbi);
+      throw errorMessage;
     }
   }
 }

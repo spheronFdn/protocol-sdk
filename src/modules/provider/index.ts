@@ -7,6 +7,7 @@ import {
 import { ethers } from 'ethers';
 import { Attribute, Category, IProvider, Provider, ProviderStatus } from './types';
 import { isValidEthereumAddress } from '@utils/index';
+import { handleContractError } from '@utils/errors';
 
 export class ProviderModule {
   private provider: ethers.Provider;
@@ -47,7 +48,8 @@ export class ProviderModule {
       return providerDetailsData;
     } catch (error) {
       console.log('Error in get Provider Details ->', error);
-      return error;
+      const errorMessage = handleContractError(error, ProviderRegistryAbi);
+      throw errorMessage;
     }
   }
 
@@ -76,7 +78,8 @@ export class ProviderModule {
       return response;
     } catch (error) {
       console.log('Error in get Provider Pending Attrs ->', error);
-      return error;
+      const errorMessage = handleContractError(error, ProviderRegistryAbi);
+      throw errorMessage;
     }
   }
 
@@ -105,7 +108,8 @@ export class ProviderModule {
       return response;
     } catch (error) {
       console.log('Error in get Provider Attrs ->', error);
-      return error;
+      const errorMessage = handleContractError(error, ProviderRegistryAbi);
+      throw errorMessage;
     }
   }
 
@@ -132,7 +136,8 @@ export class ProviderModule {
       };
     } catch (error) {
       console.error('Failed to retrieve provider details: ', error);
-      throw error;
+      const errorMessage = handleContractError(error, ProviderRegistryAbi);
+      throw errorMessage;
     }
   }
 
@@ -159,7 +164,8 @@ export class ProviderModule {
       };
     } catch (error) {
       console.error('Failed to retrieve provider details by address: ', error);
-      throw error;
+      const errorMessage = handleContractError(error, ProviderRegistryAbi);
+      throw errorMessage;
     }
   }
 
@@ -190,7 +196,8 @@ export class ProviderModule {
       return providers;
     } catch (error) {
       console.error('Failed to retrieve all providers: ', error);
-      throw error;
+      const errorMessage = handleContractError(error, ProviderRegistryAbi);
+      throw errorMessage;
     }
   }
 
@@ -216,7 +223,8 @@ export class ProviderModule {
       return decoratedAttributes;
     } catch (error) {
       console.error('Failed to retrieve attributes: ', error);
-      throw error;
+      const errorMessage = handleContractError(error, ProviderRegistryAbi);
+      throw errorMessage;
     }
   }
 
@@ -243,7 +251,8 @@ export class ProviderModule {
       return decoratedAttributes;
     } catch (error) {
       console.error('Failed to retrieve pending attributes: ', error);
-      throw error;
+      const errorMessage = handleContractError(error, ProviderRegistryAbi);
+      throw errorMessage;
     }
   }
 }
