@@ -1,7 +1,8 @@
 import { contractAddresses } from '@contracts/addresses';
 
 // Testnet URLs
-export const SPHERON_DEVNET_HTTP_URL = 'https://spheron-devnet-eth.rpc.caldera.xyz/http';
+// export const SPHERON_DEVNET_HTTP_URL = 'https://spheron-devnet-eth.rpc.caldera.xyz/http';
+export const SPHERON_DEVNET_HTTP_URL = 'https://spheron-devnet-eth.rpc.caldera.xyz/infra-partner-http';
 export const SPHERON_DEVNET_WSS_URL = 'wss://spheron-devnet-eth.rpc.caldera.xyz/ws';
 export const SPHERON_DEVNET_EXPLORER_URL = 'https://spheron-devnet-eth.explorer.caldera.xyz';
 
@@ -105,7 +106,7 @@ export const tokenMap: Record<NetworkType, IToken[]> = {
   mainnet: [],
 };
 
-export const networkType = (process.env.NEXT_PUBLIC_NETWORK_TYPE as NetworkType) || 'testnet';
+export const networkType = (process.env.NETWORK_TYPE as NetworkType) || 'testnet';
 
 export const DEFAULT_PAGE_SIZE = 10;
 
