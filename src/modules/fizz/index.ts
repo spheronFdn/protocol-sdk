@@ -95,7 +95,7 @@ export class FizzModule {
     }
   }
 
-  async addFizzNode(fizzParams: FizzParams, regFee: bigint): Promise<unknown> {
+  async addFizzNode(fizzParams: FizzParams): Promise<unknown> {
     try {
       if (typeof window?.ethereum === 'undefined') {
         console.log('Please install MetaMask');
@@ -111,9 +111,7 @@ export class FizzModule {
       const abi = FizzRegistryAbi;
       const contract = new ethers.Contract(contractAddress, abi, signer);
 
-      const tx = await contract.addFizzNode(fizzParams, {
-        value: regFee,
-      });
+      const tx = await contract.addFizzNode(fizzParams);
       const receipt = await tx.wait();
 
       console.log('Fizz registration successful: ', receipt);
@@ -163,8 +161,6 @@ export class FizzModule {
 
       const {
         providerId,
-        name,
-        region,
         spec,
         paymentsAccepted,
         status,
@@ -175,8 +171,6 @@ export class FizzModule {
 
       return {
         providerId,
-        name,
-        region,
         spec,
         paymentsAccepted,
         status,
@@ -190,7 +184,7 @@ export class FizzModule {
     }
   }
 
-  async getFizzNodeByAddress(walletAddress: string): Promise<FizzNode | unknown> {
+  async getFizzNodeByAddress(walletAddress: string) {
     try {
       const contractAddress = FizzRegistryDev;
       const contractAbi = FizzRegistryAbi;
@@ -200,11 +194,11 @@ export class FizzModule {
       const fizzId = await contract.addressToFizzId(walletAddress);
       const fizzNode: any = await this.getFizzById(fizzId);
 
+      const spec = fizzNode.spec;
+
       const result: FizzNode = {
         fizzId,
         providerId: fizzNode.providerId,
-        name: fizzNode.name,
-        region: fizzNode.region,
         spec: fizzNode.spec,
         walletAddress: fizzNode.walletAddress,
         paymentsAccepted: fizzNode.paymentsAccepted,
@@ -221,7 +215,7 @@ export class FizzModule {
     }
   }
 
-  async getAllFizzNodes(): Promise<FizzNode[] | unknown> {
+  async getAllFizzNodes(): Promise<FizzNode[]> {
     try {
       const contractAddress = FizzRegistryDev;
       const contractAbi = FizzRegistryAbi;
@@ -233,14 +227,12 @@ export class FizzModule {
       const fizzNodes: FizzNode[] = allFizzNodes.map((fizzNode: any) => ({
         fizzId: fizzNode[0],
         providerId: fizzNode[1],
-        name: fizzNode[2],
-        region: fizzNode[3],
-        spec: fizzNode[4],
-        walletAddress: fizzNode[5],
-        paymentsAccepted: fizzNode[6],
-        status: fizzNode[7],
-        joinTimestamp: fizzNode[8],
-        rewardWallet: fizzNode[9],
+        spec: fizzNode[2],
+        walletAddress: fizzNode[3],
+        paymentsAccepted: fizzNode[4],
+        status: fizzNode[5],
+        joinTimestamp: fizzNode[6],
+        rewardWallet: fizzNode[7],
       }));
 
       console.log('All Fizz Nodes: ', fizzNodes);
@@ -356,17 +348,15 @@ export class FizzModule {
       const providerData = await contract.getProvider(providerId);
 
       return {
-        name: providerData[0],
-        region: providerData[1],
-        attributes: providerData[2],
-        hostUri: providerData[3],
-        certificate: providerData[4],
-        paymentsAccepted: providerData[5],
-        status: providerData[6],
-        tier: providerData[7],
-        joinTimestamp: providerData[8],
-        walletAddress: providerData[9],
-        rewardWallet: providerData[10],
+        attributes: providerData[0],
+        hostUri: providerData[1],
+        certificate: providerData[2],
+        paymentsAccepted: providerData[3],
+        status: providerData[4],
+        tier: providerData[5],
+        joinTimestamp: providerData[6],
+        walletAddress: providerData[7],
+        rewardWallet: providerData[8],
       };
     } catch (error) {
       console.error('Failed to retrieve provider details: ', error);
@@ -409,10 +399,9 @@ export class FizzModule {
       const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
       const providersData = await contract.getAllProviders();
 
+      console.log({ providersData });
       const providers: FizzProvider[] = providersData.map((provider: any) => ({
         providerId: provider.providerId.toString(),
-        name: provider.name,
-        region: provider.region,
         walletAddress: provider.walletAddress,
         paymentsAccepted: provider.paymentsAccepted,
         attributes: provider.attributes,
