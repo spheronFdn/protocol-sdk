@@ -194,8 +194,6 @@ export class FizzModule {
       const fizzId = await contract.addressToFizzId(walletAddress);
       const fizzNode: any = await this.getFizzById(fizzId);
 
-      const spec = fizzNode.spec;
-
       const result: FizzNode = {
         fizzId,
         providerId: fizzNode.providerId,
@@ -399,7 +397,6 @@ export class FizzModule {
       const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
       const providersData = await contract.getAllProviders();
 
-      console.log({ providersData });
       const providers: FizzProvider[] = providersData.map((provider: any) => ({
         providerId: provider.providerId.toString(),
         walletAddress: provider.walletAddress,
