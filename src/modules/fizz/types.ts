@@ -84,7 +84,7 @@ export interface FizzProvider {
   region: string;
   walletAddress: string;
   paymentsAccepted: string[];
-  attributes: string;
+  spec: string;
   hostUri: string;
   certificate: string;
   status: FizzProviderStatus;
