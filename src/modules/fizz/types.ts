@@ -9,6 +9,7 @@ export interface FizzParams {
 export interface FizzNode {
   fizzId: bigint;
   providerId: bigint;
+  region: string;
   spec: string;
   walletAddress: string;
   paymentsAccepted: string[];

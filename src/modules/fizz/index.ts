@@ -170,6 +170,7 @@ export class FizzModule {
       } = fizzDetails;
 
       return {
+        region: spec?.split(',')?.[7] ?? '',
         providerId,
         spec,
         paymentsAccepted,
@@ -195,6 +196,7 @@ export class FizzModule {
       const fizzNode: any = await this.getFizzById(fizzId);
 
       const result: FizzNode = {
+        region: fizzNode.spec?.split(',')?.[7] ?? '',
         fizzId,
         providerId: fizzNode.providerId,
         spec: fizzNode.spec,
