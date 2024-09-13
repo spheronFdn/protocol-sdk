@@ -38,6 +38,7 @@ export class FizzModule {
   }
 
   async withdrawFizzEarnings({
+    rewardWallet,
     tokenAddress,
     amount,
     decimals,
@@ -62,7 +63,7 @@ export class FizzModule {
       const finalAmount = (Number(amount.toString()) - 1) / 10 ** decimals;
       const withdrawAmount = ethers.parseUnits(finalAmount.toFixed(decimals), decimals);
 
-      const result = await contract.withdrawFizzNodeEarnings(tokenAddress, withdrawAmount);
+      const result = await contract.withdrawFizzNodeEarnings(rewardWallet, tokenAddress, withdrawAmount);
       const receipt = await result.wait();
       console.log('Withdraw earnings successful -> ', receipt);
       if (onSuccessCallback) onSuccessCallback(receipt);
@@ -87,6 +88,8 @@ export class FizzModule {
         withdrawn: response[1].toString(),
         balance: response[2].toString(),
       };
+
+      console.log("fizz earnings -> ", fizzEarnings);
 
       return fizzEarnings;
     } catch (error) {
