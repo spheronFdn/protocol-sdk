@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import FizzRegistryAbi from '@contracts/abis/devnet/FizzRegistry.json';
-import ResourceRegistryAbi from '@contracts/abis/devnet/ResourceRegistry.json';
-import ComputeLeaseAbi from '@contracts/abis/devnet/ComputeLease.json';
+import FizzRegistryAbi from '@contracts/abis/testnet/FizzRegistry.json';
+import ResourceRegistryAbi from '@contracts/abis/testnet/ResourceRegistry.json';
+import ComputeLeaseAbi from '@contracts/abis/testnet/ComputeLease.json';
 import {
-  FizzRegistryDev,
-  ResourceRegistryCPUDev,
-  ResourceRegistryGPUDev,
-  ComputeLeaseDev,
+  FizzRegistryTestnet,
+  ResourceRegistryCPUTestnet,
+  ResourceRegistryGPUTestnet,
+  ComputeLeaseTestnet,
 } from '@contracts/addresses';
 import { ethers } from 'ethers';
 import {
@@ -42,7 +42,7 @@ export class FizzModule {
     try {
       const { signer } = await initializeSigner({ wallet: this.wallet });
 
-      const contractAddress = FizzRegistryDev;
+      const contractAddress = FizzRegistryTestnet;
       const abi = FizzRegistryAbi;
       const contract = new ethers.Contract(contractAddress, abi, signer);
 
@@ -65,7 +65,7 @@ export class FizzModule {
       const { signer } = await initializeSigner({ wallet: this.wallet });
 
       // Contract address (hardcoded or retrieved from an environment variable)
-      const contractAddress = FizzRegistryDev;
+      const contractAddress = FizzRegistryTestnet;
       const abi = FizzRegistryAbi;
       const contract = new ethers.Contract(contractAddress, abi, signer);
 
@@ -84,7 +84,7 @@ export class FizzModule {
 
   async getFizzById(fizzId: bigint): Promise<unknown> {
     try {
-      const contractAddress = FizzRegistryDev;
+      const contractAddress = FizzRegistryTestnet;
       const contractAbi = FizzRegistryAbi;
 
       const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
@@ -123,7 +123,7 @@ export class FizzModule {
 
   async getFizzNodeByAddress(walletAddress: string): Promise<FizzNode | unknown> {
     try {
-      const contractAddress = FizzRegistryDev;
+      const contractAddress = FizzRegistryTestnet;
       const contractAbi = FizzRegistryAbi;
 
       const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
@@ -155,7 +155,7 @@ export class FizzModule {
 
   async getAllFizzNodes(): Promise<FizzNode[] | unknown> {
     try {
-      const contractAddress = FizzRegistryDev;
+      const contractAddress = FizzRegistryTestnet;
       const contractAbi = FizzRegistryAbi;
 
       const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
@@ -187,7 +187,7 @@ export class FizzModule {
   async getResource(resourceID: bigint, category: string): Promise<Resource> {
     try {
       const contractAbi = ResourceRegistryAbi;
-      const contractAddress = category === 'CPU' ? ResourceRegistryCPUDev : ResourceRegistryGPUDev;
+      const contractAddress = category === 'CPU' ? ResourceRegistryCPUTestnet : ResourceRegistryGPUTestnet;
 
       const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
 
@@ -216,7 +216,7 @@ export class FizzModule {
       const providerData = await this.providerModule.getProvider(providerId);
       const walletAddress = providerData.walletAddress;
 
-      const leaseContractAddress = ComputeLeaseDev;
+      const leaseContractAddress = ComputeLeaseTestnet;
       const leaseContractAbi = ComputeLeaseAbi;
       const leaseContract = new ethers.Contract(
         leaseContractAddress,
@@ -264,7 +264,7 @@ export class FizzModule {
     onFailureCallback: () => void,
     timeoutTime = 60000
   ) {
-    const contractAddress = FizzRegistryDev;
+    const contractAddress = FizzRegistryTestnet;
     const contractAbi = FizzRegistryAbi;
 
     try {
@@ -299,7 +299,7 @@ export class FizzModule {
     try {
       const { signer } = await initializeSigner({ wallet: this.wallet });
 
-      const contractAddress = FizzRegistryDev;
+      const contractAddress = FizzRegistryTestnet;
       const contractAbi = FizzRegistryAbi;
 
       const contract = new ethers.Contract(contractAddress, contractAbi, signer);
@@ -321,7 +321,7 @@ export class FizzModule {
     onFailureCallback: () => void,
     timeoutTime = 60000
   ) {
-    const contractAddress = FizzRegistryDev;
+    const contractAddress = FizzRegistryTestnet;
     const contractAbi = FizzRegistryAbi;
 
     try {
@@ -361,7 +361,7 @@ export class FizzModule {
     try {
       const { signer } = await initializeSigner({ wallet: this.wallet });
 
-      const contractAddress = FizzRegistryDev;
+      const contractAddress = FizzRegistryTestnet;
       const contractAbi = FizzRegistryAbi;
 
       const contract = new ethers.Contract(contractAddress, contractAbi, signer);
@@ -383,7 +383,7 @@ export class FizzModule {
     onFailureCallback: () => void,
     timeoutTime = 60000
   ) {
-    const contractAddress = FizzRegistryDev;
+    const contractAddress = FizzRegistryTestnet;
     const contractAbi = FizzRegistryAbi;
 
     try {
@@ -423,7 +423,7 @@ export class FizzModule {
     try {
       const { signer } = await initializeSigner({ wallet: this.wallet });
 
-      const contractAddress = FizzRegistryDev;
+      const contractAddress = FizzRegistryTestnet;
       const contractAbi = FizzRegistryAbi;
 
       const contract = new ethers.Contract(contractAddress, contractAbi, signer);
@@ -445,7 +445,7 @@ export class FizzModule {
     onFailureCallback: () => void,
     timeoutTime = 60000
   ) {
-    const contractAddress = FizzRegistryDev;
+    const contractAddress = FizzRegistryTestnet;
     const contractAbi = FizzRegistryAbi;
 
     try {
@@ -485,7 +485,7 @@ export class FizzModule {
     try {
       const { signer } = await initializeSigner({ wallet: this.wallet });
 
-      const contractAddress = FizzRegistryDev;
+      const contractAddress = FizzRegistryTestnet;
       const contractAbi = FizzRegistryAbi;
 
       const contract = new ethers.Contract(contractAddress, contractAbi, signer);
@@ -507,7 +507,7 @@ export class FizzModule {
     onFailureCallback: () => void,
     timeoutTime = 60000
   ) {
-    const contractAddress = FizzRegistryDev;
+    const contractAddress = FizzRegistryTestnet;
     const contractAbi = FizzRegistryAbi;
 
     try {
@@ -547,7 +547,7 @@ export class FizzModule {
     try {
       const { signer } = await initializeSigner({ wallet: this.wallet });
 
-      const contractAddress = FizzRegistryDev;
+      const contractAddress = FizzRegistryTestnet;
       const contractAbi = FizzRegistryAbi;
 
       const contract = new ethers.Contract(contractAddress, contractAbi, signer);
@@ -569,7 +569,7 @@ export class FizzModule {
     onFailureCallback: () => void,
     timeoutTime = 60000
   ) {
-    const contractAddress = FizzRegistryDev;
+    const contractAddress = FizzRegistryTestnet;
     const contractAbi = FizzRegistryAbi;
 
     try {

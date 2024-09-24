@@ -1,5 +1,5 @@
-import ComputeLeaseAbi from '@contracts/abis/devnet/ComputeLease.json';
-import { ComputeLeaseDev as ComputeLease } from '@contracts/addresses';
+import ComputeLeaseAbi from '@contracts/abis/testnet/ComputeLease.json';
+import { ComputeLeaseTestnet as ComputeLease } from '@contracts/addresses';
 import { OrderModule } from '@modules/order';
 import { getTokenDetails, initializeSigner } from '@utils/index';
 import { ethers } from 'ethers';

@@ -10,6 +10,16 @@
         "internalType": "address",
         "name": "_tokenRegistryAddress",
         "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_access",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_maxBlockNumber",
+        "type": "uint256"
       }
     ],
     "stateMutability": "nonpayable",
@@ -17,28 +27,22 @@
   },
   {
     "inputs": [],
-    "name": "AccessControlBadConfirmation",
-    "type": "error"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "account",
-        "type": "address"
-      },
-      {
-        "internalType": "bytes32",
-        "name": "neededRole",
-        "type": "bytes32"
-      }
-    ],
-    "name": "AccessControlUnauthorizedAccount",
+    "name": "InsufficientBalance",
     "type": "error"
   },
   {
     "inputs": [],
     "name": "InvalidAddress",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "InvalidAmount",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "InvalidBlockNumber",
     "type": "error"
   },
   {
@@ -104,6 +108,19 @@
     "inputs": [
       {
         "indexed": false,
+        "internalType": "uint256",
+        "name": "maxBlockNumber",
+        "type": "uint256"
+      }
+    ],
+    "name": "MaxBlockNumberUpdated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
         "internalType": "uint64",
         "name": "orderId",
         "type": "uint64"
@@ -161,81 +178,6 @@
     "inputs": [
       {
         "indexed": true,
-        "internalType": "bytes32",
-        "name": "role",
-        "type": "bytes32"
-      },
-      {
-        "indexed": true,
-        "internalType": "bytes32",
-        "name": "previousAdminRole",
-        "type": "bytes32"
-      },
-      {
-        "indexed": true,
-        "internalType": "bytes32",
-        "name": "newAdminRole",
-        "type": "bytes32"
-      }
-    ],
-    "name": "RoleAdminChanged",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "bytes32",
-        "name": "role",
-        "type": "bytes32"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "account",
-        "type": "address"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "sender",
-        "type": "address"
-      }
-    ],
-    "name": "RoleGranted",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "bytes32",
-        "name": "role",
-        "type": "bytes32"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "account",
-        "type": "address"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "sender",
-        "type": "address"
-      }
-    ],
-    "name": "RoleRevoked",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
         "internalType": "address",
         "name": "_registryContract",
         "type": "address"
@@ -259,25 +201,12 @@
   },
   {
     "inputs": [],
-    "name": "BID_CONTRACT_ROLE",
+    "name": "accessControl",
     "outputs": [
       {
-        "internalType": "bytes32",
+        "internalType": "contract IAccessControlManager",
         "name": "",
-        "type": "bytes32"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "DEFAULT_ADMIN_ROLE",
-    "outputs": [
-      {
-        "internalType": "bytes32",
-        "name": "",
-        "type": "bytes32"
+        "type": "address"
       }
     ],
     "stateMutability": "view",
@@ -287,31 +216,6 @@
     "inputs": [
       {
         "components": [
-          {
-            "internalType": "string",
-            "name": "name",
-            "type": "string"
-          },
-          {
-            "internalType": "string",
-            "name": "region",
-            "type": "string"
-          },
-          {
-            "internalType": "uint64",
-            "name": "uptime",
-            "type": "uint64"
-          },
-          {
-            "internalType": "uint64",
-            "name": "reputation",
-            "type": "uint64"
-          },
-          {
-            "internalType": "uint64",
-            "name": "slashes",
-            "type": "uint64"
-          },
           {
             "internalType": "uint256",
             "name": "maxPrice",
@@ -333,14 +237,14 @@
             "type": "string"
           },
           {
-            "internalType": "string",
+            "internalType": "uint16",
             "name": "version",
-            "type": "string"
+            "type": "uint16"
           },
           {
-            "internalType": "string",
+            "internalType": "enum OrderRequest.Mode",
             "name": "mode",
-            "type": "string"
+            "type": "uint8"
           },
           {
             "internalType": "enum OrderRequest.Tier[]",
@@ -383,31 +287,6 @@
             "type": "uint64"
           },
           {
-            "internalType": "string",
-            "name": "name",
-            "type": "string"
-          },
-          {
-            "internalType": "string",
-            "name": "region",
-            "type": "string"
-          },
-          {
-            "internalType": "uint64",
-            "name": "uptime",
-            "type": "uint64"
-          },
-          {
-            "internalType": "uint64",
-            "name": "reputation",
-            "type": "uint64"
-          },
-          {
-            "internalType": "uint64",
-            "name": "slashes",
-            "type": "uint64"
-          },
-          {
             "internalType": "uint256",
             "name": "maxPrice",
             "type": "uint256"
@@ -440,14 +319,14 @@
                 "type": "string"
               },
               {
-                "internalType": "string",
+                "internalType": "uint16",
                 "name": "version",
-                "type": "string"
+                "type": "uint16"
               },
               {
-                "internalType": "string",
+                "internalType": "enum OrderRequest.Mode",
                 "name": "mode",
-                "type": "string"
+                "type": "uint8"
               },
               {
                 "internalType": "enum OrderRequest.Tier[]",
@@ -486,31 +365,6 @@
             "type": "uint64"
           },
           {
-            "internalType": "string",
-            "name": "name",
-            "type": "string"
-          },
-          {
-            "internalType": "string",
-            "name": "region",
-            "type": "string"
-          },
-          {
-            "internalType": "uint64",
-            "name": "uptime",
-            "type": "uint64"
-          },
-          {
-            "internalType": "uint64",
-            "name": "reputation",
-            "type": "uint64"
-          },
-          {
-            "internalType": "uint64",
-            "name": "slashes",
-            "type": "uint64"
-          },
-          {
             "internalType": "uint256",
             "name": "maxPrice",
             "type": "uint256"
@@ -543,14 +397,14 @@
                 "type": "string"
               },
               {
-                "internalType": "string",
+                "internalType": "uint16",
                 "name": "version",
-                "type": "string"
+                "type": "uint16"
               },
               {
-                "internalType": "string",
+                "internalType": "enum OrderRequest.Mode",
                 "name": "mode",
-                "type": "string"
+                "type": "uint8"
               },
               {
                 "internalType": "enum OrderRequest.Tier[]",
@@ -608,31 +462,6 @@
             "type": "uint64"
           },
           {
-            "internalType": "string",
-            "name": "name",
-            "type": "string"
-          },
-          {
-            "internalType": "string",
-            "name": "region",
-            "type": "string"
-          },
-          {
-            "internalType": "uint64",
-            "name": "uptime",
-            "type": "uint64"
-          },
-          {
-            "internalType": "uint64",
-            "name": "reputation",
-            "type": "uint64"
-          },
-          {
-            "internalType": "uint64",
-            "name": "slashes",
-            "type": "uint64"
-          },
-          {
             "internalType": "uint256",
             "name": "maxPrice",
             "type": "uint256"
@@ -665,14 +494,14 @@
                 "type": "string"
               },
               {
-                "internalType": "string",
+                "internalType": "uint16",
                 "name": "version",
-                "type": "string"
+                "type": "uint16"
               },
               {
-                "internalType": "string",
+                "internalType": "enum OrderRequest.Mode",
                 "name": "mode",
-                "type": "string"
+                "type": "uint8"
               },
               {
                 "internalType": "enum OrderRequest.Tier[]",
@@ -694,67 +523,6 @@
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "bytes32",
-        "name": "role",
-        "type": "bytes32"
-      }
-    ],
-    "name": "getRoleAdmin",
-    "outputs": [
-      {
-        "internalType": "bytes32",
-        "name": "",
-        "type": "bytes32"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "bytes32",
-        "name": "role",
-        "type": "bytes32"
-      },
-      {
-        "internalType": "address",
-        "name": "account",
-        "type": "address"
-      }
-    ],
-    "name": "grantRole",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "bytes32",
-        "name": "role",
-        "type": "bytes32"
-      },
-      {
-        "internalType": "address",
-        "name": "account",
-        "type": "address"
-      }
-    ],
-    "name": "hasRole",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
     "inputs": [],
     "name": "lease",
     "outputs": [
@@ -762,6 +530,19 @@
         "internalType": "contract IComputeLease",
         "name": "",
         "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "maxBlockNumber",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -780,31 +561,6 @@
       {
         "internalType": "uint64",
         "name": "id",
-        "type": "uint64"
-      },
-      {
-        "internalType": "string",
-        "name": "name",
-        "type": "string"
-      },
-      {
-        "internalType": "string",
-        "name": "region",
-        "type": "string"
-      },
-      {
-        "internalType": "uint64",
-        "name": "uptime",
-        "type": "uint64"
-      },
-      {
-        "internalType": "uint64",
-        "name": "reputation",
-        "type": "uint64"
-      },
-      {
-        "internalType": "uint64",
-        "name": "slashes",
         "type": "uint64"
       },
       {
@@ -840,14 +596,14 @@
             "type": "string"
           },
           {
-            "internalType": "string",
+            "internalType": "uint16",
             "name": "version",
-            "type": "string"
+            "type": "uint16"
           },
           {
-            "internalType": "string",
+            "internalType": "enum OrderRequest.Mode",
             "name": "mode",
-            "type": "string"
+            "type": "uint8"
           },
           {
             "internalType": "enum OrderRequest.Tier[]",
@@ -884,31 +640,6 @@
         "type": "uint64"
       },
       {
-        "internalType": "string",
-        "name": "name",
-        "type": "string"
-      },
-      {
-        "internalType": "string",
-        "name": "region",
-        "type": "string"
-      },
-      {
-        "internalType": "uint64",
-        "name": "uptime",
-        "type": "uint64"
-      },
-      {
-        "internalType": "uint64",
-        "name": "reputation",
-        "type": "uint64"
-      },
-      {
-        "internalType": "uint64",
-        "name": "slashes",
-        "type": "uint64"
-      },
-      {
         "internalType": "uint256",
         "name": "maxPrice",
         "type": "uint256"
@@ -941,14 +672,14 @@
             "type": "string"
           },
           {
-            "internalType": "string",
+            "internalType": "uint16",
             "name": "version",
-            "type": "string"
+            "type": "uint16"
           },
           {
-            "internalType": "string",
+            "internalType": "enum OrderRequest.Mode",
             "name": "mode",
-            "type": "string"
+            "type": "uint8"
           },
           {
             "internalType": "enum OrderRequest.Tier[]",
@@ -967,56 +698,14 @@
   {
     "inputs": [
       {
-        "internalType": "bytes32",
-        "name": "role",
-        "type": "bytes32"
-      },
-      {
-        "internalType": "address",
-        "name": "callerConfirmation",
-        "type": "address"
+        "internalType": "uint256",
+        "name": "_maxBlockNumber",
+        "type": "uint256"
       }
     ],
-    "name": "renounceRole",
+    "name": "setMaxBlockNumber",
     "outputs": [],
     "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "bytes32",
-        "name": "role",
-        "type": "bytes32"
-      },
-      {
-        "internalType": "address",
-        "name": "account",
-        "type": "address"
-      }
-    ],
-    "name": "revokeRole",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "bytes4",
-        "name": "interfaceId",
-        "type": "bytes4"
-      }
-    ],
-    "name": "supportsInterface",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -1055,31 +744,6 @@
       {
         "components": [
           {
-            "internalType": "string",
-            "name": "name",
-            "type": "string"
-          },
-          {
-            "internalType": "string",
-            "name": "region",
-            "type": "string"
-          },
-          {
-            "internalType": "uint64",
-            "name": "uptime",
-            "type": "uint64"
-          },
-          {
-            "internalType": "uint64",
-            "name": "reputation",
-            "type": "uint64"
-          },
-          {
-            "internalType": "uint64",
-            "name": "slashes",
-            "type": "uint64"
-          },
-          {
             "internalType": "uint256",
             "name": "maxPrice",
             "type": "uint256"
@@ -1100,14 +764,14 @@
             "type": "string"
           },
           {
-            "internalType": "string",
+            "internalType": "uint16",
             "name": "version",
-            "type": "string"
+            "type": "uint16"
           },
           {
-            "internalType": "string",
+            "internalType": "enum OrderRequest.Mode",
             "name": "mode",
-            "type": "string"
+            "type": "uint8"
           },
           {
             "internalType": "enum OrderRequest.Tier[]",

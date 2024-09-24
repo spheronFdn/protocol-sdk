@@ -1,6 +1,6 @@
-import EscrowAbi from '@contracts/abis/devnet/Escrow.json';
-import TokenAbi from '@contracts/abis/devnet/TestToken.json';
-import { EscrowDev as Escrow, EscrowDev } from '@contracts/addresses';
+import EscrowAbi from '@contracts/abis/testnet/Escrow.json';
+import TokenAbi from '@contracts/abis/testnet/TestToken.json';
+import { EscrowTestnet as Escrow } from '@contracts/addresses';
 import { ethers } from 'ethers';
 import { DepositData, TransactionData } from './types';
 import { networkType, tokenMap } from '@config/index';
@@ -51,7 +51,7 @@ export class EscrowModule {
       if (!tokenDetails) {
         throw new Error('Provided token symbol is invalid.');
       }
-      const tokenAddress: any = tokenDetails?.address;
+      const tokenAddress: any = tokenDetails?.address || '0x0000000000000000000000000000000000000000';
 
       const response = await contract.getUserData(walletAddress, tokenAddress);
 
@@ -187,7 +187,7 @@ export class EscrowModule {
       const { signer } = await initializeSigner({ wallet: this.wallet });
 
       const contractABI = EscrowAbi;
-      const contractAddress = EscrowDev;
+      const contractAddress = Escrow;
       const contract = new ethers.Contract(contractAddress, contractABI, signer);
 
       const finalAmount = (Number(amount.toString()) - 1) / 10 ** decimals;
@@ -209,7 +209,7 @@ export class EscrowModule {
   async getFizzEarnings(fizzAddress: string, tokenAddress: string) {
     try {
       const contractAbi = EscrowAbi;
-      const contractAddress = EscrowDev;
+      const contractAddress = Escrow;
       const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
 
       const response = await contract.getFizzNodeEarnings(fizzAddress, tokenAddress);

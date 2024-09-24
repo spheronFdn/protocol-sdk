@@ -1,8 +1,8 @@
-import ProviderRegistryAbi from '@contracts/abis/devnet/ProviderRegistry.json';
+import ProviderRegistryAbi from '@contracts/abis/testnet/ProviderRegistry.json';
 import {
-  FizzAttributeRegistryDev,
-  ProviderRegistryDev as ProviderRegistry,
-  ProviderRegistryDev,
+  FizzAttributeRegistryTestnet,
+  ProviderRegistryTestnet as ProviderRegistry,
+  ProviderRegistryTestnet,
 } from '@contracts/addresses';
 import { ethers } from 'ethers';
 import { Attribute, Category, IProvider, Provider, ProviderStatus } from './types';
@@ -115,7 +115,7 @@ export class ProviderModule {
 
   async getProvider(providerId: bigint): Promise<any> {
     try {
-      const contractAddress = ProviderRegistryDev;
+      const contractAddress = ProviderRegistryTestnet;
       const contractAbi = ProviderRegistryAbi;
 
       const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
@@ -143,7 +143,7 @@ export class ProviderModule {
 
   async getProviderByAddress(walletAddress: string): Promise<any> {
     try {
-      const contractAddress = ProviderRegistryDev;
+      const contractAddress = ProviderRegistryTestnet;
       const contractAbi = ProviderRegistryAbi;
 
       const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
@@ -171,7 +171,7 @@ export class ProviderModule {
 
   async getAllProviders(): Promise<Provider[]> {
     try {
-      const contractAddress = ProviderRegistryDev;
+      const contractAddress = ProviderRegistryTestnet;
       const contractAbi = ProviderRegistryAbi;
 
       const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
@@ -203,7 +203,7 @@ export class ProviderModule {
 
   async getAttributes(providerAddress: string, category: string): Promise<Attribute[]> {
     try {
-      const contractAddress = FizzAttributeRegistryDev;
+      const contractAddress = FizzAttributeRegistryTestnet;
       const contractAbi = ProviderRegistryAbi;
 
       const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
@@ -230,7 +230,7 @@ export class ProviderModule {
 
   async getPendingAttributes(providerAddress: string, category: string): Promise<Attribute[]> {
     try {
-      const contractAddress = FizzAttributeRegistryDev;
+      const contractAddress = FizzAttributeRegistryTestnet;
       const contractAbi = ProviderRegistryAbi;
 
       const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
