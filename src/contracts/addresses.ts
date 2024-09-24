@@ -70,4 +70,4 @@ export const contractAddresses = {
     DAI: DAITestnet,
     WETH: WETHTestnet,
   },
-}
+};

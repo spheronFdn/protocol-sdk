@@ -16,6 +16,7 @@ export enum TransactionStatus {
 }
 
 export interface TransactionData {
+  rewardWallet: string;
   tokenAddress: string;
   amount: number;
   decimals: number;

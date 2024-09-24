@@ -147,6 +147,7 @@ export class EscrowModule {
   }
 
   async withdrawProviderEarnings({
+    rewardWallet,
     tokenAddress,
     amount,
     decimals,
@@ -163,7 +164,7 @@ export class EscrowModule {
       const finalAmount = (Number(amount.toString()) - 1) / 10 ** decimals;
       const withdrawAmount = ethers.parseUnits(finalAmount.toFixed(decimals), decimals);
 
-      const result = await contract.withdrawProviderEarnings(tokenAddress, withdrawAmount);
+      const result = await contract.withdrawProviderEarnings(rewardWallet, tokenAddress, withdrawAmount);
       const receipt = await result.wait();
       console.log('Withdraw earnings successfull -> ', receipt);
       if (onSuccessCallback) onSuccessCallback(receipt);
@@ -177,6 +178,7 @@ export class EscrowModule {
   }
 
   async withdrawFizzEarnings({
+    rewardWallet,
     tokenAddress,
     amount,
     decimals,
@@ -193,7 +195,7 @@ export class EscrowModule {
       const finalAmount = (Number(amount.toString()) - 1) / 10 ** decimals;
       const withdrawAmount = ethers.parseUnits(finalAmount.toFixed(decimals), decimals);
 
-      const result = await contract.withdrawFizzNodeEarnings(tokenAddress, withdrawAmount);
+      const result = await contract.withdrawFizzNodeEarnings(rewardWallet, tokenAddress, withdrawAmount);
       const receipt = await result.wait();
       console.log('Withdraw earnings successful -> ', receipt);
       if (onSuccessCallback) onSuccessCallback(receipt);

@@ -85,9 +85,6 @@ export class OrderModule {
 
     return {
       id: response.id.toString(),
-      uptime: Number(response.metrics[0]),
-      reputation: Number(response.metrics[1]),
-      slashes: Number(response.metrics[2]),
       maxPrice: Number(response.maxPrice),
       numOfBlocks: Number(response.numOfBlocks),
       token,

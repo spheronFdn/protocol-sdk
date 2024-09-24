@@ -14,7 +14,6 @@ export enum Mode {
 }
 
 export interface OrderDetails {
-  metrics: [bigint, bigint, bigint]; // [0: uptime, 1: reputation, 2: slashes]
   maxPrice: bigint;
   numOfBlocks: bigint;
   token: string;

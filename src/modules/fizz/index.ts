@@ -38,7 +38,7 @@ export class FizzModule {
     this.providerModule = new ProviderModule(provider);
   }
 
-  async addFizzNode(fizzParams: FizzParams, regFee: bigint): Promise<unknown> {
+  async addFizzNode(fizzParams: FizzParams): Promise<unknown> {
     try {
       const { signer } = await initializeSigner({ wallet: this.wallet });
 
@@ -46,9 +46,7 @@ export class FizzModule {
       const abi = FizzRegistryAbi;
       const contract = new ethers.Contract(contractAddress, abi, signer);
 
-      const tx = await contract.addFizzNode(fizzParams, {
-        value: regFee,
-      });
+      const tx = await contract.addFizzNode(fizzParams);
       const receipt = await tx.wait();
 
       console.log('Fizz registration successful: ', receipt);
@@ -93,8 +91,6 @@ export class FizzModule {
 
       const {
         providerId,
-        name,
-        region,
         spec,
         paymentsAccepted,
         status,
@@ -104,9 +100,8 @@ export class FizzModule {
       } = fizzDetails;
 
       return {
+        region: spec?.split(',')?.[7] ?? '',
         providerId,
-        name,
-        region,
         spec,
         paymentsAccepted,
         status,
@@ -121,7 +116,7 @@ export class FizzModule {
     }
   }
 
-  async getFizzNodeByAddress(walletAddress: string): Promise<FizzNode | unknown> {
+  async getFizzNodeByAddress(walletAddress: string) {
     try {
       const contractAddress = FizzRegistryTestnet;
       const contractAbi = FizzRegistryAbi;
@@ -132,10 +127,9 @@ export class FizzModule {
       const fizzNode: any = await this.getFizzById(fizzId);
 
       const result: FizzNode = {
+        region: fizzNode.spec?.split(',')?.[7] ?? '',
         fizzId,
         providerId: fizzNode.providerId,
-        name: fizzNode.name,
-        region: fizzNode.region,
         spec: fizzNode.spec,
         walletAddress: fizzNode.walletAddress,
         paymentsAccepted: fizzNode.paymentsAccepted,
@@ -153,7 +147,7 @@ export class FizzModule {
     }
   }
 
-  async getAllFizzNodes(): Promise<FizzNode[] | unknown> {
+  async getAllFizzNodes(): Promise<FizzNode[]> {
     try {
       const contractAddress = FizzRegistryTestnet;
       const contractAbi = FizzRegistryAbi;
@@ -165,14 +159,12 @@ export class FizzModule {
       const fizzNodes: FizzNode[] = allFizzNodes.map((fizzNode: any) => ({
         fizzId: fizzNode[0],
         providerId: fizzNode[1],
-        name: fizzNode[2],
-        region: fizzNode[3],
-        spec: fizzNode[4],
-        walletAddress: fizzNode[5],
-        paymentsAccepted: fizzNode[6],
-        status: fizzNode[7],
-        joinTimestamp: fizzNode[8],
-        rewardWallet: fizzNode[9],
+        spec: fizzNode[2],
+        walletAddress: fizzNode[3],
+        paymentsAccepted: fizzNode[4],
+        status: fizzNode[5],
+        joinTimestamp: fizzNode[6],
+        rewardWallet: fizzNode[7],
       }));
 
       console.log('All Fizz Nodes: ', fizzNodes);

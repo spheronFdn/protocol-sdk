@@ -1,7 +1,5 @@
 export interface FizzParams {
-  name: string;
   providerId: bigint;
-  region: string;
   spec: string;
   walletAddress: string;
   paymentsAccepted: string[];
@@ -11,7 +9,6 @@ export interface FizzParams {
 export interface FizzNode {
   fizzId: bigint;
   providerId: bigint;
-  name: string;
   region: string;
   spec: string;
   walletAddress: string;
@@ -56,4 +53,38 @@ export interface FizzLease {
   startTime: bigint;
   endTime: bigint;
   state: string;
+}
+
+export enum FizzProviderStatus {
+  Unregistered,
+  Registered,
+  Active,
+  Maintenance,
+  Suspended,
+  Deactivated,
+}
+
+export enum FizzProviderTrustTier {
+  One,
+  Two,
+  Three,
+  Four,
+  Five,
+  Six,
+  Seven,
+}
+
+export interface FizzProvider {
+  providerId: bigint;
+  name: string;
+  region: string;
+  walletAddress: string;
+  paymentsAccepted: string[];
+  spec: string;
+  hostUri: string;
+  certificate: string;
+  status: FizzProviderStatus;
+  tier: FizzProviderTrustTier;
+  joinTimestamp: bigint;
+  rewardWallet: string;
 }

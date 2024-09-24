@@ -34,15 +34,13 @@ export class ProviderModule {
       const response = await contract.getProviderByAddress(providerAddress);
 
       const providerDetailsData: IProvider = {
-        name: response[0],
-        region: response[1],
-        attributes: response[2],
-        hostUri: response[3],
-        certificate: response[4],
-        paymentsAccepted: response[5],
-        status: response[6].toString(),
-        trust: Number(response[7].toString()) + 1,
-        timestamp: Number(response[8].toString()),
+        spec: response[0],
+        hostUri: response[1],
+        certificate: response[2],
+        paymentsAccepted: response[3],
+        status: response[4].toString(),
+        trust: Number(response[5].toString()) + 1,
+        timestamp: Number(response[6].toString()),
       };
 
       return providerDetailsData;

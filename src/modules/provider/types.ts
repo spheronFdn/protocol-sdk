@@ -1,7 +1,5 @@
 export interface IProvider {
-  name: string;
-  region: string;
-  attributes: any;
+  spec: string;
   hostUri: string;
   certificate: string;
   paymentsAccepted: any;
