@@ -39,7 +39,7 @@ export class EscrowModule {
     }
   }
 
-  async getUserBalance(walletAddress: string, token: string) {
+  async getUserBalance(token: string, walletAddress?: string) {
     try {
       const contractAbi = EscrowAbi;
       const contractAddress = Escrow;
@@ -53,7 +53,18 @@ export class EscrowModule {
       }
       const tokenAddress: any = tokenDetails?.address || '0x0000000000000000000000000000000000000000';
 
-      const response = await contract.getUserData(walletAddress, tokenAddress);
+      let userWalletAddress;
+      if (walletAddress) {
+        userWalletAddress = walletAddress;
+      } else {
+        if (this.wallet) {
+          userWalletAddress = await this.wallet.getAddress();
+        } else {
+          throw new Error("No wallet address provided");
+        }
+      }
+      
+      const response = await contract.getUserData(userWalletAddress, tokenAddress);
 
       const userData: { lockedBalance: string; unlockedBalance: string; token: any } = {
         lockedBalance: response[0].toString(),

@@ -109,7 +109,9 @@ export class OrderModule {
       console.log('Please pass websocket provider in constructor');
       return;
     }
-    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+    const { signer } = await initializeSigner({ wallet: this.wallet });
+    const account = await signer.getAddress();
+
     const contractAbi = BidAbi;
     const contractAddress = Bid;
 
@@ -131,7 +133,7 @@ export class OrderModule {
           acceptedPrice: string | number | bigint,
           creatorAddress: string
         ) => {
-          if (creatorAddress.toString().toLowerCase() === accounts[0].toString().toLowerCase()) {
+          if (creatorAddress.toString().toLowerCase() === account.toString().toLowerCase()) {
             onSuccessCallback(orderId, providerAddress, providerId, acceptedPrice, creatorAddress);
             this.websocketProvider?.destroy();
             contract.off('OrderMatched');
