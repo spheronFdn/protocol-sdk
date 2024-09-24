@@ -1,7 +1,5 @@
 export interface FizzParams {
-  name: string;
   providerId: bigint;
-  region: string;
   spec: string;
   walletAddress: string;
   paymentsAccepted: string[];
@@ -11,7 +9,6 @@ export interface FizzParams {
 export interface FizzNode {
   fizzId: bigint;
   providerId: bigint;
-  name: string;
   region: string;
   spec: string;
   walletAddress: string;
@@ -88,7 +85,7 @@ export interface FizzProvider {
   region: string;
   walletAddress: string;
   paymentsAccepted: string[];
-  attributes: string;
+  spec: string;
   hostUri: string;
   certificate: string;
   status: FizzProviderStatus;

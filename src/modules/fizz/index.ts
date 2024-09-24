@@ -38,6 +38,7 @@ export class FizzModule {
   }
 
   async withdrawFizzEarnings({
+    rewardWallet,
     tokenAddress,
     amount,
     decimals,
@@ -62,7 +63,7 @@ export class FizzModule {
       const finalAmount = (Number(amount.toString()) - 1) / 10 ** decimals;
       const withdrawAmount = ethers.parseUnits(finalAmount.toFixed(decimals), decimals);
 
-      const result = await contract.withdrawFizzNodeEarnings(tokenAddress, withdrawAmount);
+      const result = await contract.withdrawFizzNodeEarnings(rewardWallet, tokenAddress, withdrawAmount);
       const receipt = await result.wait();
       console.log('Withdraw earnings successful -> ', receipt);
       if (onSuccessCallback) onSuccessCallback(receipt);
@@ -88,6 +89,8 @@ export class FizzModule {
         balance: response[2].toString(),
       };
 
+      console.log("fizz earnings -> ", fizzEarnings);
+
       return fizzEarnings;
     } catch (error) {
       console.error('Error in getFizzEarnings:', error);
@@ -95,7 +98,7 @@ export class FizzModule {
     }
   }
 
-  async addFizzNode(fizzParams: FizzParams, regFee: bigint): Promise<unknown> {
+  async addFizzNode(fizzParams: FizzParams): Promise<unknown> {
     try {
       if (typeof window?.ethereum === 'undefined') {
         console.log('Please install MetaMask');
@@ -111,9 +114,7 @@ export class FizzModule {
       const abi = FizzRegistryAbi;
       const contract = new ethers.Contract(contractAddress, abi, signer);
 
-      const tx = await contract.addFizzNode(fizzParams, {
-        value: regFee,
-      });
+      const tx = await contract.addFizzNode(fizzParams);
       const receipt = await tx.wait();
 
       console.log('Fizz registration successful: ', receipt);
@@ -163,8 +164,6 @@ export class FizzModule {
 
       const {
         providerId,
-        name,
-        region,
         spec,
         paymentsAccepted,
         status,
@@ -174,9 +173,8 @@ export class FizzModule {
       } = fizzDetails;
 
       return {
+        region: spec?.split(',')?.[7] ?? '',
         providerId,
-        name,
-        region,
         spec,
         paymentsAccepted,
         status,
@@ -190,7 +188,7 @@ export class FizzModule {
     }
   }
 
-  async getFizzNodeByAddress(walletAddress: string): Promise<FizzNode | unknown> {
+  async getFizzNodeByAddress(walletAddress: string) {
     try {
       const contractAddress = FizzRegistryDev;
       const contractAbi = FizzRegistryAbi;
@@ -201,10 +199,9 @@ export class FizzModule {
       const fizzNode: any = await this.getFizzById(fizzId);
 
       const result: FizzNode = {
+        region: fizzNode.spec?.split(',')?.[7] ?? '',
         fizzId,
         providerId: fizzNode.providerId,
-        name: fizzNode.name,
-        region: fizzNode.region,
         spec: fizzNode.spec,
         walletAddress: fizzNode.walletAddress,
         paymentsAccepted: fizzNode.paymentsAccepted,
@@ -221,7 +218,7 @@ export class FizzModule {
     }
   }
 
-  async getAllFizzNodes(): Promise<FizzNode[] | unknown> {
+  async getAllFizzNodes(): Promise<FizzNode[]> {
     try {
       const contractAddress = FizzRegistryDev;
       const contractAbi = FizzRegistryAbi;
@@ -233,14 +230,12 @@ export class FizzModule {
       const fizzNodes: FizzNode[] = allFizzNodes.map((fizzNode: any) => ({
         fizzId: fizzNode[0],
         providerId: fizzNode[1],
-        name: fizzNode[2],
-        region: fizzNode[3],
-        spec: fizzNode[4],
-        walletAddress: fizzNode[5],
-        paymentsAccepted: fizzNode[6],
-        status: fizzNode[7],
-        joinTimestamp: fizzNode[8],
-        rewardWallet: fizzNode[9],
+        spec: fizzNode[2],
+        walletAddress: fizzNode[3],
+        paymentsAccepted: fizzNode[4],
+        status: fizzNode[5],
+        joinTimestamp: fizzNode[6],
+        rewardWallet: fizzNode[7],
       }));
 
       console.log('All Fizz Nodes: ', fizzNodes);
@@ -355,18 +350,28 @@ export class FizzModule {
       const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
       const providerData = await contract.getProvider(providerId);
 
+      let name, region;
+      try {
+        const { Name, Region } = JSON.parse(providerData.spec);
+        name = Name;
+        region = Region;
+      } catch (error) {
+        name = "";
+        region = "";
+      }
+
       return {
-        name: providerData[0],
-        region: providerData[1],
-        attributes: providerData[2],
-        hostUri: providerData[3],
-        certificate: providerData[4],
-        paymentsAccepted: providerData[5],
-        status: providerData[6],
-        tier: providerData[7],
-        joinTimestamp: providerData[8],
-        walletAddress: providerData[9],
-        rewardWallet: providerData[10],
+        name,
+        region,
+        spec: providerData.spec,
+        hostUri: providerData.hostUri,
+        certificate: providerData.certificate,
+        paymentsAccepted: providerData.paymentsAccepted,
+        status: providerData.status,
+        tier: providerData.tier,
+        joinTimestamp: providerData.joinTimestamp,
+        walletAddress: providerData.walletAddress,
+        rewardWallet: providerData.rewardWallet,
       };
     } catch (error) {
       console.error('Failed to retrieve provider details: ', error);
@@ -383,17 +388,27 @@ export class FizzModule {
 
       const providerData = await contract.getProviderByAddress(walletAddress);
 
+      let name, region;
+      try {
+        const { Name, Region } = JSON.parse(providerData.spec);
+        name = Name;
+        region = Region;
+      } catch (error) {
+        name = "";
+        region = "";
+      }
+
       return {
-        name: providerData[0],
-        region: providerData[1],
-        attributes: providerData[2],
-        hostUri: providerData[3],
-        certificate: providerData[4],
-        paymentsAccepted: providerData[5],
-        status: providerData[6],
-        tier: providerData[7],
-        joinTimestamp: providerData[8],
-        rewardWallet: providerData[9],
+        name,
+        region,
+        spec: providerData.spec,
+        hostUri: providerData.hostUri,
+        certificate: providerData.certificate,
+        paymentsAccepted: providerData.paymentsAccepted,
+        status: providerData.status,
+        tier: providerData.tier,
+        joinTimestamp: providerData.joinTimestamp,
+        rewardWallet: providerData.rewardWallet,
       };
     } catch (error) {
       console.error('Failed to retrieve provider details by address: ', error);
@@ -409,21 +424,32 @@ export class FizzModule {
       const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
       const providersData = await contract.getAllProviders();
 
-      const providers: FizzProvider[] = providersData.map((provider: any) => ({
-        providerId: provider.providerId.toString(),
-        name: provider.name,
-        region: provider.region,
-        walletAddress: provider.walletAddress,
-        paymentsAccepted: provider.paymentsAccepted,
-        attributes: provider.attributes,
-        hostUri: provider.hostUri,
-        certificate: provider.certificate,
-        status: FizzProviderStatus[provider.status],
-        // tier: FizzProviderTrustTier[provider.tier],
-        tier: Number(provider.tier.toString()),
-        joinTimestamp: Number(provider.joinTimestamp.toString()),
-        rewardWallet: provider.rewardWallet,
-      }));
+      const providers: FizzProvider[] = providersData.map((provider: any) => {
+        let name, region;
+        try {
+          const { Name, Region } = JSON.parse(provider.spec);
+          name = Name;
+          region = Region;
+        } catch (error) {
+          name = "";
+          region = "";
+        }
+        return {
+          providerId: provider.providerId.toString(),
+          name,
+          region,
+          walletAddress: provider.walletAddress,
+          paymentsAccepted: provider.paymentsAccepted,
+          spec: provider.spec,
+          hostUri: provider.hostUri,
+          certificate: provider.certificate,
+          status: FizzProviderStatus[provider.status],
+          // tier: FizzProviderTrustTier[provider.tier],
+          tier: Number(provider.tier.toString()),
+          joinTimestamp: Number(provider.joinTimestamp.toString()),
+          rewardWallet: provider.rewardWallet,
+        };
+      });
 
       return providers;
     } catch (error) {

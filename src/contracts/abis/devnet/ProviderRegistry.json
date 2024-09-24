@@ -5,31 +5,15 @@
         "internalType": "address",
         "name": "_tokenRegistryAddress",
         "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_access",
+        "type": "address"
       }
     ],
     "stateMutability": "nonpayable",
     "type": "constructor"
-  },
-  {
-    "inputs": [],
-    "name": "AccessControlBadConfirmation",
-    "type": "error"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "account",
-        "type": "address"
-      },
-      {
-        "internalType": "bytes32",
-        "name": "neededRole",
-        "type": "bytes32"
-      }
-    ],
-    "name": "AccessControlUnauthorizedAccount",
-    "type": "error"
   },
   {
     "inputs": [],
@@ -170,25 +154,6 @@
       {
         "indexed": false,
         "internalType": "string",
-        "name": "attribute",
-        "type": "string"
-      }
-    ],
-    "name": "ProviderAttributeUpdated",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "uint256",
-        "name": "providerId",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "string",
         "name": "certificate",
         "type": "string"
       }
@@ -223,44 +188,6 @@
         "internalType": "uint256",
         "name": "providerId",
         "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "string",
-        "name": "name",
-        "type": "string"
-      }
-    ],
-    "name": "ProviderNameUpdated",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "uint256",
-        "name": "providerId",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "string",
-        "name": "region",
-        "type": "string"
-      }
-    ],
-    "name": "ProviderRegionUpdated",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "uint256",
-        "name": "providerId",
-        "type": "uint256"
       }
     ],
     "name": "ProviderRemoved",
@@ -283,6 +210,25 @@
       }
     ],
     "name": "ProviderRewardWalletUpdated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "providerId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "spec",
+        "type": "string"
+      }
+    ],
+    "name": "ProviderSpecUpdated",
     "type": "event"
   },
   {
@@ -341,81 +287,6 @@
     "inputs": [
       {
         "indexed": true,
-        "internalType": "bytes32",
-        "name": "role",
-        "type": "bytes32"
-      },
-      {
-        "indexed": true,
-        "internalType": "bytes32",
-        "name": "previousAdminRole",
-        "type": "bytes32"
-      },
-      {
-        "indexed": true,
-        "internalType": "bytes32",
-        "name": "newAdminRole",
-        "type": "bytes32"
-      }
-    ],
-    "name": "RoleAdminChanged",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "bytes32",
-        "name": "role",
-        "type": "bytes32"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "account",
-        "type": "address"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "sender",
-        "type": "address"
-      }
-    ],
-    "name": "RoleGranted",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "bytes32",
-        "name": "role",
-        "type": "bytes32"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "account",
-        "type": "address"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "sender",
-        "type": "address"
-      }
-    ],
-    "name": "RoleRevoked",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
         "internalType": "address",
         "name": "_tokenRegistry",
         "type": "address"
@@ -426,7 +297,7 @@
   },
   {
     "inputs": [],
-    "name": "DEFAULT_ADMIN_ROLE",
+    "name": "VERIFIER_ROLE",
     "outputs": [
       {
         "internalType": "bytes32",
@@ -439,12 +310,12 @@
   },
   {
     "inputs": [],
-    "name": "VERIFIER_ROLE",
+    "name": "accessControl",
     "outputs": [
       {
-        "internalType": "bytes32",
+        "internalType": "contract IAccessControlManager",
         "name": "",
-        "type": "bytes32"
+        "type": "address"
       }
     ],
     "stateMutability": "view",
@@ -468,16 +339,6 @@
       {
         "components": [
           {
-            "internalType": "string",
-            "name": "name",
-            "type": "string"
-          },
-          {
-            "internalType": "string",
-            "name": "region",
-            "type": "string"
-          },
-          {
             "internalType": "address",
             "name": "walletAddress",
             "type": "address"
@@ -489,7 +350,7 @@
           },
           {
             "internalType": "string",
-            "name": "attributes",
+            "name": "spec",
             "type": "string"
           },
           {
@@ -547,16 +408,6 @@
             "type": "uint256"
           },
           {
-            "internalType": "string",
-            "name": "name",
-            "type": "string"
-          },
-          {
-            "internalType": "string",
-            "name": "region",
-            "type": "string"
-          },
-          {
             "internalType": "address",
             "name": "walletAddress",
             "type": "address"
@@ -568,7 +419,7 @@
           },
           {
             "internalType": "string",
-            "name": "attributes",
+            "name": "spec",
             "type": "string"
           },
           {
@@ -624,16 +475,6 @@
             "type": "uint256"
           },
           {
-            "internalType": "string",
-            "name": "name",
-            "type": "string"
-          },
-          {
-            "internalType": "string",
-            "name": "region",
-            "type": "string"
-          },
-          {
             "internalType": "address",
             "name": "walletAddress",
             "type": "address"
@@ -645,7 +486,7 @@
           },
           {
             "internalType": "string",
-            "name": "attributes",
+            "name": "spec",
             "type": "string"
           },
           {
@@ -690,42 +531,6 @@
   {
     "inputs": [
       {
-        "internalType": "address",
-        "name": "_providerAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "string",
-        "name": "_category",
-        "type": "string"
-      }
-    ],
-    "name": "getProviderAttributes",
-    "outputs": [
-      {
-        "components": [
-          {
-            "internalType": "uint256",
-            "name": "id",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "units",
-            "type": "uint256"
-          }
-        ],
-        "internalType": "struct ProviderAttributeRegistry.Attribute[]",
-        "name": "",
-        "type": "tuple[]"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "uint256",
         "name": "_providerId",
         "type": "uint256"
@@ -735,17 +540,7 @@
     "outputs": [
       {
         "internalType": "string",
-        "name": "name",
-        "type": "string"
-      },
-      {
-        "internalType": "string",
-        "name": "region",
-        "type": "string"
-      },
-      {
-        "internalType": "string",
-        "name": "attributes",
+        "name": "spec",
         "type": "string"
       },
       {
@@ -823,17 +618,7 @@
     "outputs": [
       {
         "internalType": "string",
-        "name": "name",
-        "type": "string"
-      },
-      {
-        "internalType": "string",
-        "name": "region",
-        "type": "string"
-      },
-      {
-        "internalType": "string",
-        "name": "attributes",
+        "name": "spec",
         "type": "string"
       },
       {
@@ -921,25 +706,6 @@
         "type": "address"
       }
     ],
-    "name": "getProviderRewardWallet",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_walletAddress",
-        "type": "address"
-      }
-    ],
     "name": "getProviderStatus",
     "outputs": [
       {
@@ -984,67 +750,6 @@
         "internalType": "address",
         "name": "",
         "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "bytes32",
-        "name": "role",
-        "type": "bytes32"
-      }
-    ],
-    "name": "getRoleAdmin",
-    "outputs": [
-      {
-        "internalType": "bytes32",
-        "name": "",
-        "type": "bytes32"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "bytes32",
-        "name": "role",
-        "type": "bytes32"
-      },
-      {
-        "internalType": "address",
-        "name": "account",
-        "type": "address"
-      }
-    ],
-    "name": "grantRole",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "bytes32",
-        "name": "role",
-        "type": "bytes32"
-      },
-      {
-        "internalType": "address",
-        "name": "account",
-        "type": "address"
-      }
-    ],
-    "name": "hasRole",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
       }
     ],
     "stateMutability": "view",
@@ -1102,6 +807,19 @@
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "providerRewardManager",
+    "outputs": [
+      {
+        "internalType": "contract IProviderRewardsManager",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "uint256",
@@ -1117,23 +835,13 @@
         "type": "uint256"
       },
       {
-        "internalType": "string",
-        "name": "name",
-        "type": "string"
-      },
-      {
-        "internalType": "string",
-        "name": "region",
-        "type": "string"
-      },
-      {
         "internalType": "address",
         "name": "walletAddress",
         "type": "address"
       },
       {
         "internalType": "string",
-        "name": "attributes",
+        "name": "spec",
         "type": "string"
       },
       {
@@ -1199,42 +907,6 @@
   {
     "inputs": [
       {
-        "internalType": "bytes32",
-        "name": "role",
-        "type": "bytes32"
-      },
-      {
-        "internalType": "address",
-        "name": "callerConfirmation",
-        "type": "address"
-      }
-    ],
-    "name": "renounceRole",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "bytes32",
-        "name": "role",
-        "type": "bytes32"
-      },
-      {
-        "internalType": "address",
-        "name": "account",
-        "type": "address"
-      }
-    ],
-    "name": "revokeRole",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "address",
         "name": "",
         "type": "address"
@@ -1246,19 +918,6 @@
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "rewardManager",
-    "outputs": [
-      {
-        "internalType": "contract IRewardsManager",
-        "name": "",
-        "type": "address"
       }
     ],
     "stateMutability": "view",
@@ -1283,25 +942,6 @@
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "bytes4",
-        "name": "interfaceId",
-        "type": "bytes4"
-      }
-    ],
-    "name": "supportsInterface",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
     "inputs": [],
     "name": "tokenRegistry",
     "outputs": [
@@ -1312,19 +952,6 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "string",
-        "name": "_attribute",
-        "type": "string"
-      }
-    ],
-    "name": "updateProviderAttribute",
-    "outputs": [],
-    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -1356,38 +983,25 @@
   {
     "inputs": [
       {
-        "internalType": "string",
-        "name": "_name",
-        "type": "string"
-      }
-    ],
-    "name": "updateProviderName",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "string",
-        "name": "_region",
-        "type": "string"
-      }
-    ],
-    "name": "updateProviderRegion",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "address",
         "name": "_rewardWallet",
         "type": "address"
       }
     ],
     "name": "updateProviderRewardAddress",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "_spec",
+        "type": "string"
+      }
+    ],
+    "name": "updateProviderSpec",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
