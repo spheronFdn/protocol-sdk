@@ -127,22 +127,24 @@ export class DeploymentModule {
         throw new Error('Insufficient Balance');
       }
 
+      const updateOrderResponse = this.orderModule.updateOrder(leaseId, details);
+      console.log('Update Order Request sent');
       const updatedOrderLease: any = this.orderModule.listenToOrderUpdated(
         60_000,
         (orderId, providerAddress) => {
-          console.log('Order Updated', orderId, providerAddress);
+          console.log('Order Updated', orderId, providerAddress, updateOrderResponse);
         },
         () => {
-          console.log('Order Updation Failed');
+          console.log('Order Updation Failed', updateOrderResponse);
         }
       );
       const updateOrderAcceptance: any = this.orderModule.listenToOrderUpdateAccepted(
         60_000,
         (orderId, providerAddress) => {
-          console.log('Order Update Accepted', orderId, providerAddress);
+          console.log('Order Update Accepted', orderId, providerAddress, updateOrderResponse);
         },
         () => {
-          console.log('Order Update did not get accepted');
+          console.log('Order Update did not get accepted', updateOrderResponse);
         }
       );
       const updateOrderAcceptanceResponse = await updateOrderAcceptance;
