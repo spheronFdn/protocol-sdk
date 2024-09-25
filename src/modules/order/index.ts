@@ -174,7 +174,7 @@ export class OrderModule {
           this.websocketProvider?.destroy();
           contract.off('leaseUpdated');
           clearTimeout(this.updateTimeoutId as NodeJS.Timeout);
-          resolve(orderId);
+          resolve({ orderId, providerAddress, tenantAddress });
         }
       });
     });

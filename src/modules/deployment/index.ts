@@ -30,37 +30,30 @@ export class DeploymentModule {
 
   async createDeployment(iclYaml: string, providerProxyUrl: string) {
     try {
-      const { error, orderDetails: details } = yamlToOrderDetails(
-        iclYaml
-      );
+      const { error, orderDetails: details } = yamlToOrderDetails(iclYaml);
       if (error) {
-        throw new Error("Please verify YAML format");
+        throw new Error('Please verify YAML format');
       }
       const sdlManifest = getManifestIcl(iclYaml);
       const { token, maxPrice } = details;
       const tokenDetails = getTokenDetails(token, networkType as NetworkType);
       const decimal =
-        tokenDetails?.symbol === "USDT" || tokenDetails?.symbol === "USDC"
+        tokenDetails?.symbol === 'USDT' || tokenDetails?.symbol === 'USDC'
           ? 18
           : tokenDetails?.decimal;
-      const totalCost =
-        Number(maxPrice.toString() / 10 ** (decimal || 0)) * 14400;
+      const totalCost = Number(maxPrice.toString() / 10 ** (decimal || 0)) * 14400;
 
       if (!this.wallet) {
-        throw new Error("Unable to access wallet");
+        throw new Error('Unable to access wallet');
       }
       const account = await this.wallet.getAddress();
 
       const tokenBalance = await this.escrowModule.getUserBalance(
-        tokenDetails?.symbol || "",
+        tokenDetails?.symbol || '',
         account
       );
-      if (
-        Number(tokenBalance.unlockedBalance) /
-        10 ** (tokenDetails?.decimal || 0) <
-        totalCost
-      ) {
-        throw new Error("Insufficient Balance");
+      if (Number(tokenBalance.unlockedBalance) / 10 ** (tokenDetails?.decimal || 0) < totalCost) {
+        throw new Error('Insufficient Balance');
       }
       try {
         const transaction = await this.orderModule.createOrder(details);
@@ -79,18 +72,21 @@ export class DeploymentModule {
           (await this.providerModule.getProviderDetails(providerAddress)) as any;
         const authToken = await createAuthorizationToken(this.wallet);
         const port = details.mode === 0 ? 8543 : 8443;
-        const spheronProvider = new SpheronProviderModule(`https://${hostUri}:${port}`, providerProxyUrl);
+        const spheronProvider = new SpheronProviderModule(
+          `https://${hostUri}:${port}`,
+          providerProxyUrl
+        );
         try {
           await spheronProvider.submitManfiest(
             certificate,
             authToken,
             orderId.toString(),
-            sdlManifest,
+            sdlManifest
           );
           console.log(`Deployment Created Successfully! Lease ID: ${orderId}`);
           return { leaseId: orderId, transaction };
         } catch (error) {
-          throw new Error("Error occured in sending manifest");
+          throw new Error('Error occured in sending manifest');
         }
       } catch (error) {
         throw error;
@@ -103,17 +99,141 @@ export class DeploymentModule {
 
   async updateDeployment(leaseId: string, iclYaml: string, providerProxyUrl: string) {
     try {
+      const { error, orderDetails: details } = yamlToOrderDetails(iclYaml);
+      if (error) {
+        throw new Error('Please verify YAML format');
+      }
+      delete details.creator;
+      delete details.id;
+      const sdlManifest = getManifestIcl(iclYaml);
+      const { token, maxPrice } = details;
+      const tokenDetails = getTokenDetails(token, networkType as NetworkType);
+      const decimal =
+        tokenDetails?.symbol === 'USDT' || tokenDetails?.symbol === 'USDC'
+          ? 18
+          : tokenDetails?.decimal;
+      const totalCost = Number(maxPrice.toString() / 10 ** (decimal || 0)) * 14400;
 
+      if (!this.wallet) {
+        throw new Error('Unable to access wallet');
+      }
+      const account = await this.wallet.getAddress();
+
+      const tokenBalance = await this.escrowModule.getUserBalance(
+        tokenDetails?.symbol || '',
+        account
+      );
+      if (Number(tokenBalance.unlockedBalance) / 10 ** (tokenDetails?.decimal || 0) < totalCost) {
+        throw new Error('Insufficient Balance');
+      }
+
+      const updateOrderResponse = this.orderModule.updateOrder(leaseId, details);
+      console.log('Update Order Request sent');
+      const updatedOrderLease: any = this.orderModule.listenToOrderUpdated(
+        120_000,
+        (orderId, providerAddress) => {
+          console.log('Order Updated', orderId, providerAddress, updateOrderResponse);
+        },
+        () => {
+          console.log('Order Updation Failed', updateOrderResponse);
+        }
+      );
+      const updateOrderAcceptance: any = this.orderModule.listenToOrderUpdateAccepted(
+        120_000,
+        (orderId, providerAddress) => {
+          console.log('Order Update Accepted', orderId, providerAddress, updateOrderResponse);
+        },
+        () => {
+          console.log('Order Update did not get accepted', updateOrderResponse);
+        }
+      );
+      const updateOrderAcceptanceResponse = await updateOrderAcceptance;
+      const { orderId, providerAddress } = updateOrderAcceptanceResponse;
+      const { certificate, hostUri }: { certificate: string; hostUri: string } =
+        (await this.providerModule.getProviderDetails(providerAddress)) as any;
+      const port = details.mode === 0 ? 8543 : 8443;
+      const spheronProvider = new SpheronProviderModule(
+        `https://${hostUri}:${port}`,
+        providerProxyUrl
+      );
+      const authToken = await createAuthorizationToken(this.wallet);
+      const updateOrder = await spheronProvider.submitManfiest(
+        certificate,
+        authToken,
+        orderId as string,
+        sdlManifest
+      );
+      const updateOrderLeaseResponse = await updatedOrderLease;
+      console.log(`Deployment Updated Successfully! Lease ID: ${orderId}`);
+      return { ...updateOrderLeaseResponse };
     } catch (error) {
       console.error('Error in updating deployment: ', error);
+      throw error;
     }
   }
 
   async getDeployment(leaseId: string, providerProxyUrl: string) {
     try {
+      if (!this.wallet) {
+        throw new Error('Unable to access wallet');
+      }
 
+      if (!leaseId) {
+        throw new Error('Provider Lease Id');
+      }
+      const { providerAddress, fizzId } = await this.leaseModule.getLeaseDetails(leaseId);
+      const port = fizzId?.toString() !== '0' ? 8543 : 8443;
+      const { certificate, hostUri }: { certificate: string; hostUri: string } =
+        (await this.providerModule.getProviderDetails(providerAddress)) as any;
+
+      const spheronProvider = new SpheronProviderModule(
+        `https://${hostUri}:${port}`,
+        providerProxyUrl
+      );
+      const authToken = await createAuthorizationToken(this.wallet);
+      const leaseInfo = await spheronProvider.getLeaseStatus(certificate, authToken, leaseId);
+      console.log(`Deployment Details Fetched Successfully! Lease ID: ${leaseId}`);
+      return leaseInfo;
     } catch (error) {
+      console.log('Error in getting lease Info', error);
+      throw error;
+    }
+  }
 
+  async closeDeployment(leaseId: string, providerProxyUrl: string) {
+    try {
+      if (!this.wallet) {
+        throw new Error('Unable to access wallet');
+      }
+
+      if (!leaseId) {
+        throw new Error('Provider Lease Id');
+      }
+
+      if (!providerProxyUrl) {
+        throw new Error('Provider Proxy Url');
+      }
+
+      const closeLeaseResponse = await this.leaseModule.closeLease(leaseId);
+      console.log('Close Lease Sent:', closeLeaseResponse);
+
+      const closeLeaseEvent = this.leaseModule.listenToLeaseClosedEvent(
+        () => {
+          console.log('Close Lease Accepted');
+        },
+        () => {
+          console.log('Close Lease Failed');
+        },
+        60_000
+      );
+
+      const closeLeaseEventResponse = await closeLeaseEvent;
+
+      console.log(`Deployment Closed Successfully! Lease ID: ${leaseId}`);
+      return closeLeaseEventResponse;
+    } catch (error) {
+      console.log('Error in closing lease:');
+      throw error;
     }
   }
 }
