@@ -150,12 +150,14 @@ export class OrderModule {
     onSuccessCallback: (orderId: string, providerAddress: string) => void,
     onFailureCallback: () => void
   ) {
-    if (typeof window?.ethereum === 'undefined') {
-      console.log('Please install MetaMask');
+    if (!this.websocketProvider) {
+      console.log('Please pass websocket provider in constructor');
       return;
     }
 
-    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+    const { signer } = await initializeSigner({ wallet: this.wallet });
+    const account = await signer.getAddress();
+
     const contractAbi = BidAbi;
     const contractAddress = Bid;
 
@@ -169,7 +171,7 @@ export class OrderModule {
       }, timeoutTime);
 
       contract.on('leaseUpdated', (orderId, providerAddress, tenantAddress) => {
-        if (tenantAddress.toString().toLowerCase() === accounts[0].toString().toLowerCase()) {
+        if (tenantAddress.toString().toLowerCase() === account.toString().toLowerCase()) {
           onSuccessCallback(orderId, providerAddress);
           this.websocketProvider?.destroy();
           contract.off('leaseUpdated');
@@ -185,12 +187,14 @@ export class OrderModule {
     onSuccessCallback: (orderId: string, providerAddress: string) => void,
     onFailureCallback: () => void
   ) {
-    if (typeof window?.ethereum === 'undefined') {
-      console.log('Please install MetaMask');
+    if (!this.websocketProvider) {
+      console.log('Please pass websocket provider in constructor');
       return;
     }
 
-    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+    const { signer } = await initializeSigner({ wallet: this.wallet });
+    const account = await signer.getAddress();
+
     const contractAbi = BidAbi;
     const contractAddress = Bid;
 
@@ -204,12 +208,12 @@ export class OrderModule {
       }, timeoutTime);
 
       contract.on('UpdateRequestAccepted', (orderId, providerAddress, tenantAddress) => {
-        if (tenantAddress.toString().toLowerCase() === accounts[0].toString().toLowerCase()) {
+        if (tenantAddress.toString().toLowerCase() === account.toString().toLowerCase()) {
           onSuccessCallback(orderId, providerAddress);
           this.websocketProvider?.destroy();
           contract.off('UpdateRequestAccepted');
           clearTimeout(this.updateTimeoutId as NodeJS.Timeout);
-          resolve(orderId);
+          resolve({ orderId, providerAddress });
         }
       });
     });

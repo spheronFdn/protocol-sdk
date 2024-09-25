@@ -127,27 +127,29 @@ export class DeploymentModule {
         throw new Error('Insufficient Balance');
       }
 
-      const updateOrderResponse = this.orderModule.updateOrder(leaseId, details);
-      console.log('Update Order Request sent');
       const updatedOrderLease: any = this.orderModule.listenToOrderUpdated(
         120_000,
         (orderId, providerAddress) => {
-          console.log('Order Updated', orderId, providerAddress, updateOrderResponse);
+          console.log(`Order Updated with ID: ${orderId}`);
         },
         () => {
-          console.log('Order Updation Failed', updateOrderResponse);
+          console.log('Order Updation Failed');
         }
       );
       const updateOrderAcceptance: any = this.orderModule.listenToOrderUpdateAccepted(
         120_000,
-        (orderId, providerAddress) => {
-          console.log('Order Update Accepted', orderId, providerAddress, updateOrderResponse);
+        (orderId) => {
+          console.log(`Update Order Request Accepted for lease ID: ${orderId}`);
         },
         () => {
-          console.log('Order Update did not get accepted', updateOrderResponse);
+          console.log('Order Update did not get accepted');
         }
       );
+      
+      const updateOrderResponse = await this.orderModule.updateOrder(leaseId, details);
+
       const updateOrderAcceptanceResponse = await updateOrderAcceptance;
+      
       const { orderId, providerAddress } = updateOrderAcceptanceResponse;
       const { certificate, hostUri }: { certificate: string; hostUri: string } =
         (await this.providerModule.getProviderDetails(providerAddress)) as any;
@@ -232,7 +234,7 @@ export class DeploymentModule {
       console.log(`Deployment Closed Successfully! Lease ID: ${leaseId}`);
       return closeLeaseEventResponse;
     } catch (error) {
-      console.log('Error in closing lease:');
+      console.log('Error in closing lease: ', error);
       throw error;
     }
   }
