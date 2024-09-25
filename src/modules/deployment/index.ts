@@ -130,7 +130,7 @@ export class DeploymentModule {
       const updateOrderResponse = this.orderModule.updateOrder(leaseId, details);
       console.log('Update Order Request sent');
       const updatedOrderLease: any = this.orderModule.listenToOrderUpdated(
-        60_000,
+        120_000,
         (orderId, providerAddress) => {
           console.log('Order Updated', orderId, providerAddress, updateOrderResponse);
         },
@@ -139,7 +139,7 @@ export class DeploymentModule {
         }
       );
       const updateOrderAcceptance: any = this.orderModule.listenToOrderUpdateAccepted(
-        60_000,
+        120_000,
         (orderId, providerAddress) => {
           console.log('Order Update Accepted', orderId, providerAddress, updateOrderResponse);
         },
@@ -194,6 +194,41 @@ export class DeploymentModule {
       return leaseInfo;
     } catch (error) {
       console.log('Error in getting lease Info', error);
+      throw error;
+    }
+  }
+
+  async closeDeployment(leaseId: string, providerProxyUrl: string) {
+    try {
+      if (!this.wallet) {
+        throw new Error('Unable to access wallet');
+      }
+
+      if (!leaseId) {
+        throw new Error('Provider Lease Id');
+      }
+
+      if (!providerProxyUrl) {
+        throw new Error('Provider Proxy Url');
+      }
+
+      const closeLeaseResponse = await this.leaseModule.closeLease(leaseId);
+      console.log('Close Lease Sent:', closeLeaseResponse);
+
+      const closeLeaseEvent = await this.leaseModule.listenToLeaseClosedEvent(
+        () => {
+          console.log('Close Lease Accepted');
+        },
+        () => {
+          console.log('Close Lease Failed');
+        },
+        60_000
+      );
+
+      console.log('Lease Closed');
+      return closeLeaseEvent;
+    } catch (error) {
+      console.log('Error in closing lease:');
       throw error;
     }
   }

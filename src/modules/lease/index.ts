@@ -197,7 +197,8 @@ export class LeaseModule {
       console.log('Please pass websocket provider in constructor');
       return;
     }
-    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+    const { signer } = await initializeSigner({ wallet: this.wallet });
+    const account = await signer.getAddress();
     const contractAbi = ComputeLeaseAbi;
     const contractAddress = ComputeLease;
 
@@ -214,8 +215,8 @@ export class LeaseModule {
         'LeaseClosed',
         (orderId: string, providerAddress: string, tenantAddress: string) => {
           if (
-            providerAddress.toString().toLowerCase() === accounts[0].toString().toLowerCase() ||
-            tenantAddress.toString().toLowerCase() === accounts[0].toString().toLowerCase()
+            providerAddress.toString().toLowerCase() === account.toString().toLowerCase() ||
+            tenantAddress.toString().toLowerCase() === account.toString().toLowerCase()
           ) {
             onSuccessCallback({ orderId, providerAddress, tenantAddress });
             this.websocketProvider?.destroy();
