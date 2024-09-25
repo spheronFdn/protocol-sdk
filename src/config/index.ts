@@ -1,16 +1,23 @@
-import { DAI, USDC, USDT, WETH } from '@contracts/addresses';
+import { contractAddresses } from '@contracts/addresses';
 
 // Testnet URLs
-// export const SPHERON_TESTNET_RPC_URL = 'https://sepolia-rollup.arbitrum.io/rpc';
-export const SPHERON_TESTNET_RPC_URL =
-  'https://arbitrum-sepolia.core.chainstack.com/f89a40155b4b82dc5c601286fcac4ffb';
-export const SPHERON_TESTNET_WSS_URL =
-  'wss://arbitrum-sepolia.core.chainstack.com/f89a40155b4b82dc5c601286fcac4ffb';
-export const SPHERON_TESTNET_EXPLORER_URL = 'https://sepolia.arbiscan.io/';
-
-export const SPHERON_DEVNET_RPC_URL = 'https://spheron-devnet-eth.rpc.caldera.xyz/infra-partner-http';
+// export const SPHERON_DEVNET_HTTP_URL = 'https://spheron-devnet-eth.rpc.caldera.xyz/http';
+export const SPHERON_DEVNET_HTTP_URL = 'https://spheron-devnet-eth.rpc.caldera.xyz/infra-partner-http';
 export const SPHERON_DEVNET_WSS_URL = 'wss://spheron-devnet-eth.rpc.caldera.xyz/ws';
 export const SPHERON_DEVNET_EXPLORER_URL = 'https://spheron-devnet-eth.explorer.caldera.xyz';
+
+export const rpcUrls = {
+  testnet: {
+    HTTP_URL: SPHERON_DEVNET_HTTP_URL,
+    WSS_URL: SPHERON_DEVNET_WSS_URL,
+    EXPORER_URL: SPHERON_DEVNET_EXPLORER_URL,
+  },
+  mainnet: {
+    HTTP_URL: SPHERON_DEVNET_HTTP_URL,
+    WSS_URL: SPHERON_DEVNET_WSS_URL,
+    EXPORER_URL: SPHERON_DEVNET_EXPLORER_URL,
+  },
+}
 
 export interface IToken {
   id: number;
@@ -37,15 +44,15 @@ export type NetworkType = 'testnet' | 'mainnet';
 
 export const networkMap: Record<NetworkType, INetwork> = {
   testnet: {
-    chainId: 421614,
-    chainName: 'Arbitrum Sepolia',
-    rpcUrls: ['https://sepolia-rollup.arbitrum.io/rpc'],
+    chainId: 89138,
+    chainName: "Spheron Devnet",
+    rpcUrls: ["https://spheron-devnet-eth.rpc.caldera.xyz/http"],
     nativeCurrency: {
-      name: 'Ethereum',
-      symbol: 'ETH',
+      name: "Ethereum",
+      symbol: "ETH",
       decimals: 18,
     },
-    blockExplorerUrls: ['https://sepolia.arbiscan.io/'],
+    blockExplorerUrls: ["https://spheron-devnet-eth.explorer.caldera.xyz/"],
   },
   // TODO: NEED TO UPDATE WHEN MAINNET RELEASE
   mainnet: {
@@ -68,7 +75,7 @@ export const tokenMap: Record<NetworkType, IToken[]> = {
       name: 'Tether USD Test Token',
       symbol: 'USDT',
       decimal: 6,
-      address: USDT,
+      address: contractAddresses.testnet.USDT,
       // logo: USDTIcon,
     },
     {
@@ -76,7 +83,7 @@ export const tokenMap: Record<NetworkType, IToken[]> = {
       name: 'DAI Test Token',
       symbol: 'DAI',
       decimal: 18,
-      address: DAI,
+      address: contractAddresses.testnet.DAI,
       // logo: DaiIcon,
     },
     {
@@ -84,7 +91,7 @@ export const tokenMap: Record<NetworkType, IToken[]> = {
       name: 'Test Token USD Coin',
       symbol: 'USDC',
       decimal: 6,
-      address: USDC,
+      address: contractAddresses.testnet.USDC,
       // logo: USDCIcon,
     },
     {
@@ -92,14 +99,14 @@ export const tokenMap: Record<NetworkType, IToken[]> = {
       name: 'Wrapped ETH Test Token',
       symbol: 'WETH',
       decimal: 18,
-      address: WETH,
+      address: contractAddresses.testnet.WETH,
       // logo: WethIcon,
     },
   ],
   mainnet: [],
 };
 
-export const networkType = (process.env.NEXT_PUBLIC_NETWORK_TYPE as string) || 'testnet';
+export const networkType = (process.env.NETWORK_TYPE as NetworkType) || 'testnet';
 
 export const DEFAULT_PAGE_SIZE = 10;
 

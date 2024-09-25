@@ -1,27 +1,37 @@
-import ComputeLeaseAbi from '@contracts/abis/devnet/ComputeLease.json';
-import { ComputeLeaseDev as ComputeLease } from '@contracts/addresses';
+import ComputeLeaseAbi from '@contracts/abis/testnet/ComputeLease.json';
+import { ComputeLeaseTestnet as ComputeLease } from '@contracts/addresses';
 import { OrderModule } from '@modules/order';
-import { getTokenDetails } from '@utils/index';
+import { getTokenDetails, initializeSigner } from '@utils/index';
 import { ethers } from 'ethers';
 import { Lease, LeaseState, LeaseWithOrderDetails } from './types';
 import { getLeaseStateAsString } from '@utils/lease';
 import { DEFAULT_PAGE_SIZE } from '@config/index';
 import { FizzModule } from '@modules/fizz';
+import { ProviderModule } from '@modules/provider';
+import { handleContractError } from '@utils/errors';
 
 export class LeaseModule {
   private provider: ethers.Provider;
   private orderModule: OrderModule;
   private fizzModule: FizzModule;
+  private providerModule: ProviderModule;
   private websocketProvider?: ethers.WebSocketProvider;
   private leaseCloseTimeoutId: NodeJS.Timeout | null;
+  private wallet: ethers.Wallet | undefined;
 
-  constructor(provider: ethers.Provider, websocketProvider?: ethers.WebSocketProvider) {
+  constructor(
+    provider: ethers.Provider,
+    websocketProvider?: ethers.WebSocketProvider,
+    wallet?: ethers.Wallet
+  ) {
     this.provider = provider;
     this.websocketProvider = websocketProvider;
     this.getLeaseDetails = this.getLeaseDetails.bind(this);
     this.orderModule = new OrderModule(provider);
     this.fizzModule = new FizzModule(provider, websocketProvider);
+    this.providerModule = new ProviderModule(provider);
     this.leaseCloseTimeoutId = null;
+    this.wallet = wallet;
   }
 
   async getLeaseDetails(leaseId: string) {
@@ -125,7 +135,9 @@ export class LeaseModule {
           const fizz: any = await this.fizzModule.getFizzById(BigInt(lease.fizzId));
           region = fizz?.region;
         } else {
-          const provider: any = await this.fizzModule.getProviderByAddress(lease.providerAddress);
+          const provider: any = await this.providerModule.getProviderByAddress(
+            lease.providerAddress
+          );
           region = provider?.region;
         }
 
@@ -142,7 +154,7 @@ export class LeaseModule {
       })
     );
 
-    console.log("leases -> ", leaseWithToken);
+    console.log('leases -> ', leaseWithToken);
 
     return {
       leases: leaseWithToken,
@@ -156,15 +168,15 @@ export class LeaseModule {
     const contractAbi = ComputeLeaseAbi;
     const contractAddress = ComputeLease;
     try {
-      const provider = new ethers.BrowserProvider(window.ethereum);
-      const signer = await provider.getSigner();
+      const { signer } = await initializeSigner({ wallet: this.wallet });
       const contract = new ethers.Contract(contractAddress, contractAbi, signer);
       const tx = await contract.closeLease(leaseId);
       const receipt = await tx.wait();
       return receipt;
     } catch (error) {
       console.log('Error in close lease ->', error);
-      throw error;
+      const errorMessage = handleContractError(error, contractAbi);
+      throw errorMessage;
     }
   }
 
@@ -185,7 +197,8 @@ export class LeaseModule {
       console.log('Please pass websocket provider in constructor');
       return;
     }
-    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+    const { signer } = await initializeSigner({ wallet: this.wallet });
+    const account = await signer.getAddress();
     const contractAbi = ComputeLeaseAbi;
     const contractAddress = ComputeLease;
 
@@ -202,8 +215,8 @@ export class LeaseModule {
         'LeaseClosed',
         (orderId: string, providerAddress: string, tenantAddress: string) => {
           if (
-            providerAddress.toString().toLowerCase() === accounts[0].toString().toLowerCase() ||
-            tenantAddress.toString().toLowerCase() === accounts[0].toString().toLowerCase()
+            providerAddress.toString().toLowerCase() === account.toString().toLowerCase() ||
+            tenantAddress.toString().toLowerCase() === account.toString().toLowerCase()
           ) {
             onSuccessCallback({ orderId, providerAddress, tenantAddress });
             this.websocketProvider?.destroy();

@@ -1,59 +1,51 @@
-import { OrderRequestDev as OrderRequest, BidDev as Bid } from '@contracts/addresses';
-import OrderRequestAbi from '@contracts/abis/devnet/OrderRequest.json';
-import BidAbi from '@contracts/abis/devnet/Bid.json';
+import { OrderRequestTestnet as OrderRequest, BidTestnet as Bid } from '@contracts/addresses';
+import OrderRequestAbi from '@contracts/abis/testnet/OrderRequest.json';
+import BidAbi from '@contracts/abis/testnet/Bid.json';
 import { ethers } from 'ethers';
 import { InitialOrder, OrderDetails, Tier } from './types';
-import { getTokenDetails } from '@utils/index';
+import { getTokenDetails, initializeSigner } from '@utils/index';
 import { getOrderStateAsString } from '@utils/order';
+import { handleContractError } from '@utils/errors';
 
 export class OrderModule {
   private provider: ethers.Provider;
   private websocketProvider?: ethers.WebSocketProvider;
   private createTimeoutId: NodeJS.Timeout | null;
   private updateTimeoutId: NodeJS.Timeout | null;
+  private wallet: ethers.Wallet | undefined;
 
-  constructor(provider: ethers.Provider, websocketProvider?: ethers.WebSocketProvider) {
+  constructor(
+    provider: ethers.Provider,
+    websocketProvider?: ethers.WebSocketProvider,
+    wallet?: ethers.Wallet
+  ) {
     this.provider = provider;
     this.websocketProvider = websocketProvider;
     this.createTimeoutId = null;
     this.updateTimeoutId = null;
+    this.wallet = wallet;
   }
 
   async createOrder(orderDetails: OrderDetails) {
-    if (typeof window?.ethereum === 'undefined') {
-      console.log('Please install MetaMask');
-      return;
-    }
-
     try {
-      await window.ethereum.request({ method: 'eth_requestAccounts' });
-
-      const provider = new ethers.BrowserProvider(window.ethereum);
-      const signer = await provider.getSigner();
+      const { signer } = await initializeSigner({ wallet: this.wallet });
 
       const contract = new ethers.Contract(OrderRequest, OrderRequestAbi, signer);
 
       const tx = await contract.createOrder(orderDetails);
       const receipt = await tx.wait();
-      console.log('Order created successfully -> ', receipt);
+      console.log('Order created successfully');
       return receipt;
     } catch (error) {
       console.error('Error creating order -> ', error);
-      throw error;
+      const errorMessage = handleContractError(error, OrderRequestAbi);
+      throw errorMessage;
     }
   }
 
   async updateOrder(orderId: string, orderDetails: OrderDetails) {
-    if (typeof window?.ethereum === 'undefined') {
-      console.log('Please install metamask');
-      return;
-    }
-
     try {
-      await window.ethereum.request({ method: 'eth_requestAccounts' });
-
-      const provider = new ethers.BrowserProvider(window.ethereum);
-      const signer = await provider.getSigner();
+      const { signer } = await initializeSigner({ wallet: this.wallet });
 
       const contract = new ethers.Contract(OrderRequest, OrderRequestAbi, signer);
 
@@ -65,7 +57,8 @@ export class OrderModule {
       return receipt;
     } catch (error) {
       console.error('Error in updating order -> ', error);
-      throw error;
+      const errorMessage = handleContractError(error, OrderRequestAbi);
+      throw errorMessage;
     }
   }
 
@@ -116,7 +109,9 @@ export class OrderModule {
       console.log('Please pass websocket provider in constructor');
       return;
     }
-    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+    const { signer } = await initializeSigner({ wallet: this.wallet });
+    const account = await signer.getAddress();
+
     const contractAbi = BidAbi;
     const contractAddress = Bid;
 
@@ -138,7 +133,7 @@ export class OrderModule {
           acceptedPrice: string | number | bigint,
           creatorAddress: string
         ) => {
-          if (creatorAddress.toString().toLowerCase() === accounts[0].toString().toLowerCase()) {
+          if (creatorAddress.toString().toLowerCase() === account.toString().toLowerCase()) {
             onSuccessCallback(orderId, providerAddress, providerId, acceptedPrice, creatorAddress);
             this.websocketProvider?.destroy();
             contract.off('OrderMatched');
@@ -155,12 +150,14 @@ export class OrderModule {
     onSuccessCallback: (orderId: string, providerAddress: string) => void,
     onFailureCallback: () => void
   ) {
-    if (typeof window?.ethereum === 'undefined') {
-      console.log('Please install MetaMask');
+    if (!this.websocketProvider) {
+      console.log('Please pass websocket provider in constructor');
       return;
     }
 
-    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+    const { signer } = await initializeSigner({ wallet: this.wallet });
+    const account = await signer.getAddress();
+
     const contractAbi = BidAbi;
     const contractAddress = Bid;
 
@@ -174,12 +171,12 @@ export class OrderModule {
       }, timeoutTime);
 
       contract.on('leaseUpdated', (orderId, providerAddress, tenantAddress) => {
-        if (tenantAddress.toString().toLowerCase() === accounts[0].toString().toLowerCase()) {
+        if (tenantAddress.toString().toLowerCase() === account.toString().toLowerCase()) {
           onSuccessCallback(orderId, providerAddress);
           this.websocketProvider?.destroy();
           contract.off('leaseUpdated');
           clearTimeout(this.updateTimeoutId as NodeJS.Timeout);
-          resolve(orderId);
+          resolve({ orderId, providerAddress, tenantAddress });
         }
       });
     });
@@ -190,12 +187,14 @@ export class OrderModule {
     onSuccessCallback: (orderId: string, providerAddress: string) => void,
     onFailureCallback: () => void
   ) {
-    if (typeof window?.ethereum === 'undefined') {
-      console.log('Please install MetaMask');
+    if (!this.websocketProvider) {
+      console.log('Please pass websocket provider in constructor');
       return;
     }
 
-    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+    const { signer } = await initializeSigner({ wallet: this.wallet });
+    const account = await signer.getAddress();
+
     const contractAbi = BidAbi;
     const contractAddress = Bid;
 
@@ -209,12 +208,12 @@ export class OrderModule {
       }, timeoutTime);
 
       contract.on('UpdateRequestAccepted', (orderId, providerAddress, tenantAddress) => {
-        if (tenantAddress.toString().toLowerCase() === accounts[0].toString().toLowerCase()) {
+        if (tenantAddress.toString().toLowerCase() === account.toString().toLowerCase()) {
           onSuccessCallback(orderId, providerAddress);
           this.websocketProvider?.destroy();
           contract.off('UpdateRequestAccepted');
           clearTimeout(this.updateTimeoutId as NodeJS.Timeout);
-          resolve(orderId);
+          resolve({ orderId, providerAddress });
         }
       });
     });

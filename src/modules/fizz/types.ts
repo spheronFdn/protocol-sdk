@@ -24,11 +24,6 @@ export interface ResourceCategory {
   baseReward: bigint;
 }
 
-export interface Attribute {
-  id: bigint;
-  units: bigint;
-}
-
 export interface Resource {
   name: string;
   tier: string;

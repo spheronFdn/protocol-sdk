@@ -1,116 +1,48 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import EscrowAbi from '@contracts/abis/devnet/Escrow.json';
-import FizzRegistryAbi from '@contracts/abis/devnet/FizzRegistry.json';
-import ProviderRegistryAbi from '@contracts/abis/devnet/ProviderRegistry.json';
-import FizzAttributeRegistryAbi from '@contracts/abis/devnet/FizzAttributeRegistry.json';
-import ResourceRegistryAbi from '@contracts/abis/devnet/ResourceRegistry.json';
-import ComputeLeaseAbi from '@contracts/abis/devnet/ComputeLease.json';
+import FizzRegistryAbi from '@contracts/abis/testnet/FizzRegistry.json';
+import ResourceRegistryAbi from '@contracts/abis/testnet/ResourceRegistry.json';
+import ComputeLeaseAbi from '@contracts/abis/testnet/ComputeLease.json';
 import {
-  EscrowDev,
-  FizzRegistryDev,
-  FizzAttributeRegistryDev,
-  ResourceRegistryCPUDev,
-  ResourceRegistryGPUDev,
-  ProviderRegistryDev,
-  ComputeLeaseDev,
+  FizzRegistryTestnet,
+  ResourceRegistryCPUTestnet,
+  ResourceRegistryGPUTestnet,
+  ComputeLeaseTestnet,
 } from '@contracts/addresses';
 import { ethers } from 'ethers';
 import {
-  Attribute,
   FizzNode,
   FizzParams,
   FizzLease,
   Resource,
-  FizzProvider,
-  FizzProviderStatus,
   // FizzProviderTrustTier,
 } from './types';
-import { TransactionData } from '@modules/escrow/types';
+import { initializeSigner } from '@utils/index';
+import { handleContractError } from '@utils/errors';
+import { ProviderModule } from '@modules/provider';
 
 export class FizzModule {
   private provider: ethers.Provider;
   private webSocketProvider: ethers.WebSocketProvider | undefined;
   private timeoutId: NodeJS.Timeout | undefined;
+  private wallet: ethers.Wallet | undefined;
+  private providerModule: ProviderModule;
 
-  constructor(provider: ethers.Provider, webSocketProvider?: ethers.WebSocketProvider) {
+  constructor(
+    provider: ethers.Provider,
+    webSocketProvider?: ethers.WebSocketProvider,
+    wallet?: ethers.Wallet
+  ) {
     this.provider = provider;
     this.webSocketProvider = webSocketProvider;
-  }
-
-  async withdrawFizzEarnings({
-    rewardWallet,
-    tokenAddress,
-    amount,
-    decimals,
-    onSuccessCallback,
-    onFailureCallback,
-  }: TransactionData) {
-    if (typeof window?.ethereum === 'undefined') {
-      console.log('Please install MetaMask');
-      return;
-    }
-
-    try {
-      await window.ethereum.request({ method: 'eth_requestAccounts' });
-
-      const provider = new ethers.BrowserProvider(window.ethereum);
-      const signer = await provider.getSigner();
-
-      const contractABI = EscrowAbi;
-      const contractAddress = EscrowDev;
-      const contract = new ethers.Contract(contractAddress, contractABI, signer);
-
-      const finalAmount = (Number(amount.toString()) - 1) / 10 ** decimals;
-      const withdrawAmount = ethers.parseUnits(finalAmount.toFixed(decimals), decimals);
-
-      const result = await contract.withdrawFizzNodeEarnings(rewardWallet, tokenAddress, withdrawAmount);
-      const receipt = await result.wait();
-      console.log('Withdraw earnings successful -> ', receipt);
-      if (onSuccessCallback) onSuccessCallback(receipt);
-      return receipt;
-    } catch (error) {
-      console.error('Error withdrawing fizz earnings -> ', error);
-      if (onFailureCallback) onFailureCallback(error);
-      throw error;
-    }
-  }
-
-  async getFizzEarnings(fizzAddress: string, tokenAddress: string) {
-    try {
-      const contractAbi = EscrowAbi;
-      const contractAddress = EscrowDev;
-      const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
-
-      const response = await contract.getFizzNodeEarnings(fizzAddress, tokenAddress);
-
-      const fizzEarnings: { earned: string; withdrawn: string; balance: string } = {
-        earned: response[0].toString(),
-        withdrawn: response[1].toString(),
-        balance: response[2].toString(),
-      };
-
-      console.log("fizz earnings -> ", fizzEarnings);
-
-      return fizzEarnings;
-    } catch (error) {
-      console.error('Error in getFizzEarnings:', error);
-      throw error;
-    }
+    this.wallet = wallet;
+    this.providerModule = new ProviderModule(provider);
   }
 
   async addFizzNode(fizzParams: FizzParams): Promise<unknown> {
     try {
-      if (typeof window?.ethereum === 'undefined') {
-        console.log('Please install MetaMask');
-        return 'MetaMask not installed';
-      }
+      const { signer } = await initializeSigner({ wallet: this.wallet });
 
-      await window.ethereum.request({ method: 'eth_requestAccounts' });
-
-      const provider = new ethers.BrowserProvider(window.ethereum);
-      const signer = await provider.getSigner();
-
-      const contractAddress = FizzRegistryDev;
+      const contractAddress = FizzRegistryTestnet;
       const abi = FizzRegistryAbi;
       const contract = new ethers.Contract(contractAddress, abi, signer);
 
@@ -121,23 +53,17 @@ export class FizzModule {
       return tx;
     } catch (error) {
       console.error('Fizz registration failed: ', error);
-      throw error;
+      const errorMessage = handleContractError(error, FizzRegistryAbi);
+      throw errorMessage;
     }
   }
 
   async updateFizzName(newName: string): Promise<unknown> {
     try {
-      if (typeof window?.ethereum === 'undefined') {
-        console.log('Please install MetaMask');
-        return 'MetaMask not installed';
-      }
-
-      await window.ethereum.request({ method: 'eth_requestAccounts' });
-      const provider = new ethers.BrowserProvider(window.ethereum);
-      const signer = await provider.getSigner();
+      const { signer } = await initializeSigner({ wallet: this.wallet });
 
       // Contract address (hardcoded or retrieved from an environment variable)
-      const contractAddress = FizzRegistryDev;
+      const contractAddress = FizzRegistryTestnet;
       const abi = FizzRegistryAbi;
       const contract = new ethers.Contract(contractAddress, abi, signer);
 
@@ -149,13 +75,14 @@ export class FizzModule {
       return tx;
     } catch (error) {
       console.error('Update Fizz Name failed: ', error);
-      throw error;
+      const errorMessage = handleContractError(error, FizzRegistryAbi);
+      throw errorMessage;
     }
   }
 
   async getFizzById(fizzId: bigint): Promise<unknown> {
     try {
-      const contractAddress = FizzRegistryDev;
+      const contractAddress = FizzRegistryTestnet;
       const contractAbi = FizzRegistryAbi;
 
       const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
@@ -184,13 +111,14 @@ export class FizzModule {
       };
     } catch (error) {
       console.error('Failed to retrieve Fizz details: ', error);
-      throw error;
+      const errorMessage = handleContractError(error, FizzRegistryAbi);
+      throw errorMessage;
     }
   }
 
   async getFizzNodeByAddress(walletAddress: string) {
     try {
-      const contractAddress = FizzRegistryDev;
+      const contractAddress = FizzRegistryTestnet;
       const contractAbi = FizzRegistryAbi;
 
       const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
@@ -214,13 +142,14 @@ export class FizzModule {
       return result;
     } catch (error) {
       console.error('Failed to fetch Fizz Node details: ', error);
-      throw error;
+      const errorMessage = handleContractError(error, FizzRegistryAbi);
+      throw errorMessage;
     }
   }
 
   async getAllFizzNodes(): Promise<FizzNode[]> {
     try {
-      const contractAddress = FizzRegistryDev;
+      const contractAddress = FizzRegistryTestnet;
       const contractAbi = FizzRegistryAbi;
 
       const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
@@ -242,88 +171,15 @@ export class FizzModule {
       return fizzNodes;
     } catch (error) {
       console.error('Failed to fetch all Fizz Nodes: ', error);
-      throw error;
-    }
-  }
-
-  async submitAttributes(category: string, ids: bigint[], units: bigint[]): Promise<void> {
-    try {
-      const provider = new ethers.BrowserProvider(window.ethereum);
-
-      await provider.send('eth_requestAccounts', []);
-
-      const signer = await provider.getSigner();
-
-      const contractAddress = FizzAttributeRegistryDev;
-      const contractAbi = FizzAttributeRegistryAbi;
-
-      const contract = new ethers.Contract(contractAddress, contractAbi, signer);
-
-      const tx = await contract.submitAttributes(category, ids, units);
-      const result = await tx.wait();
-
-      console.log('Attributes submitted successfully.');
-
-      return result;
-    } catch (error) {
-      console.error('Failed to submit attributes: ', error);
-    }
-  }
-
-  async getAttributes(fizzAddress: string, category: string): Promise<Attribute[]> {
-    try {
-      const contractAddress = FizzAttributeRegistryDev;
-      const contractAbi = FizzAttributeRegistryAbi;
-
-      const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
-
-      const attributes: Attribute[] = await contract.getAttributes(fizzAddress, category);
-
-      console.log('attributes raw -> ', attributes);
-
-      const decoratedAttributes = attributes.map((attr: any) => ({
-        id: attr[0],
-        units: attr[1],
-      }));
-      console.log(
-        `Attributes for ${fizzAddress} in category ${category} retrieved successfully:`,
-        decoratedAttributes
-      );
-      return decoratedAttributes;
-    } catch (error) {
-      console.error('Failed to retrieve attributes: ', error);
-      throw error;
-    }
-  }
-
-  async getPendingAttributes(fizzAddress: string, category: string): Promise<Attribute[]> {
-    try {
-      const contractAddress = FizzAttributeRegistryDev;
-      const contractAbi = FizzAttributeRegistryAbi;
-
-      const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
-
-      const attributes: Attribute[] = await contract.getPendingAttributes(fizzAddress, category);
-
-      const decoratedAttributes = attributes.map((attr: any) => ({
-        id: attr[0],
-        units: attr[1],
-      }));
-      console.log(
-        `Pending Attributes for ${fizzAddress} in category ${category} retrieved successfully:`,
-        decoratedAttributes
-      );
-      return decoratedAttributes;
-    } catch (error) {
-      console.error('Failed to retrieve pending attributes: ', error);
-      throw error;
+      const errorMessage = handleContractError(error, FizzRegistryAbi);
+      throw errorMessage;
     }
   }
 
   async getResource(resourceID: bigint, category: string): Promise<Resource> {
     try {
       const contractAbi = ResourceRegistryAbi;
-      const contractAddress = category === 'CPU' ? ResourceRegistryCPUDev : ResourceRegistryGPUDev;
+      const contractAddress = category === 'CPU' ? ResourceRegistryCPUTestnet : ResourceRegistryGPUTestnet;
 
       const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
 
@@ -338,123 +194,8 @@ export class FizzModule {
       return resource;
     } catch (error) {
       console.error('Failed to retrieve resource: ', error);
-      throw error;
-    }
-  }
-
-  async getProvider(providerId: bigint): Promise<any> {
-    try {
-      const contractAddress = ProviderRegistryDev;
-      const contractAbi = ProviderRegistryAbi;
-
-      const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
-      const providerData = await contract.getProvider(providerId);
-
-      let name, region;
-      try {
-        const { Name, Region } = JSON.parse(providerData.spec);
-        name = Name;
-        region = Region;
-      } catch (error) {
-        name = "";
-        region = "";
-      }
-
-      return {
-        name,
-        region,
-        spec: providerData.spec,
-        hostUri: providerData.hostUri,
-        certificate: providerData.certificate,
-        paymentsAccepted: providerData.paymentsAccepted,
-        status: providerData.status,
-        tier: providerData.tier,
-        joinTimestamp: providerData.joinTimestamp,
-        walletAddress: providerData.walletAddress,
-        rewardWallet: providerData.rewardWallet,
-      };
-    } catch (error) {
-      console.error('Failed to retrieve provider details: ', error);
-      throw error;
-    }
-  }
-
-  async getProviderByAddress(walletAddress: string): Promise<any> {
-    try {
-      const contractAddress = ProviderRegistryDev;
-      const contractAbi = ProviderRegistryAbi;
-
-      const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
-
-      const providerData = await contract.getProviderByAddress(walletAddress);
-
-      let name, region;
-      try {
-        const { Name, Region } = JSON.parse(providerData.spec);
-        name = Name;
-        region = Region;
-      } catch (error) {
-        name = "";
-        region = "";
-      }
-
-      return {
-        name,
-        region,
-        spec: providerData.spec,
-        hostUri: providerData.hostUri,
-        certificate: providerData.certificate,
-        paymentsAccepted: providerData.paymentsAccepted,
-        status: providerData.status,
-        tier: providerData.tier,
-        joinTimestamp: providerData.joinTimestamp,
-        rewardWallet: providerData.rewardWallet,
-      };
-    } catch (error) {
-      console.error('Failed to retrieve provider details by address: ', error);
-      throw error;
-    }
-  }
-
-  async getAllProviders(): Promise<FizzProvider[]> {
-    try {
-      const contractAddress = ProviderRegistryDev;
-      const contractAbi = ProviderRegistryAbi;
-
-      const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
-      const providersData = await contract.getAllProviders();
-
-      const providers: FizzProvider[] = providersData.map((provider: any) => {
-        let name, region;
-        try {
-          const { Name, Region } = JSON.parse(provider.spec);
-          name = Name;
-          region = Region;
-        } catch (error) {
-          name = "";
-          region = "";
-        }
-        return {
-          providerId: provider.providerId.toString(),
-          name,
-          region,
-          walletAddress: provider.walletAddress,
-          paymentsAccepted: provider.paymentsAccepted,
-          spec: provider.spec,
-          hostUri: provider.hostUri,
-          certificate: provider.certificate,
-          status: FizzProviderStatus[provider.status],
-          // tier: FizzProviderTrustTier[provider.tier],
-          tier: Number(provider.tier.toString()),
-          joinTimestamp: Number(provider.joinTimestamp.toString()),
-          rewardWallet: provider.rewardWallet,
-        };
-      });
-
-      return providers;
-    } catch (error) {
-      console.error('Failed to retrieve all providers: ', error);
-      throw error;
+      const errorMessage = handleContractError(error, ResourceRegistryAbi);
+      throw errorMessage;
     }
   }
 
@@ -464,10 +205,10 @@ export class FizzModule {
     state?: string
   ): Promise<FizzLease[] | unknown> {
     try {
-      const providerData = await this.getProvider(providerId);
+      const providerData = await this.providerModule.getProvider(providerId);
       const walletAddress = providerData.walletAddress;
 
-      const leaseContractAddress = ComputeLeaseDev;
+      const leaseContractAddress = ComputeLeaseTestnet;
       const leaseContractAbi = ComputeLeaseAbi;
       const leaseContract = new ethers.Contract(
         leaseContractAddress,
@@ -505,7 +246,8 @@ export class FizzModule {
       return leases;
     } catch (error) {
       console.error('Failed to retrieve fizz leases: ', error);
-      throw error;
+      const errorMessage = handleContractError(error, ComputeLeaseAbi);
+      throw errorMessage;
     }
   }
 
@@ -514,7 +256,7 @@ export class FizzModule {
     onFailureCallback: () => void,
     timeoutTime = 60000
   ) {
-    const contractAddress = FizzRegistryDev;
+    const contractAddress = FizzRegistryTestnet;
     const contractAbi = FizzRegistryAbi;
 
     try {
@@ -540,17 +282,16 @@ export class FizzModule {
       });
     } catch (error) {
       console.log('Error in listenToFizzCreated -> ', error);
-      throw error;
+      const errorMessage = handleContractError(error, FizzRegistryAbi);
+      throw errorMessage;
     }
   }
 
   async updateFizzSpecs(specs: string) {
     try {
-      const provider = new ethers.BrowserProvider(window.ethereum);
-      await provider.send('eth_requestAccounts', []);
-      const signer = await provider.getSigner();
+      const { signer } = await initializeSigner({ wallet: this.wallet });
 
-      const contractAddress = FizzRegistryDev;
+      const contractAddress = FizzRegistryTestnet;
       const contractAbi = FizzRegistryAbi;
 
       const contract = new ethers.Contract(contractAddress, contractAbi, signer);
@@ -562,7 +303,8 @@ export class FizzModule {
       return receipt;
     } catch (error) {
       console.log('Error in updateFizzSpecs -> ', error);
-      throw error;
+      const errorMessage = handleContractError(error, FizzRegistryAbi);
+      throw errorMessage;
     }
   }
 
@@ -571,7 +313,7 @@ export class FizzModule {
     onFailureCallback: () => void,
     timeoutTime = 60000
   ) {
-    const contractAddress = FizzRegistryDev;
+    const contractAddress = FizzRegistryTestnet;
     const contractAbi = FizzRegistryAbi;
 
     try {
@@ -602,17 +344,16 @@ export class FizzModule {
       });
     } catch (error) {
       console.log('Error in listenToFizzNodeUpdated -> ', error);
-      throw error;
+      const errorMessage = handleContractError(error, FizzRegistryAbi);
+      throw errorMessage;
     }
   }
 
   async updateFizzRegion(region: string) {
     try {
-      const provider = new ethers.BrowserProvider(window.ethereum);
-      await provider.send('eth_requestAccounts', []);
-      const signer = await provider.getSigner();
+      const { signer } = await initializeSigner({ wallet: this.wallet });
 
-      const contractAddress = FizzRegistryDev;
+      const contractAddress = FizzRegistryTestnet;
       const contractAbi = FizzRegistryAbi;
 
       const contract = new ethers.Contract(contractAddress, contractAbi, signer);
@@ -624,7 +365,8 @@ export class FizzModule {
       return receipt;
     } catch (error) {
       console.log('Error in updateFizzRegion -> ', error);
-      throw error;
+      const errorMessage = handleContractError(error, FizzRegistryAbi);
+      throw errorMessage;
     }
   }
 
@@ -633,7 +375,7 @@ export class FizzModule {
     onFailureCallback: () => void,
     timeoutTime = 60000
   ) {
-    const contractAddress = FizzRegistryDev;
+    const contractAddress = FizzRegistryTestnet;
     const contractAbi = FizzRegistryAbi;
 
     try {
@@ -664,17 +406,16 @@ export class FizzModule {
       });
     } catch (error) {
       console.log('Error in listenToFizzNodeUpdated -> ', error);
-      throw error;
+      const errorMessage = handleContractError(error, FizzRegistryAbi);
+      throw errorMessage;
     }
   }
 
   async updateFizzProvider(providerId: bigint) {
     try {
-      const provider = new ethers.BrowserProvider(window.ethereum);
-      await provider.send('eth_requestAccounts', []);
-      const signer = await provider.getSigner();
+      const { signer } = await initializeSigner({ wallet: this.wallet });
 
-      const contractAddress = FizzRegistryDev;
+      const contractAddress = FizzRegistryTestnet;
       const contractAbi = FizzRegistryAbi;
 
       const contract = new ethers.Contract(contractAddress, contractAbi, signer);
@@ -686,7 +427,8 @@ export class FizzModule {
       return receipt;
     } catch (error) {
       console.log('Error in updateFizzProvider -> ', error);
-      throw error;
+      const errorMessage = handleContractError(error, FizzRegistryAbi);
+      throw errorMessage;
     }
   }
 
@@ -695,7 +437,7 @@ export class FizzModule {
     onFailureCallback: () => void,
     timeoutTime = 60000
   ) {
-    const contractAddress = FizzRegistryDev;
+    const contractAddress = FizzRegistryTestnet;
     const contractAbi = FizzRegistryAbi;
 
     try {
@@ -726,17 +468,16 @@ export class FizzModule {
       });
     } catch (error) {
       console.log('Error in listenToFizzNodeUpdated -> ', error);
-      throw error;
+      const errorMessage = handleContractError(error, FizzRegistryAbi);
+      throw errorMessage;
     }
   }
 
   async addAcceptedPayment(tokenAddress: string) {
     try {
-      const provider = new ethers.BrowserProvider(window.ethereum);
-      await provider.send('eth_requestAccounts', []);
-      const signer = await provider.getSigner();
+      const { signer } = await initializeSigner({ wallet: this.wallet });
 
-      const contractAddress = FizzRegistryDev;
+      const contractAddress = FizzRegistryTestnet;
       const contractAbi = FizzRegistryAbi;
 
       const contract = new ethers.Contract(contractAddress, contractAbi, signer);
@@ -748,7 +489,8 @@ export class FizzModule {
       return receipt;
     } catch (error) {
       console.log('Error in addAcceptedPayment -> ', error);
-      throw error;
+      const errorMessage = handleContractError(error, FizzRegistryAbi);
+      throw errorMessage;
     }
   }
 
@@ -757,7 +499,7 @@ export class FizzModule {
     onFailureCallback: () => void,
     timeoutTime = 60000
   ) {
-    const contractAddress = FizzRegistryDev;
+    const contractAddress = FizzRegistryTestnet;
     const contractAbi = FizzRegistryAbi;
 
     try {
@@ -788,17 +530,16 @@ export class FizzModule {
       });
     } catch (error) {
       console.log('Error in listenToAddAcceptedPayment -> ', error);
-      throw error;
+      const errorMessage = handleContractError(error, FizzRegistryAbi);
+      throw errorMessage;
     }
   }
 
   async removeAcceptedPayment(tokenAddress: string) {
     try {
-      const provider = new ethers.BrowserProvider(window.ethereum);
-      await provider.send('eth_requestAccounts', []);
-      const signer = await provider.getSigner();
+      const { signer } = await initializeSigner({ wallet: this.wallet });
 
-      const contractAddress = FizzRegistryDev;
+      const contractAddress = FizzRegistryTestnet;
       const contractAbi = FizzRegistryAbi;
 
       const contract = new ethers.Contract(contractAddress, contractAbi, signer);
@@ -810,7 +551,8 @@ export class FizzModule {
       return receipt;
     } catch (error) {
       console.log('Error in removeAcceptedPayment -> ', error);
-      throw error;
+      const errorMessage = handleContractError(error, FizzRegistryAbi);
+      throw errorMessage;
     }
   }
 
@@ -819,7 +561,7 @@ export class FizzModule {
     onFailureCallback: () => void,
     timeoutTime = 60000
   ) {
-    const contractAddress = FizzRegistryDev;
+    const contractAddress = FizzRegistryTestnet;
     const contractAbi = FizzRegistryAbi;
 
     try {
@@ -850,7 +592,8 @@ export class FizzModule {
       });
     } catch (error) {
       console.log('Error in listenToRemoveAcceptedPayment -> ', error);
-      throw error;
+      const errorMessage = handleContractError(error, FizzRegistryAbi);
+      throw errorMessage;
     }
   }
 }
