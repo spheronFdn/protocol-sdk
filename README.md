@@ -171,7 +171,7 @@ The **Deployment Module** within the Spheron SDK is designed to streamline the p
 
 ### Provider Proxy Setup
 
-To submit manifests to a provider, a proxy server needs to be set up by the SDK consumer. You can find the proxy server code here: [Provider Proxy Guide](./src/utils/provider-proxy-server/README.md).
+To submit manifests to a provider, a proxy server needs to be set up by the SDK consumer. You can find the proxy server code here: [Provider Proxy Guide](./provider-proxy-server/README.md).
 
 Lease Module
 ------------
