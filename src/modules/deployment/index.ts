@@ -164,7 +164,8 @@ export class DeploymentModule {
         sdlManifest
       );
       const updateOrderLeaseResponse = await updatedOrderLease;
-      console.log('Lease Updated ->', updateOrder, updateOrderLeaseResponse);
+      console.log(`Deployment Updated Successfully! Lease ID: ${orderId}`);
+      return { ...updateOrderLeaseResponse };
     } catch (error) {
       console.error('Error in updating deployment: ', error);
       throw error;
@@ -191,6 +192,7 @@ export class DeploymentModule {
       );
       const authToken = await createAuthorizationToken(this.wallet);
       const leaseInfo = await spheronProvider.getLeaseStatus(certificate, authToken, leaseId);
+      console.log(`Deployment Details Fetched Successfully! Lease ID: ${leaseId}`);
       return leaseInfo;
     } catch (error) {
       console.log('Error in getting lease Info', error);
@@ -215,7 +217,7 @@ export class DeploymentModule {
       const closeLeaseResponse = await this.leaseModule.closeLease(leaseId);
       console.log('Close Lease Sent:', closeLeaseResponse);
 
-      const closeLeaseEvent = await this.leaseModule.listenToLeaseClosedEvent(
+      const closeLeaseEvent = this.leaseModule.listenToLeaseClosedEvent(
         () => {
           console.log('Close Lease Accepted');
         },
@@ -225,8 +227,10 @@ export class DeploymentModule {
         60_000
       );
 
-      console.log('Lease Closed');
-      return closeLeaseEvent;
+      const closeLeaseEventResponse = await closeLeaseEvent;
+
+      console.log(`Deployment Closed Successfully! Lease ID: ${leaseId}`);
+      return closeLeaseEventResponse;
     } catch (error) {
       console.log('Error in closing lease:');
       throw error;
