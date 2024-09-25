@@ -60,7 +60,7 @@ export class DeploymentModule {
         const newOrderEvent: any = this.orderModule.listenToOrderCreated(
           60_000,
           () => {
-            console.log(`Order Created. Txn Hash: ${transaction.hash}`);
+            console.log(`Order Matched. Txn Hash: ${transaction.hash}`);
           },
           () => {
             console.log(`Could not find Lease. Txn Hash: ${transaction.hash}`);
@@ -83,7 +83,8 @@ export class DeploymentModule {
             orderId.toString(),
             sdlManifest
           );
-          console.log('Deployment Created Successfully');
+          console.log(`Deployment Created Successfully! Lease ID: ${orderId}`);
+          return { leaseId: orderId, transaction };
         } catch (error) {
           throw new Error('Error occured in sending manifest');
         }
@@ -96,7 +97,7 @@ export class DeploymentModule {
     }
   }
 
-  async updateDeployment(iclYaml: string, providerProxyUrl: string) {
+  async updateDeployment(leaseId: string, iclYaml: string, providerProxyUrl: string) {
     try {
       const { error, orderDetails: details } = yamlToOrderDetails(iclYaml);
       if (error) {

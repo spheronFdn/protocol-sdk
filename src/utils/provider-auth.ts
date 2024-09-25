@@ -73,8 +73,6 @@ export async function createAuthorizationToken(wallet: ethers.Wallet): Promise<s
     signed_timestamp: signedTimestamp,
   };
 
-  console.log("auth json -> ", body);
-
   // Convert the JSON object to a string
   const jsonString = JSON.stringify(body);
 
