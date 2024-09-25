@@ -202,7 +202,7 @@ export class DeploymentModule {
     }
   }
 
-  async closeDeployment(leaseId: string, providerProxyUrl: string) {
+  async closeDeployment(leaseId: string) {
     try {
       if (!this.wallet) {
         throw new Error('Unable to access wallet');
@@ -212,27 +212,10 @@ export class DeploymentModule {
         throw new Error('Provider Lease Id');
       }
 
-      if (!providerProxyUrl) {
-        throw new Error('Provider Proxy Url');
-      }
-
       const closeLeaseResponse = await this.leaseModule.closeLease(leaseId);
-      console.log('Close Lease Sent:', closeLeaseResponse);
-
-      const closeLeaseEvent = this.leaseModule.listenToLeaseClosedEvent(
-        () => {
-          console.log('Close Lease Accepted');
-        },
-        () => {
-          console.log('Close Lease Failed');
-        },
-        60_000
-      );
-
-      const closeLeaseEventResponse = await closeLeaseEvent;
 
       console.log(`Deployment Closed Successfully! Lease ID: ${leaseId}`);
-      return closeLeaseEventResponse;
+      return closeLeaseResponse;
     } catch (error) {
       console.log('Error in closing lease: ', error);
       throw error;

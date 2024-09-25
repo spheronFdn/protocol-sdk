@@ -208,7 +208,7 @@ export class LeaseModule {
       this.leaseCloseTimeoutId = setTimeout(() => {
         contract.off('LeaseClosed');
         onFailureCallback();
-        reject({ error: true, msg: 'Order Updation Failed' });
+        reject({ error: true, msg: 'Lease Close Failed' });
       }, timeout);
 
       contract.on(

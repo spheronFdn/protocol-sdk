@@ -150,15 +150,24 @@ The **Deployment Module** within the Spheron SDK is designed to streamline the p
     *   `iclYaml`: The deployment configuration in YAML format.
     *   `providerProxyUrl`: URL of the provider proxy server
 
-3. **getDeployment**: This function updates an existing deployment using the Lease ID and ICL YAML configuration.
+3. **getDeployment**: This function retrieves the details of an existing deployment based on the provided lease ID.
 
     ```typescript
-    const deploymentTxn = await sdk.deploymentModule.updateDeployment(leaseId, iclYaml, providerProxyUrl);
+    const deploymentTxn = await sdk.deploymentModule.getDeployment(leaseId, providerProxyUrl);
     ```
     #### Parameters:
 
     *   `leaseId`: Lease ID for the deployment.
     *   `providerProxyUrl`: URL of the provider proxy server
+
+4. **closeDeployment**: This function closes an existing deployment using the Lease ID.
+
+    ```typescript
+    const closeDeploymentDetails = await sdk.deploymentModule.closeDeployment(leaseId);
+    ```
+    #### Parameters:
+
+    *   `leaseId`: Lease ID for the deployment.
 
 ### Provider Proxy Setup
 
