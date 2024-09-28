@@ -35,13 +35,13 @@ export class DeploymentModule {
         throw new Error('Please verify YAML format');
       }
       const sdlManifest = getManifestIcl(iclYaml);
-      const { token, maxPrice } = details;
+      const { token, maxPrice, numOfBlocks } = details;
       const tokenDetails = getTokenDetails(token, networkType as NetworkType);
       const decimal =
         tokenDetails?.symbol === 'USDT' || tokenDetails?.symbol === 'USDC'
           ? 18
           : tokenDetails?.decimal;
-      const totalCost = Number(maxPrice.toString() / 10 ** (decimal || 0)) * 14400;
+      const totalCost = Number(maxPrice.toString() / 10 ** (decimal || 0)) * numOfBlocks;
 
       if (!this.wallet) {
         throw new Error('Unable to access wallet');
@@ -106,13 +106,13 @@ export class DeploymentModule {
       delete details.creator;
       delete details.id;
       const sdlManifest = getManifestIcl(iclYaml);
-      const { token, maxPrice } = details;
+      const { token, maxPrice, numOfBlocks } = details;
       const tokenDetails = getTokenDetails(token, networkType as NetworkType);
       const decimal =
         tokenDetails?.symbol === 'USDT' || tokenDetails?.symbol === 'USDC'
           ? 18
           : tokenDetails?.decimal;
-      const totalCost = Number(maxPrice.toString() / 10 ** (decimal || 0)) * 14400;
+      const totalCost = Number(maxPrice.toString() / 10 ** (decimal || 0)) * numOfBlocks;
 
       if (!this.wallet) {
         throw new Error('Unable to access wallet');
@@ -145,11 +145,11 @@ export class DeploymentModule {
           console.log('Order Update did not get accepted');
         }
       );
-      
+
       const updateOrderResponse = await this.orderModule.updateOrder(leaseId, details);
 
       const updateOrderAcceptanceResponse = await updateOrderAcceptance;
-      
+
       const { orderId, providerAddress } = updateOrderAcceptanceResponse;
       const { certificate, hostUri }: { certificate: string; hostUri: string } =
         (await this.providerModule.getProviderDetails(providerAddress)) as any;
