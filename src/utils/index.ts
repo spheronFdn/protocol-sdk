@@ -47,21 +47,25 @@ export const requestPipeline = async ({
 }) => {
   const headers = new Headers();
   headers.append('Content-Type', 'application/json');
+  try {
+    const res = await fetch(`${url}`, {
+      headers,
+      method,
+      body,
+    });
 
-  const res = await fetch(`${url}`, {
-    headers,
-    method,
-    body,
-  });
+    const contentType = res.headers.get('Content-Type');
+    const isJson = contentType && contentType.includes('application/json');
 
-  const contentType = res.headers.get('Content-Type');
-  const isJson = contentType && contentType.includes('application/json');
-
-  if (res.status === 204 || res.status === 205) {
-    return null;
-  } else if (isJson) {
-    return res.json();
-  } else {
-    return res.text();
+    if (res.status === 204 || res.status === 205) {
+      return null;
+    } else if (isJson) {
+      return res.json();
+    } else {
+      return res.text();
+    }
+  } catch (error) {
+    console.log('Error in Request Pipeline ->', error);
+    throw error;
   }
 };
