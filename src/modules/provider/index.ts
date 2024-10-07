@@ -1,8 +1,9 @@
 import ProviderRegistryAbi from '@contracts/abis/testnet/ProviderRegistry.json';
+import ProviderAttributeRegistryAbi from '@contracts/abis/testnet/ProviderAttributeRegistry.json';
+
 import {
-  FizzAttributeRegistryTestnet,
   ProviderRegistryTestnet as ProviderRegistry,
-  ProviderRegistryTestnet,
+  ProviderAttributeRegistryTestnet as ProviderAttributeRegistry,
 } from '@contracts/addresses';
 import { ethers } from 'ethers';
 import { Attribute, Category, IProvider, Provider, ProviderStatus } from './types';
@@ -67,8 +68,8 @@ export class ProviderModule {
       return;
     }
     try {
-      const contractAbi = ProviderRegistryAbi;
-      const contractAddress = ProviderRegistry;
+      const contractAbi = ProviderAttributeRegistryAbi;
+      const contractAddress = ProviderAttributeRegistry;
 
       const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
       const response = await contract.getProviderPendingAttributes(providerAddress, category);
@@ -76,7 +77,7 @@ export class ProviderModule {
       return response;
     } catch (error) {
       console.log('Error in get Provider Pending Attrs ->', error);
-      const errorMessage = handleContractError(error, ProviderRegistryAbi);
+      const errorMessage = handleContractError(error, ProviderAttributeRegistryAbi);
       throw errorMessage;
     }
   }
@@ -97,8 +98,8 @@ export class ProviderModule {
       return;
     }
     try {
-      const contractAbi = ProviderRegistryAbi;
-      const contractAddress = ProviderRegistry;
+      const contractAbi = ProviderAttributeRegistryAbi;
+      const contractAddress = ProviderAttributeRegistry;
 
       const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
       const response = await contract.getProviderAttributes(providerAddress, category);
@@ -106,14 +107,14 @@ export class ProviderModule {
       return response;
     } catch (error) {
       console.log('Error in get Provider Attrs ->', error);
-      const errorMessage = handleContractError(error, ProviderRegistryAbi);
+      const errorMessage = handleContractError(error, ProviderAttributeRegistryAbi);
       throw errorMessage;
     }
   }
 
   async getProvider(providerId: bigint): Promise<any> {
     try {
-      const contractAddress = ProviderRegistryTestnet;
+      const contractAddress = ProviderRegistry;
       const contractAbi = ProviderRegistryAbi;
 
       const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
@@ -141,7 +142,7 @@ export class ProviderModule {
 
   async getProviderByAddress(walletAddress: string): Promise<any> {
     try {
-      const contractAddress = ProviderRegistryTestnet;
+      const contractAddress = ProviderRegistry;
       const contractAbi = ProviderRegistryAbi;
 
       const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
@@ -169,7 +170,7 @@ export class ProviderModule {
 
   async getAllProviders(): Promise<Provider[]> {
     try {
-      const contractAddress = ProviderRegistryTestnet;
+      const contractAddress = ProviderRegistry;
       const contractAbi = ProviderRegistryAbi;
 
       const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
@@ -201,8 +202,8 @@ export class ProviderModule {
 
   async getAttributes(providerAddress: string, category: string): Promise<Attribute[]> {
     try {
-      const contractAddress = FizzAttributeRegistryTestnet;
-      const contractAbi = ProviderRegistryAbi;
+      const contractAddress = ProviderAttributeRegistry;
+      const contractAbi = ProviderAttributeRegistryAbi;
 
       const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
 
@@ -228,8 +229,8 @@ export class ProviderModule {
 
   async getPendingAttributes(providerAddress: string, category: string): Promise<Attribute[]> {
     try {
-      const contractAddress = FizzAttributeRegistryTestnet;
-      const contractAbi = ProviderRegistryAbi;
+      const contractAddress = ProviderAttributeRegistry;
+      const contractAbi = ProviderAttributeRegistryAbi;
 
       const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
 
