@@ -1,254 +1,195 @@
 # Spheron Protocol SDK
 
-Table of Contents
------------------
+## Table of Contents
 
-1.  [Introduction](#introduction)
-2.  [Installation](#installation)
-3.  [Usage](#usage)
-    *   [Initializing the SDK](#initializing-the-sdk)
-    *   [Modules](#modules)
-        *   [Escrow Module](#escrow-module)
-        *   [Deployment Module](#deployment-module)
-        *   [Lease Module](#lease-module)
-4.  [Examples](#examples)
-5.  [Error Handling](#error-handling)
-6.  [Contributing](#contributing)
-7.  [License](#license)
+1. [Introduction](#introduction)
+2. [How It Works](#how-it-works)
+3. [Components](#components)
+   - [Node.js SDK](#nodejs-sdk)
+   - [Provider Proxy Server](#provider-proxy-server)
+4. [Installation and Setup](#installation-and-setup)
+   - [Installing the SDK](#installing-the-sdk)
+   - [Setting Up the Provider Proxy Server](#setting-up-the-provider-proxy-server)
+5. [Usage](#usage)
+   - [Initializing the SDK](#initializing-the-sdk)
+   - [Examples](#examples)
+6. [Contributing](#contributing)
+7. [License](#license)
 
-Introduction
-------------
+## Introduction
 
-The **Spheron Protocol SDK** provides a comprehensive set of modules to interact with the Spheron decentralized infrastructure. This includes modules for lease management, orders management, and escrow operations.
+The **Spheron Protocol SDK** provides developers with tools to interact with the Spheron decentralized infrastructure. It includes modules for managing compute leases, deployments, escrow operations, and more.
 
-Installation
-------------
+## How It Works
 
-To install the Spheron SDK, use npm:
+The Spheron Protocol SDK comprises two main components that work together to provide a seamless experience for interacting with the Spheron decentralized infrastructure:
 
-```
+### Protocol SDK
+
+The Protocol SDK handles all deployment and escrow-specific operations, including:
+
+- Creating Deployment Orders: Initiate new deployments on the network.
+- Updating Deployments: Modify existing deployments with new configurations.
+- Closing Deployments: Terminate deployments when they are no longer needed.
+- Managing Escrow Balances: Track and manage your account balance within the network’s escrow system.
+- Financial Transactions: Deposit and withdraw funds securely.
+
+This component manages the blockchain transactions and smart contract interactions required for these operations.
+
+### Provider Proxy Server
+
+The Provider Proxy Server is essential for interacting with provider-specific functions, such as:
+
+- Fetching Deployment Details: Retrieve information about your deployments.
+- Retrieving Exposed Ports: Get details about network ports exposed by your services.
+- Getting Service Details: Access information about running services.
+- Checking Service Statuses: Monitor the status of your deployed applications.
+
+The Provider Proxy Server acts as an intermediary between your application and the Spheron provider, handling both HTTP and WebSocket requests.
+
+### Working Together
+
+These components work hand in hand, allowing you to interact with the Spheron infrastructure without needing to build additional components:
+
+1. Run the Provider Proxy Server: This server communicates with the Spheron provider on your behalf.
+2. Pass the Provider Proxy Server URL to the Protocol SDK: This allows the SDK to route requests appropriately.
+3. Use the SDK Functions: Manage deployments and interact with the Spheron infrastructure through the SDK’s API.
+
+By following the guide below and referring to the [Node.js SDK README](./nodejs/README.md), you'll be able to perform all necessary interactions for deployments on Spheron.
+
+## Components
+
+### Node.js SDK
+
+The [Node.js SDK](./nodejs/README.md) offers a comprehensive set of functionalities to interact with the Spheron Protocol via Node.js applications.
+
+Key features include:
+
+- **Escrow Module**: Manage user balances, deposits, and withdrawals.
+- **Deployment Module**: Create, update, retrieve, and close deployments.
+- **Lease Module**: Manage compute leases, including retrieving lease details and managing active leases.
+
+### Provider Proxy Server
+
+The [Provider Proxy Server](./provider-proxy-server/README.md) acts as an intermediary for fetching data related to deployments from the Spheron Provider. It handles both HTTP and WebSocket requests to communicate with the Spheron provider.
+
+## Installation and Setup
+
+### Installing the SDK
+
+To install the Spheron SDK in your Node.js project, use npm or yarn:
+
+```bash
 npm install @spheron/protocol-sdk
 ```
 
-Or using yarn:
+Or with yarn:
 
-```
+```bash
 yarn add @spheron/protocol-sdk
 ```
 
-Usage
------
+### Setting Up the Provider Proxy Server
+
+To submit manifests to a provider, you need to set up a proxy server. You can run the provider proxy server using Docker or from source code.
+
+Refer to the [Provider Proxy Server README](./provider-proxy-server/README.md) for detailed instructions.
+
+#### Option 1: Use the Docker Image
+
+Pull and run the Docker image:
+
+```bash
+docker pull spheronnetwork/provider-proxy-server:latest
+docker run -p 3040:3040 spheronnetwork/provider-proxy-server:latest
+```
+
+#### Option 2: Run from Source Code
+
+Clone the repository and run the server:
+
+```bash
+git clone https://github.com/spheronFdn/protocol-sdk.git
+cd protocol-sdk/provider-proxy-server
+npm install
+npm run start
+```
+
+Make sure to set any necessary environment variables as described in the [Provider Proxy Server README](./provider-proxy-server/README.md).
+
+## Usage
 
 ### Initializing the SDK
 
-To use the Spheron SDK, first import it and initialize it with the desired network type:
+Import and initialize the SDK in your Node.js application:
 
+```javascript
+const { SpheronSDK } = require("@spheron/protocol-sdk");
 
-```typescript
-import { SpheronSDK } from 'spheron-sdk';
-const sdk = new SpheronSDK('testnet');
+const sdk = new SpheronSDK("testnet");
 ```
 
-If you want to perform write operations, you'll need to provide a private key:
+If performing write operations, provide a private key:
 
-```typescript
-const sdk = new SpheronSDK('testnet', 'your-private-key');
+```javascript
+const sdk = new SpheronSDK("testnet", "your-private-key");
 ```
 
-#### Constructor Parameters:
+**Note:** Never hardcode your private key; use environment variables or secure key management systems.
 
-*   `networkType`: Specifies the environment (e.g., 'testnet', 'mainnet').
-*   `privateKey`: Private key for signing transactions.
+### Examples
 
+Refer to the [Examples Directory](./examples) for sample code demonstrating how to use various modules of the SDK.
 
-## Modules
+**Example: Creating a Deployment**
 
-The SDK provides several modules for different functionalities:
+```javascript
+const { SpheronSDK } = require("@spheron/protocol-sdk");
 
-Escrow Module
--------------
+const sdk = new SpheronSDK("testnet", "your-private-key");
 
-The Escrow Module handles escrow-related operations, including user deposits, withdrawals and balance management.
+const iclYaml = `
+// Your YAML file here
+`;
 
+const providerProxyUrl = "http://localhost:3040";
 
-1. **getUserBalance**: This function fetches the user's balance from the escrow contract for a given token and wallet address.
-
-    ```typescript
-    const balance = await sdk.escrow.getUserBalance('0x1234...', 'USDT');
-    ```
-    
-    #### Parameters:
-
-    *   `token`: The token symbol (e.g., USDT, USDC, WETH & DAI).
-    *   `walletAddress`: (optional) Wallet address to query. If not provided, the wallet used during the initialization (for which the private key was given) will be used.
-
-2. **depositBalance**: This function deposits a specified amount of tokens into the escrow contract.
-
-    ```typescript
-    await sdk.escrow.depositBalance({
-      token: 'USDT',
-      amount: 10,
-      onSuccessCallback: (receipt) => {
-        console.log('Successfully deposited ', receipt);
-      },
-      onFailureCallback: (error) => {
-        console.error('Deposit failed ', error);
-      },
-    });
-    ```
-    #### Parameters:
-    *   `token`: The token symbol (e.g., USDT, USDC, WETH & DAI).
-    *   `amount`: The amount to deposit.
-    *   `onSuccessCallback`: Function to be called upon a successful deposit.
-    *   `onFailureCallback`: Function to be called in case of failure.
-
-3. **withdrawBalance**: This function withdraws a specified amount of tokens from the escrow contract.
-
-
-    ```typescript
-    await sdk.escrow.escrow.withdrawBalance({
-      token: 'USDT',
-      amount: 10,
-      onSuccessCallback: (receipt) => {
-        console.log('Successfully withdrawn ', receipt)
-      },
-      onFailureCallback: (error) => {
-        console.error('Withdraw failed ', error)
-      },
-    });
-    ```
-
-    #### Parameters:
-    *   `token`: The token symbol (e.g., USDT, USDC, WETH & DAI).
-    *   `amount`: The amount to withdraw.
-    *   `onSuccessCallback`: Function to be called upon a successful deposit.
-    *   `onFailureCallback`: Function to be called in case of failure.
-
-Deployment Module
------------------
-
-The **Deployment Module** within the Spheron SDK is designed to streamline the process of creating, updating, and fetching deployment details.
-
-1. **createDeployment**: This function allows you to create a new deployment using the [ICL (Infrastructure Configuration Language) YAML](https://docs.spheron.network/user-guide/icl). It validates the YAML format, checks token balance, creates an order, and submits the manifest to the Spheron provider.
-
-    ```typescript
-    const deploymentTxn = await sdk.deploymentModule.createDeployment(iclYaml, providerProxyUrl);
-    ```
-    #### Parameters:
-
-    *   `iclYaml`: The deployment configuration in YAML format.
-    *   `providerProxyUrl`: URL of the provider proxy server
-
-2. **updateDeployment**: This function updates an existing deployment using the Lease ID and ICL YAML configuration.
-
-    ```typescript
-    const deploymentTxn = await sdk.deploymentModule.updateDeployment(leaseId, iclYaml, providerProxyUrl);
-    ```
-    #### Parameters:
-
-    *   `leaseId`: Lease ID for the deployment.
-    *   `iclYaml`: The deployment configuration in YAML format.
-    *   `providerProxyUrl`: URL of the provider proxy server
-
-3. **getDeployment**: This function retrieves the details of an existing deployment based on the provided lease ID.
-
-    ```typescript
-    const deploymentTxn = await sdk.deploymentModule.getDeployment(leaseId, providerProxyUrl);
-    ```
-    #### Parameters:
-
-    *   `leaseId`: Lease ID for the deployment.
-    *   `providerProxyUrl`: URL of the provider proxy server
-
-4. **closeDeployment**: This function closes an existing deployment using the Lease ID.
-
-    ```typescript
-    const closeDeploymentDetails = await sdk.deploymentModule.closeDeployment(leaseId);
-    ```
-    #### Parameters:
-
-    *   `leaseId`: Lease ID for the deployment.
-
-### Provider Proxy Setup
-
-To submit manifests to a provider, a proxy server needs to be set up by the SDK consumer. You can find the proxy server code here: [Provider Proxy Guide](./provider-proxy-server/README.md).
-
-Lease Module
-------------
-
-The Lease Module provides functionality for managing and interacting with compute leases. It allows you to retrieve lease details, get lease IDs, filter leases by state, close leases, and listen for lease-related events.
-
-1.  **Get Lease Details**: Retrieve detailed information about a specific lease.
-
-    ```typescript    
-    const leaseDetails = await sdk.leases.getLeaseDetails(leaseId);
-    ```
-    
-2.  **Get Lease IDs**: Retrieve active, terminated, and all lease IDs for a given address.
-    
-    ```typescript
-    const { activeLeaseIds, terminatedLeaseIds, allLeaseIds } = await sdk.leases.getLeaseIds(address);
-    ```
-    
-3.  **Get Leases by State**: Retrieve leases filtered by state (ACTIVE or TERMINATED) with pagination support.
-    
-    ```typescript
-    const options = { state: LeaseState.ACTIVE, page: 1, pageSize: 10 }; const leases = await sdk.leases.getLeasesByState(address, options);
-    ```
-    
-4.  **Close Lease**: Close an active lease.
-    
-    ```typescript
-    const receipt = await sdk.leases.closeLease(leaseId);
-    ```
-    
-5.  **Listen to Lease Closed Event**: Set up a listener for the LeaseClosed event.
-    
-    ```typescript
-    sdk.leases.listenToLeaseClosedEvent(
-      ({ orderId, providerAddress, tenantAddress }) => {
-        console.log('Lease closed:', orderId);
-      },
-      () => console.log('Listening failed or timed out'),
-      60000
+(async () => {
+  try {
+    const deploymentTxn = await sdk.deployment.createDeployment(
+      iclYaml,
+      providerProxyUrl
     );
-    ```
-    
-
-The Lease Module interacts with the ComputeLease smart contract and uses the Order Module and Fizz Module for additional functionality.
-
-
-API Reference
--------------
-
-### Lease Module
-
-*   `getLeaseDetails(leaseId: string): Promise<Lease>`
-*   `getLeaseIds(address: string): Promise<{ activeLeaseIds: string[], terminatedLeaseIds: string[], allLeaseIds: string[] }>`
-*   `getLeasesByState(address: string, options?: { state?: LeaseState, page?: number, pageSize?: number }): Promise<{ leases: LeaseWithOrderDetails[], activeCount: number, terminatedCount: number, totalCount: number }>`
-*   `closeLease(leaseId: string): Promise<TransactionReceipt>`
-*   `listenToLeaseClosedEvent(onSuccessCallback: Function, onFailureCallback: Function, timeout?: number): Promise<void>`
-
-
-Error Handling
---------------
-
-The SDK uses try-catch blocks for error handling. Most methods will throw an error if something goes wrong. It's recommended to wrap your SDK calls in try-catch blocks:
-
-
-```typescript
-try {
-  const result = await sdk.someModule.someMethod();  // Handle successful result
-} catch (error) {
-  console.error('An error occurred:', error);  // Handle error
-}
+    console.log("Deployment created:", deploymentTxn);
+  } catch (error) {
+    console.error("Error creating deployment:", error);
+  }
+})();
 ```
 
-Contributing
-------------
+## Security Best Practices
 
-Feel free to contribute by submitting pull requests or issues. Ensure you follow the coding standards set in the repository.
+- Private Key Management: Store your private key securely using environment variables or secret management services like AWS Secrets Manager, Azure Key Vault, etc.
+- Avoid Hardcoding Sensitive Data: Never commit sensitive information like private keys or API keys to version control.
 
-License
--------
-This project is licensed under the [Apache License 2.0](LICENSE) - see the LICENSE file for details.
+## Contributing
+
+1. Fork the Repository: Click the “Fork” button at the top of the repository page.
+2. Create a Feature Branch: Use a descriptive name, e.g., feature/add-new-module.
+3. Make Changes: Commit your changes with clear and concise commit messages.
+4. Run Tests: Ensure all tests pass by running npm test.
+5. Submit a Pull Request: Open a pull request against the main branch with a detailed description of your changes.
+
+## Coding Standards
+
+- **Code Style:** Follow the established coding style in the project.
+- **Linting:** Run `npm run lint` to check for linting errors.
+- **Testing:** Include unit tests for new features and ensure existing tests pass.
+
+## License
+
+This project is licensed under the [Apache License 2.0](./LICENSE) - see the LICENSE file for details.
+
+## Contact
+
+For any questions or inquiries, please contact us in our [Discord](https://sphn.wiki/discord).
