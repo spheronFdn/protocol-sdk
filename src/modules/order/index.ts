@@ -152,7 +152,12 @@ export class OrderModule {
 
   async listenToOrderUpdated(
     timeoutTime = 60000,
-    onSuccessCallback: (orderId: string, providerAddress: string) => void,
+    onSuccessCallback: (
+      orderId: string,
+      providerAddress: string,
+      tenantAddress?: string,
+      acceptedPrice?: string
+    ) => void,
     onFailureCallback: () => void
   ) {
     if (typeof window?.ethereum === 'undefined') {
@@ -168,16 +173,16 @@ export class OrderModule {
 
     return new Promise((resolve, reject) => {
       this.updateTimeoutId = setTimeout(() => {
-        contract.off('leaseUpdated');
+        contract.off('LeaseUpdated');
         onFailureCallback();
         reject({ error: true, msg: 'Order updation Failed' });
       }, timeoutTime);
 
-      contract.on('leaseUpdated', (orderId, providerAddress, tenantAddress) => {
+      contract.on('LeaseUpdated', (orderId, providerAddress, tenantAddress, acceptedPrice) => {
         if (tenantAddress.toString().toLowerCase() === accounts[0].toString().toLowerCase()) {
-          onSuccessCallback(orderId, providerAddress);
+          onSuccessCallback(orderId, providerAddress, tenantAddress, acceptedPrice?.toString());
           this.websocketProvider?.destroy();
-          contract.off('leaseUpdated');
+          contract.off('LeaseUpdated');
           clearTimeout(this.updateTimeoutId as NodeJS.Timeout);
           resolve(orderId);
         }

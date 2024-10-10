@@ -21,20 +21,20 @@ export const WETH = '0x55B1835d60Bb7CFcfB838E0963E58ad84Fd9694F';
 // Devnet Contract Addresses
 export const AccessControlManagerDev = '0x7408e72DaD483859570df578F57f4F61434a8d39';
 export const TokenRegistryDev = '0x30E76950e5eFf7f193FD0a55d86E5249f5f51F7B';
-export const ProviderRegistryDev = '0x840399F9b4CBe04a80facD844c6358d8c2d981fB';
-export const ProviderAttributeRegistryDev = '0x09BCF5BdbD752bA6FD3aB2E4eB8c5b7923d2312C';
-export const FizzRegistryDev = '0x83B06EF4Ae0310682cb90f8b9771A75547b6EBC0';
+export const ProviderRegistryDev = '0x1C64658c0738eB15744DDCFE0Efe442994AA4cd5';
+export const ProviderAttributeRegistryDev = '0x4a356b572522eD2EF88D04A30C53AEfBdF854A88';
+export const FizzRegistryDev = '0x14ae53c7130746d5342c53216Fc7622D30F236c0';
 export const FizzAttributeRegistryDev = '0x8B4e0fE5C9293855681e518fb9B1c8B0114A0f83';
-export const EscrowDev = '0x4A7aa7e772b53c15cc491247079Dc8B1D814c4af';
-export const OrderRequestDev = '0xBc5D4524518E1af5cbFcFbC7fF0534fa4E59F94b';
-export const ResourceManagerDev = '0xd14F7B393cD5f4eFbBbFDaCe7c45057690Ac1B63';
-export const ComputeLeaseDev = '0x3f1ddD572Fb76FAe1D65c8d11FB9d5f60Bf43257';
-export const BidDev = '0xf04Ba15C07ddA36c49c709375355430F33FEc74C';
+export const EscrowDev = '0x1377BF6D421dc2926b54a93A4bBDDb9F8E857EFc';
+export const OrderRequestDev = '0x66286846010EE3A43D85175b04D5BA5A176Cb961';
+export const ResourceManagerDev = '0xF01fB027593DD2C60e0024AF8F9014c41fA0756e';
+export const ComputeLeaseDev = '0x314C4616C6371686234DeE6244F40a4E199c7E87';
+export const BidDev = '0x4AF4902D5f0F5c83a40A41f561273f884854e087';
 export const ResourceRegistryCPUDev = '0x7aEEE296044c955A707A3A0BB6E1A505bbD15585';
 export const ResourceRegistryGPUDev = '0x01e909Ac5E5D833998bA84a1BB2a16d227A9b3ea';
 export const ResourceRegistryFactoryDev = '0xd6d4C265B3549c4425DF1a15CCEA0634EcB351D2';
 export const ProviderRewardsManagerDev = '0x1b932690a36966C56e89103b786E0bb01bDDDc36';
-export const FizzRewardsManagerDev = '0xB4C78b75c00D1C02409e447B3D78d37BB707913A';
+export const FizzRewardsManagerDev = '0x9dE3eB40b66F07e92740328e67fF4762d4D0147b';
 export const RewardTokenDev = '0xa8ACde36Ec65A5ca286CE5617f0b22F26341B8aE';
 
 // Devnet Token addresses
