@@ -41,7 +41,7 @@ export class DeploymentModule {
         tokenDetails?.symbol === 'USDT' || tokenDetails?.symbol === 'USDC'
           ? 18
           : tokenDetails?.decimal;
-      const totalCost = Number(maxPrice.toString() / 10 ** (decimal || 0)) * numOfBlocks;
+      const totalCost = Number(maxPrice.toString() / 10 ** (decimal || 0)) * Number(numOfBlocks);
 
       if (!this.wallet) {
         throw new Error('Unable to access wallet');
@@ -112,7 +112,7 @@ export class DeploymentModule {
         tokenDetails?.symbol === 'USDT' || tokenDetails?.symbol === 'USDC'
           ? 18
           : tokenDetails?.decimal;
-      const totalCost = Number(maxPrice.toString() / 10 ** (decimal || 0)) * numOfBlocks;
+      const totalCost = Number(maxPrice.toString() / 10 ** (decimal || 0)) * Number(numOfBlocks);
 
       if (!this.wallet) {
         throw new Error('Unable to access wallet');

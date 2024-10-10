@@ -16,7 +16,6 @@ export class EscrowModule {
     this.wallet = wallet;
   }
 
-
   async getUserBalance(token: string, walletAddress?: string) {
     try {
       const contractAbi = EscrowAbi;
@@ -29,7 +28,8 @@ export class EscrowModule {
       if (!tokenDetails) {
         throw new Error('Provided token symbol is invalid.');
       }
-      const tokenAddress: any = tokenDetails?.address || '0x0000000000000000000000000000000000000000';
+      const tokenAddress: any =
+        tokenDetails?.address || '0x0000000000000000000000000000000000000000';
 
       let userWalletAddress;
       if (walletAddress) {
@@ -38,7 +38,7 @@ export class EscrowModule {
         if (this.wallet) {
           userWalletAddress = await this.wallet.getAddress();
         } else {
-          throw new Error("No wallet address provided");
+          throw new Error('No wallet address provided');
         }
       }
 
@@ -153,7 +153,11 @@ export class EscrowModule {
       const finalAmount = (Number(amount.toString()) - 1) / 10 ** decimals;
       const withdrawAmount = ethers.parseUnits(finalAmount.toFixed(decimals), decimals);
 
-      const result = await contract.withdrawProviderEarnings(rewardWallet, tokenAddress, withdrawAmount);
+      const result = await contract.withdrawProviderEarnings(
+        rewardWallet,
+        tokenAddress,
+        withdrawAmount
+      );
       const receipt = await result.wait();
       console.log('Withdraw earnings successfull -> ', receipt);
       if (onSuccessCallback) onSuccessCallback(receipt);
@@ -184,7 +188,11 @@ export class EscrowModule {
       const finalAmount = (Number(amount.toString()) - 1) / 10 ** decimals;
       const withdrawAmount = ethers.parseUnits(finalAmount.toFixed(decimals), decimals);
 
-      const result = await contract.withdrawFizzNodeEarnings(rewardWallet, tokenAddress, withdrawAmount);
+      const result = await contract.withdrawFizzNodeEarnings(
+        rewardWallet,
+        tokenAddress,
+        withdrawAmount
+      );
       const receipt = await result.wait();
       console.log('Withdraw earnings successful -> ', receipt);
       if (onSuccessCallback) onSuccessCallback(receipt);

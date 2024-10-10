@@ -2,7 +2,8 @@ import { contractAddresses } from '@contracts/addresses';
 
 // Testnet URLs
 // export const SPHERON_DEVNET_HTTP_URL = 'https://spheron-devnet-eth.rpc.caldera.xyz/http';
-export const SPHERON_DEVNET_HTTP_URL = 'https://spheron-devnet-eth.rpc.caldera.xyz/infra-partner-http';
+export const SPHERON_DEVNET_HTTP_URL =
+  'https://spheron-devnet-eth.rpc.caldera.xyz/infra-partner-http';
 export const SPHERON_DEVNET_WSS_URL = 'wss://spheron-devnet-eth.rpc.caldera.xyz/ws';
 export const SPHERON_DEVNET_EXPLORER_URL = 'https://spheron-devnet-eth.explorer.caldera.xyz';
 
@@ -17,7 +18,7 @@ export const rpcUrls = {
     WSS_URL: SPHERON_DEVNET_WSS_URL,
     EXPORER_URL: SPHERON_DEVNET_EXPLORER_URL,
   },
-}
+};
 
 export interface IToken {
   id: number;
@@ -45,14 +46,14 @@ export type NetworkType = 'testnet' | 'mainnet';
 export const networkMap: Record<NetworkType, INetwork> = {
   testnet: {
     chainId: 89138,
-    chainName: "Spheron Devnet",
-    rpcUrls: ["https://spheron-devnet-eth.rpc.caldera.xyz/http"],
+    chainName: 'Spheron Devnet',
+    rpcUrls: ['https://spheron-devnet-eth.rpc.caldera.xyz/http'],
     nativeCurrency: {
-      name: "Ethereum",
-      symbol: "ETH",
+      name: 'Ethereum',
+      symbol: 'ETH',
       decimals: 18,
     },
-    blockExplorerUrls: ["https://spheron-devnet-eth.explorer.caldera.xyz/"],
+    blockExplorerUrls: ['https://spheron-devnet-eth.explorer.caldera.xyz/'],
   },
   // TODO: NEED TO UPDATE WHEN MAINNET RELEASE
   mainnet: {

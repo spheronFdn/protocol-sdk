@@ -1,7 +1,7 @@
-import * as yaml from "js-yaml";
-import { getTokenDetails } from "@utils/index";
-import { networkType, NetworkType } from "@config/index";
-import { manifestExpose, serviceResourceEndpoints } from "./manifest-utils";
+import * as yaml from 'js-yaml';
+import { getTokenDetails } from '@utils/index';
+import { networkType, NetworkType } from '@config/index';
+import { manifestExpose, serviceResourceEndpoints } from './manifest-utils';
 
 enum Tier {
   One,
@@ -23,15 +23,7 @@ const validTiers: { [x: string]: Tier[] } = {
   community4: [Tier.Seven],
   secured: [Tier.One, Tier.Two, Tier.Three],
   community: [Tier.Four, Tier.Five, Tier.Six, Tier.Seven],
-  "community-default": [
-    Tier.One,
-    Tier.Two,
-    Tier.Three,
-    Tier.Four,
-    Tier.Five,
-    Tier.Six,
-    Tier.Seven,
-  ],
+  'community-default': [Tier.One, Tier.Two, Tier.Three, Tier.Four, Tier.Five, Tier.Six, Tier.Seven],
 };
 
 const getTierKey = (inputTiers: number[]): string | undefined => {
@@ -43,7 +35,7 @@ const getTierKey = (inputTiers: number[]): string | undefined => {
     ) {
       return key;
     } else {
-      return "community";
+      return 'community';
     }
   }
   return undefined;
@@ -51,44 +43,44 @@ const getTierKey = (inputTiers: number[]): string | undefined => {
 
 const convertTimeToNumber = (timeStr: string): number => {
   // Retrieve the number and the unit from the timeStr
-  const numStr = timeStr.replace(/[^\d]/g, "");
-  const unit = timeStr.replace(/\d/g, "");
+  const numStr = timeStr.replace(/[^\d]/g, '');
+  const unit = timeStr.replace(/\d/g, '');
 
   // Convert number string to an integer
   const num = parseInt(numStr, 10);
   if (isNaN(num)) {
-    console.error("Error converting number");
+    console.error('Error converting number');
     return 0;
   }
 
   // Calculate the total units based on the time unit
   switch (unit) {
-    case "min":
+    case 'min':
       return num * 60 * 4;
-    case "h":
+    case 'h':
       return num * 60 * 60 * 4;
-    case "d":
+    case 'd':
       return num * 24 * 60 * 60 * 4;
-    case "mon":
+    case 'mon':
       // Assuming a month as 30 days
       return num * 30 * 24 * 60 * 60 * 4;
-    case "y":
+    case 'y':
       // Assuming a year as 365 days
       return num * 365 * 24 * 60 * 60 * 4;
     default:
-      console.error("Unsupported time unit:", unit);
+      console.error('Unsupported time unit:', unit);
       return 0;
   }
 };
 
 const getTimeInMaxUnits = (timeInSeconds: number): string => {
-  if (timeInSeconds <= 0) return "0s";
+  if (timeInSeconds <= 0) return '0s';
 
   const units = [
-    { unit: "d", value: 86400 },
-    { unit: "h", value: 3600 },
-    { unit: "min", value: 60 },
-    { unit: "s", value: 1 },
+    { unit: 'd', value: 86400 },
+    { unit: 'h', value: 3600 },
+    { unit: 'min', value: 60 },
+    { unit: 's', value: 1 },
   ];
 
   for (const { unit, value } of units) {
@@ -97,7 +89,7 @@ const getTimeInMaxUnits = (timeInSeconds: number): string => {
     }
   }
 
-  return "0s";
+  return '0s';
 };
 
 const convertSize = (storage: string): number => {
@@ -105,11 +97,11 @@ const convertSize = (storage: string): number => {
   const unit = storage.substring(storage.length - 2, storage.length);
 
   switch (unit) {
-    case "Mi":
+    case 'Mi':
       return value * 1024 * 1024;
-    case "Gi":
+    case 'Gi':
       return value * 1024 * 1024 * 1024;
-    case "Ti":
+    case 'Ti':
       return value * 1024 * 1024 * 1024 * 1024;
     default:
       return value;
@@ -164,7 +156,7 @@ const convertGpuAttributes = (gpu: GPUInput): ConvertedGPU => {
       const key = `vendor/${vendor}/model/${model}`;
       attributes.push({
         Key: key,
-        Value: "true",
+        Value: 'true',
       });
     });
   }
@@ -175,14 +167,12 @@ const convertGpuAttributes = (gpu: GPUInput): ConvertedGPU => {
   };
 };
 
-export const yamlToOrderDetails = (
-  yamlString: string,
-): any => {
+export const yamlToOrderDetails = (yamlString: string): any => {
   try {
     const sdl = yaml.load(yamlString) as any;
 
     let maxPrice = 0;
-    let denom: string = "";
+    let denom: string = '';
     const profiles = sdl.profiles || {};
     const services = sdl.services || {};
     const placements = profiles.placement || {};
@@ -192,90 +182,83 @@ export const yamlToOrderDetails = (
       if (
         Object.keys(placements[firstPlacement].pricing).some((key) => {
           return (
-            placements[firstPlacement].pricing?.[key].amount.toString() ===
-              "" || isNaN(placements[firstPlacement].pricing?.[key].amount)
+            placements[firstPlacement].pricing?.[key].amount.toString() === '' ||
+            isNaN(placements[firstPlacement].pricing?.[key].amount)
           );
         })
       ) {
-        throw new Error("Please set a valid amount");
+        throw new Error('Please set a valid amount');
       }
-      maxPrice = Object.keys(placements[firstPlacement].pricing).reduce(
-        (acc, curr) => {
-          denom = !denom
-            ? placements[firstPlacement].pricing?.[curr]?.token ||
-              placements[firstPlacement].pricing?.[curr]?.denom
-            : denom;
-          const maxPricePerHours = convertToMaxPricePerBlock(
-            denom,
-            placements[firstPlacement].pricing?.[curr].amount.toString()
-          );
-          return acc + (maxPricePerHours as number);
-        },
-        0
-      );
+      maxPrice = Object.keys(placements[firstPlacement].pricing).reduce((acc, curr) => {
+        denom = !denom
+          ? placements[firstPlacement].pricing?.[curr]?.token ||
+            placements[firstPlacement].pricing?.[curr]?.denom
+          : denom;
+        const maxPricePerHours = convertToMaxPricePerBlock(
+          denom,
+          placements[firstPlacement].pricing?.[curr].amount.toString()
+        );
+        return acc + (maxPricePerHours as number);
+      }, 0);
     }
 
-    let parsedResource = Object.keys(profiles.compute).map(
-      (computeProfile, index) => {
-        const obj = profiles.compute[`${computeProfile}`];
+    let parsedResource = Object.keys(profiles.compute).map((computeProfile, index) => {
+      const obj = profiles.compute[`${computeProfile}`];
 
-        const placementKeys = Object.keys(firstPlacement);
-        let replicaCount = 1;
+      const placementKeys = Object.keys(firstPlacement);
+      let replicaCount = 1;
 
-        for (const key of placementKeys) {
-          const count = sdl.deployment[computeProfile]?.[key]?.count;
-          if (count !== undefined) {
-            replicaCount = count;
-            break;
-          }
+      for (const key of placementKeys) {
+        const count = sdl.deployment[computeProfile]?.[key]?.count;
+        if (count !== undefined) {
+          replicaCount = count;
+          break;
         }
-
-        return {
-          name: computeProfile,
-          Resources: {
-            ID: index + 1,
-            CPU: {
-              Units: parseInt((obj.resources?.cpu?.units * 1000).toString()),
-              Attributes: [],
-            },
-            Memory: {
-              Units: convertSize(obj.resources?.memory?.size),
-              Attributes: [],
-            },
-            Storage: Array.isArray(obj?.resources?.storage)
-              ? obj?.resources?.storage?.map((storage: { size: string }) => {
-                  return {
-                    Name: "default",
-                    Attributes: [],
-                    Units: convertSize(storage.size),
-                  };
-                })
-              : [
-                  {
-                    Name: "default",
-                    Attributes: [],
-                    Units: convertSize(obj?.resources?.storage.size),
-                  },
-                ],
-            GPU:
-              Object.keys(obj?.resources?.gpu || {}).length > 0
-                ? convertGpuAttributes(obj.resources.gpu)
-                : {
-                    Units: 0,
-                    Attributes: [],
-                  },
-            Endpoints:
-              serviceResourceEndpoints(services[computeProfile], sdl)?.map(
-                (item) => ({
-                  Kind: item.kind,
-                  SequenceNumber: item.sequence_number,
-                })
-              ) || [],
-          },
-          ReplicaCount: replicaCount,
-        };
       }
-    );
+
+      return {
+        name: computeProfile,
+        Resources: {
+          ID: index + 1,
+          CPU: {
+            Units: parseInt((obj.resources?.cpu?.units * 1000).toString()),
+            Attributes: [],
+          },
+          Memory: {
+            Units: convertSize(obj.resources?.memory?.size),
+            Attributes: [],
+          },
+          Storage: Array.isArray(obj?.resources?.storage)
+            ? obj?.resources?.storage?.map((storage: { size: string }) => {
+                return {
+                  Name: 'default',
+                  Attributes: [],
+                  Units: convertSize(storage.size),
+                };
+              })
+            : [
+                {
+                  Name: 'default',
+                  Attributes: [],
+                  Units: convertSize(obj?.resources?.storage.size),
+                },
+              ],
+          GPU:
+            Object.keys(obj?.resources?.gpu || {}).length > 0
+              ? convertGpuAttributes(obj.resources.gpu)
+              : {
+                  Units: 0,
+                  Attributes: [],
+                },
+          Endpoints:
+            serviceResourceEndpoints(services[computeProfile], sdl)?.map((item) => ({
+              Kind: item.kind,
+              SequenceNumber: item.sequence_number,
+            })) || [],
+        },
+        ReplicaCount: replicaCount,
+      };
+    });
 
     const spec = {
       Name: firstPlacement,
@@ -283,9 +266,8 @@ export const yamlToOrderDetails = (
         ProviderWallets: null,
         Attributes: [
           {
-            Key: "region",
-            Value:
-              placements[firstPlacement].attributes?.region || "us-central",
+            Key: 'region',
+            Value: placements[firstPlacement].attributes?.region || 'us-central',
           },
         ],
       },
@@ -299,24 +281,21 @@ export const yamlToOrderDetails = (
       // uptime: 0,
       // reputation: 0,
       // slashes: 0,
-      maxPrice: typeof maxPrice === "number" ? BigInt(maxPrice) : BigInt(0),
+      maxPrice: typeof maxPrice === 'number' ? BigInt(maxPrice) : BigInt(0),
       numOfBlocks: BigInt(convertTimeToNumber(profiles.duration)), // > 24 hours = 4 * 86400
       token: getTokenDetails(denom, networkType as NetworkType)?.address,
       spec: JSON.stringify(spec),
       version: BigInt(Number(sdl.version)),
-      mode: profiles.mode === "fizz" ? 0 : 1, // Make util function for mode
-      tier: validTiers[profiles.tier] || [
-        ...validTiers["secured"],
-        ...validTiers["community"],
-      ],
+      mode: profiles.mode === 'fizz' ? 0 : 1, // Make util function for mode
+      tier: validTiers[profiles.tier] || [...validTiers['secured'], ...validTiers['community']],
     };
 
     return { error: false, orderDetails };
   } catch (error) {
-    console.error("Error parsing YAML:", error);
+    console.error('Error parsing YAML:', error);
     return {
       error: true,
-      message: (error as any)?.message || "Error parsing YAML",
+      message: (error as any)?.message || 'Error parsing YAML',
     };
   }
 };
@@ -334,21 +313,21 @@ export const getKeysByTierValues = (tierValues: Tier[]): string[] => {
 };
 
 export const getKeysForTiersString = (tiersString: string): string[] => {
-  const tiersArray = tiersString.split(",").map((tier) => {
+  const tiersArray = tiersString.split(',').map((tier) => {
     switch (tier.trim()) {
-      case "0":
+      case '0':
         return Tier.One;
-      case "1":
+      case '1':
         return Tier.Two;
-      case "2":
+      case '2':
         return Tier.Three;
-      case "3":
+      case '3':
         return Tier.Four;
-      case "4":
+      case '4':
         return Tier.Five;
-      case "5":
+      case '5':
         return Tier.Six;
-      case "6":
+      case '6':
         return Tier.Seven;
       default:
         throw new Error(`Invalid tier value: ${tier}`);
@@ -367,15 +346,9 @@ export const exportToYaml = (obj: any, orderServices: any) => {
     const serviceName = Object.keys(orderServices.services)[index];
     const images = orderServices.services[serviceName]
       ? `${
-          orderServices.services[
-            serviceName
-          ]?.container_statuses[0]?.image?.split("/")[1] || ""
-        }/${
-          orderServices.services[
-            serviceName
-          ]?.container_statuses[0]?.image.split("/")[2]
-        }`
-      : "";
+          orderServices.services[serviceName]?.container_statuses[0]?.image?.split('/')[1] || ''
+        }/${orderServices.services[serviceName]?.container_statuses[0]?.image.split('/')[2]}`
+      : '';
 
     services[serviceName] = {
       image: images,
@@ -399,9 +372,7 @@ export const exportToYaml = (obj: any, orderServices: any) => {
         },
         storage: [
           {
-            size: `${
-              resource.Resources.Storage[0].Units / (1024 * 1024 * 1024)
-            }Gi`,
+            size: `${resource.Resources.Storage[0].Units / (1024 * 1024 * 1024)}Gi`,
           },
         ],
 
@@ -412,14 +383,9 @@ export const exportToYaml = (obj: any, orderServices: any) => {
               resource.Resources.GPU.Attributes.length > 0
                 ? {
                     vendor: {
-                      [`${
-                        resource.Resources.GPU.Attributes[0].Key.split("/")[1]
-                      }`]: [
+                      [`${resource.Resources.GPU.Attributes[0].Key.split('/')[1]}`]: [
                         {
-                          model:
-                            resource.Resources.GPU.Attributes[0].Key.split(
-                              "/"
-                            )[3],
+                          model: resource.Resources.GPU.Attributes[0].Key.split('/')[3],
                         },
                       ],
                     },
@@ -432,7 +398,7 @@ export const exportToYaml = (obj: any, orderServices: any) => {
 
     pricing[serviceName] = {
       token: obj.token.symbol,
-      amount: "",
+      amount: '',
     };
 
     deployment[serviceName] = {
@@ -444,16 +410,13 @@ export const exportToYaml = (obj: any, orderServices: any) => {
   });
 
   const yamlObject = {
-    version: "1.0",
+    version: '1.0',
 
     services,
 
     profiles: {
       duration: getTimeInMaxUnits(Number(obj.numOfBlocks) / 4),
-      mode:
-        JSON.parse(obj.specs.specs)?.mode?.toString() === "0"
-          ? "fizz"
-          : "provider",
+      mode: JSON.parse(obj.specs.specs)?.mode?.toString() === '0' ? 'fizz' : 'provider',
       tier: [getTierKey(obj.specs.tier)],
       compute,
       placement: {
@@ -495,7 +458,7 @@ function convertGpuAttributesSdl(input: Input): Output[] {
       input.vendor[vendor].forEach((item) => {
         output.push({
           key: `vendor/${vendor}/model/${item.model}`,
-          value: "true",
+          value: 'true',
         });
       });
     }
@@ -513,57 +476,52 @@ export const getManifestIcl = (yamlInput: any): any => {
   return [
     {
       name: placement,
-      services: Object.entries(input.services).map(
-        ([serviceName, serviceData], index) => {
-          const { image, expose, env, command, args } = serviceData as any;
-          const { cpu, memory, storage, gpu } =
-            input.profiles.compute[serviceName].resources;
-          const count = input.deployment[serviceName][placement].count;
+      services: Object.entries(input.services).map(([serviceName, serviceData], index) => {
+        const { image, expose, env, command, args } = serviceData as any;
+        const { cpu, memory, storage, gpu } = input.profiles.compute[serviceName].resources;
+        const count = input.deployment[serviceName][placement].count;
 
-          return {
-            name: serviceName,
-            image: image,
-            command: command,
-            args: args,
-            env: env,
-            resources: {
-              id: index + 1,
-              cpu: {
-                units: {
-                  val: (cpu.units * 1000).toString(), // Convert 0.1 to 100
-                },
+        return {
+          name: serviceName,
+          image: image,
+          command: command,
+          args: args,
+          env: env,
+          resources: {
+            id: index + 1,
+            cpu: {
+              units: {
+                val: (cpu.units * 1000).toString(), // Convert 0.1 to 100
               },
-              memory: {
-                size: {
-                  val: convertSize(memory.size).toString(),
-                },
-              },
-              storage: [
-                {
-                  name: "default",
-                  size: {
-                    val: Array.isArray(storage)
-                      ? convertSize(storage[0].size).toString()
-                      : convertSize(storage.size).toString(),
-                  },
-                },
-              ],
-              gpu: {
-                units: {
-                  val: gpu?.units.toString() || "0",
-                },
-                attributes: gpu?.attributes
-                  ? convertGpuAttributesSdl(gpu?.attributes)
-                  : [],
-              },
-              endpoints: serviceResourceEndpoints(serviceData as any, input),
             },
-            count: count,
-            expose: manifestExpose(serviceData as any, input),
-            params: null,
-          };
-        }
-      ),
+            memory: {
+              size: {
+                val: convertSize(memory.size).toString(),
+              },
+            },
+            storage: [
+              {
+                name: 'default',
+                size: {
+                  val: Array.isArray(storage)
+                    ? convertSize(storage[0].size).toString()
+                    : convertSize(storage.size).toString(),
+                },
+              },
+            ],
+            gpu: {
+              units: {
+                val: gpu?.units.toString() || '0',
+              },
+              attributes: gpu?.attributes ? convertGpuAttributesSdl(gpu?.attributes) : [],
+            },
+            endpoints: serviceResourceEndpoints(serviceData as any, input),
+          },
+          count: count,
+          expose: manifestExpose(serviceData as any, input),
+          params: null,
+        };
+      }),
     },
   ];
 };
@@ -638,7 +596,7 @@ deployment:
 
 export const getRegion = (specs: any): string | undefined => {
   const regionAttribute = specs.PlacementsRequirement.Attributes.find(
-    (attribute: any) => attribute.Key === "region"
+    (attribute: any) => attribute.Key === 'region'
   );
   return regionAttribute?.Value;
 };

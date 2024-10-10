@@ -4,14 +4,22 @@ import { IToken, NetworkType, tokenMap } from '@config/index';
 export const isValidEthereumAddress = (address: string): boolean => ethers.isAddress(address);
 
 export const getTokenDetails = (
-  tokenAddress: string,
+  tokenInfo: string,
   networkType: NetworkType
 ): IToken | undefined => {
-  return (
-    tokenMap[networkType]?.find(
-      (token) => token.address.toLowerCase() === tokenAddress.toLowerCase()
-    ) || tokenMap[networkType][0]
-  );
+  if (isValidEthereumAddress(tokenInfo)) {
+    return (
+      tokenMap[networkType]?.find(
+        (token) => token.address.toLowerCase() === tokenInfo.toLowerCase()
+      ) || tokenMap[networkType][0]
+    );
+  } else {
+    return (
+      tokenMap[networkType]?.find(
+        (token) => token.symbol.toLowerCase() === tokenInfo.toLowerCase()
+      ) || tokenMap[networkType][0]
+    );
+  }
 };
 
 export const mapTokenToId = (token: string) => {

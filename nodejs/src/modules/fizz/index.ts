@@ -179,7 +179,8 @@ export class FizzModule {
   async getResource(resourceID: bigint, category: string): Promise<Resource> {
     try {
       const contractAbi = ResourceRegistryAbi;
-      const contractAddress = category === 'CPU' ? ResourceRegistryCPUTestnet : ResourceRegistryGPUTestnet;
+      const contractAddress =
+        category === 'CPU' ? ResourceRegistryCPUTestnet : ResourceRegistryGPUTestnet;
 
       const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
 
