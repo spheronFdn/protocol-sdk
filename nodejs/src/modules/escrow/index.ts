@@ -16,28 +16,6 @@ export class EscrowModule {
     this.wallet = wallet;
   }
 
-  // read operations
-  async getProviderEarnings(providerAddress: string, tokenAddress: string) {
-    try {
-      const contractAbi = EscrowAbi;
-      const contractAddress = Escrow;
-      const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
-
-      const response = await contract.getProviderEarnings(providerAddress, tokenAddress);
-
-      const providerEarnings: { earned: string; withdrawn: string; balance: string } = {
-        earned: response[0].toString(),
-        withdrawn: response[1].toString(),
-        balance: response[2].toString(),
-      };
-
-      return providerEarnings;
-    } catch (error) {
-      console.error('Error in getProviderEarnings:', error);
-      const errorMessage = handleContractError(error, EscrowAbi);
-      throw errorMessage;
-    }
-  }
 
   async getUserBalance(token: string, walletAddress?: string) {
     try {
@@ -63,7 +41,7 @@ export class EscrowModule {
           throw new Error("No wallet address provided");
         }
       }
-      
+
       const response = await contract.getUserData(userWalletAddress, tokenAddress);
 
       const userData: { lockedBalance: string; unlockedBalance: string; token: any } = {
@@ -219,6 +197,28 @@ export class EscrowModule {
     }
   }
 
+  // read operations
+  async getProviderEarnings(providerAddress: string, tokenAddress: string) {
+    try {
+      const contractAbi = EscrowAbi;
+      const contractAddress = Escrow;
+      const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
+
+      const response = await contract.getProviderEarnings(providerAddress, tokenAddress);
+
+      const providerEarnings: { earned: string; withdrawn: string; balance: string } = {
+        earned: response[0].toString(),
+        withdrawn: response[1].toString(),
+        balance: response[2].toString(),
+      };
+
+      return providerEarnings;
+    } catch (error) {
+      console.error('Error in getProviderEarnings:', error);
+      const errorMessage = handleContractError(error, EscrowAbi);
+      throw errorMessage;
+    }
+  }
   async getFizzEarnings(fizzAddress: string, tokenAddress: string) {
     try {
       const contractAbi = EscrowAbi;

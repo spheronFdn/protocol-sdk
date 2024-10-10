@@ -1,19 +1,17 @@
 # Provider Proxy Server
 
-This proxy server acts as an intermediary for fetching data related to your deployment from the Spheron Provider. The server handles both HTTP and WebSocket requests to communicate with the Spheron provider. You can either run the server using a Docker image or set it up manually using the source code in this repository. 
+This proxy server acts as an intermediary for fetching data related to your deployment from the Spheron Provider. The server handles both HTTP and WebSocket requests to communicate with the Spheron provider. You can either run the server using a Docker image or set it up manually using the source code in this repository.
 
-Table of Contents
------------------
+## Table of Contents
 
 1.  [Option 1: Use the Docker Image](#option-1-use-the-docker-image)
 2.  [Option 2: Run from Source Code](#option-2-run-from-source-code)
 3.  [Environment Variables](#environment-variables)
 4.  [Health Check](#health-check)
 
-* * *
+---
 
-Option 1: Use the Docker Image
-------------------------------
+## Option 1: Use the Docker Image
 
 You can run the provider proxy server easily using the Docker image. Follow the below steps to run the container.
 
@@ -23,6 +21,12 @@ Pull the Docker image from Docker Hub using the following command:
 
 ```bash
 docker pull spheronnetwork/provider-proxy-server:latest
+```
+
+Or build the image from the source code:
+
+```bash
+docker build -t spheronnetwork/provider-proxy-server:latest .
 ```
 
 ### 2\. Run the Docker Container
@@ -35,9 +39,7 @@ docker run -p 3040:3040 spheronnetwork/provider-proxy-server:latest
 
 This will start the server, and it will be accessible on `http://localhost:3040`.
 
-
-Option 2: Run from Source Code
-------------------------------
+## Option 2: Run from Source Code
 
 If you'd prefer to run the server manually from the source code, follow these steps:
 
@@ -81,30 +83,30 @@ npm run start
 
 The server will now be running on `http://localhost:3040`.
 
+## Environment Variables
 
-Environment Variables
----------------------
+- **PORT**: The port on which the server will run (default: `3040`).
 
-*   **PORT**: The port on which the server will run (default: `3040`).
-
-    To use a custom port, set the `PORT` environment variable before running the container or server.
+  To use a custom port, set the `PORT` environment variable before running the container or server.
 
 Example:
 
 ```bash
-PORT=8080
+PORT=3040
 ```
 
-
-Health Check
-------------
+## Health Check
 
 To verify if the server is running, use the following endpoint:
 
-*   **GET /health**
+- **GET /health**
 
 ```bash
 curl http://localhost:3040/health
 ```
 
 Expected response: `OK` (HTTP 200)
+
+## CORS Policy
+
+The server allows requests from all origins (`*`). This is useful when running the server locally. In production, you should restrict the origins to only the domains you trust.

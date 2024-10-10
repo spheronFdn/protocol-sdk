@@ -147,7 +147,7 @@ export class DeploymentModule {
       );
 
       const updateOrderResponse = await this.orderModule.updateOrder(leaseId, details);
-
+      console.log('Update order response', updateOrderResponse);
       const updateOrderAcceptanceResponse = await updateOrderAcceptance;
 
       const { orderId, providerAddress } = updateOrderAcceptanceResponse;
@@ -165,6 +165,7 @@ export class DeploymentModule {
         orderId as string,
         sdlManifest
       );
+      console.log('Update order', updateOrder);
       const updateOrderLeaseResponse = await updatedOrderLease;
       console.log(`Deployment Updated Successfully! Lease ID: ${orderId}`);
       return { ...updateOrderLeaseResponse };

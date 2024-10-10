@@ -10,6 +10,7 @@ const app: Express = express();
 const { PORT = 3040 } = process.env;
 
 app.use(express.json());
+app.use(cors({ origin: '*' }));
 
 app.get('/health', (req: Request, res: Response) => {
   res.status(200).send('OK');
