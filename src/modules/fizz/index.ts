@@ -26,7 +26,7 @@ import {
   // FizzProviderTrustTier,
 } from './types';
 import { TransactionData } from '@modules/escrow/types';
-import { decompressSpec } from '@utils/spec';
+import { decompressProviderSpec } from '@utils/spec';
 
 export class FizzModule {
   private provider: ethers.Provider;
@@ -358,7 +358,7 @@ export class FizzModule {
         region = Region;
       } catch {
         try {
-          const { Name, Region } = decompressSpec(providerData.spec) as any;
+          const { Name, Region } = decompressProviderSpec(providerData.spec) as any;
           name = Name;
           region = Region;
         } catch {
@@ -402,7 +402,7 @@ export class FizzModule {
         region = Region;
       } catch {
         try {
-          const { Name, Region } = decompressSpec(providerData.spec) as any;
+          const { Name, Region } = decompressProviderSpec(providerData.spec) as any;
           name = Name;
           region = Region;
         } catch {
@@ -445,7 +445,7 @@ export class FizzModule {
           region = Region;
         } catch {
           try {
-            const { Name, Region } = decompressSpec(provider.spec) as any;
+            const { Name, Region } = decompressProviderSpec(provider.spec) as any;
             name = Name;
             region = Region;
           } catch {

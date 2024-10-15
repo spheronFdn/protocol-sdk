@@ -1,6 +1,6 @@
 {
   "name": "@spheron/protocol-sdk",
-  "version": "1.0.0-devnet.15",
+  "version": "1.0.0-devnet.16",
   "description": "Spheron Protocol SDK",
   "repository": {
     "type": "git",
@@ -53,6 +53,6 @@
     "ethers": "^6.13.1"
   },
   "publishConfig": {
-    "access": "restricted"
+    "access": "public"
   }
 }
