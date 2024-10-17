@@ -2,6 +2,7 @@ import * as yaml from 'js-yaml';
 import { getTokenDetails } from '@utils/index';
 import { networkType, NetworkType } from '@config/index';
 import { manifestExpose, serviceResourceEndpoints } from './manifest-utils';
+import { compressOrderSpec } from './spec';
 
 enum Tier {
   One,
@@ -217,7 +218,7 @@ export const yamlToOrderDetails = (yamlString: string): any => {
       }
 
       return {
-        name: computeProfile,
+        Name: computeProfile,
         Resources: {
           ID: index + 1,
           CPU: {
@@ -271,8 +272,23 @@ export const yamlToOrderDetails = (yamlString: string): any => {
           },
         ],
       },
-      Resources: parsedResource,
+      Services: parsedResource,
     };
+
+    const specNew = {
+      Name: firstPlacement,
+      PlacementsRequirement: {
+        Attributes: [
+          {
+            Key: "region",
+            Value:
+              placements[firstPlacement].attributes?.region || "us-central",
+          },
+        ],
+      },
+      Services: parsedResource,
+    };
+    const compressedSpec = compressOrderSpec(specNew);
 
     const orderDetails = {
       // name: profiles.name || name || "",
@@ -284,7 +300,8 @@ export const yamlToOrderDetails = (yamlString: string): any => {
       maxPrice: typeof maxPrice === 'number' ? BigInt(maxPrice) : BigInt(0),
       numOfBlocks: BigInt(convertTimeToNumber(profiles.duration)), // > 24 hours = 4 * 86400
       token: getTokenDetails(denom, networkType as NetworkType)?.address,
-      spec: JSON.stringify(spec),
+      // spec: JSON.stringify(spec),
+      spec: compressedSpec,
       version: BigInt(Number(sdl.version)),
       mode: profiles.mode === 'fizz' ? 0 : 1, // Make util function for mode
       tier: validTiers[profiles.tier] || [...validTiers['secured'], ...validTiers['community']],
