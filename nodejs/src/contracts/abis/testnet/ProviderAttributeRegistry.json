@@ -64,9 +64,27 @@
         "internalType": "string",
         "name": "category",
         "type": "string"
+      },
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "id",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "units",
+            "type": "uint256"
+          }
+        ],
+        "indexed": false,
+        "internalType": "struct ProviderAttributeRegistry.Attribute[]",
+        "name": "attributes",
+        "type": "tuple[]"
       }
     ],
-    "name": "AttributesApproved",
+    "name": "ProviderAttributesApproved",
     "type": "event"
   },
   {
@@ -85,7 +103,7 @@
         "type": "string"
       }
     ],
-    "name": "AttributesRemoved",
+    "name": "ProviderAttributesRemoved",
     "type": "event"
   },
   {
@@ -116,7 +134,7 @@
         "type": "uint256[]"
       }
     ],
-    "name": "AttributesSubmitted",
+    "name": "ProviderAttributesSubmitted",
     "type": "event"
   },
   {

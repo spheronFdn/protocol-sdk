@@ -9,6 +9,7 @@ import { ethers } from 'ethers';
 import { Attribute, Category, IProvider, Provider, ProviderStatus } from './types';
 import { isValidEthereumAddress } from '@utils/index';
 import { handleContractError } from '@utils/errors';
+import { decompressProviderSpec } from '@utils/spec';
 
 export class ProviderModule {
   private provider: ethers.Provider;
@@ -120,21 +121,37 @@ export class ProviderModule {
       const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
       const providerData = await contract.getProvider(providerId);
 
+      let name, region;
+      try {
+        const { Name, Region } = JSON.parse(providerData.spec);
+        name = Name;
+        region = Region;
+      } catch {
+        try {
+          const { Name, Region } = decompressProviderSpec(providerData.spec) as any;
+          name = Name;
+          region = Region;
+        } catch {
+          name = "";
+          region = "";
+        }
+      }
+
       return {
-        name: providerData[0],
-        region: providerData[1],
-        attributes: providerData[2],
-        hostUri: providerData[3],
-        certificate: providerData[4],
-        paymentsAccepted: providerData[5],
-        status: providerData[6],
-        tier: providerData[7],
-        joinTimestamp: providerData[8],
-        walletAddress: providerData[9],
-        rewardWallet: providerData[10],
+        name,
+        region,
+        spec: providerData.spec,
+        hostUri: providerData.hostUri,
+        certificate: providerData.certificate,
+        paymentsAccepted: providerData.paymentsAccepted,
+        status: providerData.status,
+        tier: providerData.tier,
+        joinTimestamp: providerData.joinTimestamp,
+        walletAddress: providerData.walletAddress,
+        rewardWallet: providerData.rewardWallet,
       };
     } catch (error) {
-      console.error('Failed to retrieve provider details: ', error);
+      console.error(`Failed to retrieve provider details of ID ${providerId}: `, error);
       const errorMessage = handleContractError(error, ProviderRegistryAbi);
       throw errorMessage;
     }
@@ -149,17 +166,33 @@ export class ProviderModule {
 
       const providerData = await contract.getProviderByAddress(walletAddress);
 
+      let name, region;
+      try {
+        const { Name, Region } = JSON.parse(providerData.spec);
+        name = Name;
+        region = Region;
+      } catch {
+        try {
+          const { Name, Region } = decompressProviderSpec(providerData.spec) as any;
+          name = Name;
+          region = Region;
+        } catch {
+          name = "";
+          region = "";
+        }
+      }
+
       return {
-        name: providerData[0],
-        region: providerData[1],
-        attributes: providerData[2],
-        hostUri: providerData[3],
-        certificate: providerData[4],
-        paymentsAccepted: providerData[5],
-        status: providerData[6],
-        tier: providerData[7],
-        joinTimestamp: providerData[8],
-        rewardWallet: providerData[9],
+        name,
+        region,
+        spec: providerData.spec,
+        hostUri: providerData.hostUri,
+        certificate: providerData.certificate,
+        paymentsAccepted: providerData.paymentsAccepted,
+        status: providerData.status,
+        tier: providerData.tier,
+        joinTimestamp: providerData.joinTimestamp,
+        rewardWallet: providerData.rewardWallet,
       };
     } catch (error) {
       console.error('Failed to retrieve provider details by address: ', error);
@@ -176,21 +209,38 @@ export class ProviderModule {
       const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
       const providersData = await contract.getAllProviders();
 
-      const providers: Provider[] = providersData.map((provider: any) => ({
-        providerId: provider.providerId.toString(),
-        name: provider.name,
-        region: provider.region,
-        walletAddress: provider.walletAddress,
-        paymentsAccepted: provider.paymentsAccepted,
-        attributes: provider.attributes,
-        hostUri: provider.hostUri,
-        certificate: provider.certificate,
-        status: ProviderStatus[provider.status],
-        // tier: ProviderTrustTier[provider.tier],
-        tier: Number(provider.tier.toString()),
-        joinTimestamp: Number(provider.joinTimestamp.toString()),
-        rewardWallet: provider.rewardWallet,
-      }));
+      const providers: Provider[] = providersData.map((provider: any) => {
+        let name, region;
+        try {
+          const { Name, Region } = JSON.parse(provider.spec);
+          name = Name;
+          region = Region;
+        } catch {
+          try {
+            const { Name, Region } = decompressProviderSpec(provider.spec) as any;
+            name = Name;
+            region = Region;
+          } catch {
+            name = "";
+            region = "";
+          }
+        }
+        return {
+          name,
+          region,
+          providerId: provider.providerId.toString(),
+          walletAddress: provider.walletAddress,
+          paymentsAccepted: provider.paymentsAccepted,
+          spec: provider.spec,
+          hostUri: provider.hostUri,
+          certificate: provider.certificate,
+          status: ProviderStatus[provider.status],
+          tier: Number(provider.tier.toString()),
+          // tier: ProviderTrustTier[provider.tier],
+          joinTimestamp: Number(provider.joinTimestamp.toString()),
+          rewardWallet: provider.rewardWallet,
+        }
+      });
 
       return providers;
     } catch (error) {

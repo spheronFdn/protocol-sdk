@@ -20,6 +20,11 @@
         "internalType": "uint256",
         "name": "_maxBlockNumber",
         "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_minBlockNumber",
+        "type": "uint256"
       }
     ],
     "stateMutability": "nonpayable",
@@ -96,6 +101,19 @@
       {
         "indexed": false,
         "internalType": "address",
+        "name": "escrow",
+        "type": "address"
+      }
+    ],
+    "name": "EscrowAddressUpdated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
         "name": "lease",
         "type": "address"
       }
@@ -121,6 +139,19 @@
     "inputs": [
       {
         "indexed": false,
+        "internalType": "uint256",
+        "name": "minBlockNumber",
+        "type": "uint256"
+      }
+    ],
+    "name": "MinBlockNumberUpdated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
         "internalType": "uint64",
         "name": "orderId",
         "type": "uint64"
@@ -130,6 +161,42 @@
         "internalType": "address",
         "name": "creator",
         "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "maxPrice",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint64",
+        "name": "numOfBlocks",
+        "type": "uint64"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "token",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "specs",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint16",
+        "name": "version",
+        "type": "uint16"
+      },
+      {
+        "indexed": false,
+        "internalType": "enum OrderRequest.Mode",
+        "name": "mode",
+        "type": "uint8"
       }
     ],
     "name": "OrderCreated",
@@ -154,20 +221,75 @@
       {
         "indexed": false,
         "internalType": "uint64",
+        "name": "orderId",
+        "type": "uint64"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "maxPrice",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "enum OrderRequest.State",
+        "name": "state",
+        "type": "uint8"
+      }
+    ],
+    "name": "OrderStateChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint64",
         "name": "_orderId",
         "type": "uint64"
       },
       {
         "indexed": false,
         "internalType": "address",
-        "name": "provider",
+        "name": "user",
         "type": "address"
       },
       {
         "indexed": false,
+        "internalType": "uint256",
+        "name": "maxPrice",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint64",
+        "name": "numOfBlocks",
+        "type": "uint64"
+      },
+      {
+        "indexed": false,
         "internalType": "address",
-        "name": "user",
+        "name": "token",
         "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "specs",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint16",
+        "name": "version",
+        "type": "uint16"
+      },
+      {
+        "indexed": false,
+        "internalType": "enum OrderRequest.Mode",
+        "name": "mode",
+        "type": "uint8"
       }
     ],
     "name": "OrderUpdateRequested",
@@ -184,19 +306,6 @@
       }
     ],
     "name": "TokenRegistryContactUpdated",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "escrow",
-        "type": "address"
-      }
-    ],
-    "name": "escorwAddressUpdated",
     "type": "event"
   },
   {
@@ -549,6 +658,19 @@
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "minBlockNumber",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "uint64",
@@ -704,6 +826,19 @@
       }
     ],
     "name": "setMaxBlockNumber",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_minBlockNumber",
+        "type": "uint256"
+      }
+    ],
+    "name": "setMinBlockNumber",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

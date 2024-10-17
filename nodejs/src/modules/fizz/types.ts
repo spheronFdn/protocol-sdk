@@ -88,3 +88,8 @@ export interface FizzProvider {
   joinTimestamp: bigint;
   rewardWallet: string;
 }
+
+export interface FizzAttribute {
+  id: bigint;
+  units: bigint;
+}

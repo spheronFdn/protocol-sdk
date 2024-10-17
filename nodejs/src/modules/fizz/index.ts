@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import FizzRegistryAbi from '@contracts/abis/testnet/FizzRegistry.json';
+import FizzAttributeRegistryAbi from '@contracts/abis/testnet/FizzAttributeRegistry.json';
 import ResourceRegistryAbi from '@contracts/abis/testnet/ResourceRegistry.json';
 import ComputeLeaseAbi from '@contracts/abis/testnet/ComputeLease.json';
 import {
@@ -7,6 +8,7 @@ import {
   ResourceRegistryCPUTestnet,
   ResourceRegistryGPUTestnet,
   ComputeLeaseTestnet,
+  FizzAttributeRegistryTestnet,
 } from '@contracts/addresses';
 import { ethers } from 'ethers';
 import {
@@ -14,6 +16,7 @@ import {
   FizzParams,
   FizzLease,
   Resource,
+  FizzAttribute,
   // FizzProviderTrustTier,
 } from './types';
 import { initializeSigner } from '@utils/index';
@@ -147,6 +150,22 @@ export class FizzModule {
     }
   }
 
+  async getTotalFizzNodes(): Promise<bigint> {
+    try {
+      const contractAddress = FizzRegistryTestnet;
+      const contractAbi = FizzRegistryAbi;
+
+      const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
+      const fizzCounter = await contract.nextFizzId();
+      console.log("Total Fizz Nodes -> ", fizzCounter);
+      return fizzCounter;
+    } catch (error) {
+      console.error('Failed to fetch Total Fizz Nodes: ', error);
+      const errorMessage = handleContractError(error, FizzRegistryAbi);
+      throw errorMessage;
+    }
+  }
+
   async getAllFizzNodes(): Promise<FizzNode[]> {
     try {
       const contractAddress = FizzRegistryTestnet;
@@ -172,6 +191,59 @@ export class FizzModule {
     } catch (error) {
       console.error('Failed to fetch all Fizz Nodes: ', error);
       const errorMessage = handleContractError(error, FizzRegistryAbi);
+      throw errorMessage;
+    }
+  }
+
+  async getAttributes(providerAddress: string, category: string): Promise<FizzAttribute[]> {
+    try {
+      const contractAddress = FizzAttributeRegistryTestnet;
+      const contractAbi = FizzAttributeRegistryAbi;
+
+      const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
+
+      const attributes: FizzAttribute[] = await contract.getAttributes(providerAddress, category);
+
+      const decoratedAttributes = attributes.map((attr: any) => ({
+        id: attr[0],
+        units: attr[1],
+      }));
+      console.log(
+        `Attributes for ${providerAddress} in category ${category} retrieved successfully:`,
+        decoratedAttributes
+      );
+      return decoratedAttributes;
+    } catch (error) {
+      console.error('Failed to retrieve attributes: ', error);
+      const errorMessage = handleContractError(error, FizzAttributeRegistryAbi);
+      throw errorMessage;
+    }
+  }
+
+  async getPendingAttributes(providerAddress: string, category: string): Promise<FizzAttribute[]> {
+    try {
+      const contractAddress = FizzAttributeRegistryTestnet;
+      const contractAbi = FizzAttributeRegistryAbi;
+
+      const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
+
+      const attributes: FizzAttribute[] = await contract.getPendingAttributes(
+        providerAddress,
+        category
+      );
+
+      const decoratedAttributes = attributes.map((attr: any) => ({
+        id: attr[0],
+        units: attr[1],
+      }));
+      console.log(
+        `Pending Attributes for ${providerAddress} in category ${category} retrieved successfully:`,
+        decoratedAttributes
+      );
+      return decoratedAttributes;
+    } catch (error) {
+      console.error('Failed to retrieve pending attributes: ', error);
+      const errorMessage = handleContractError(error, FizzAttributeRegistryAbi);
       throw errorMessage;
     }
   }
