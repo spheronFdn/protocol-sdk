@@ -191,7 +191,7 @@ export function serviceResourceEndpoints(service: Service, sdl: any) {
             const kind = exposeShouldBeIngress(exposeSpec) ? 0 : 1;
 
             const defaultEp =
-              kind !== 0 ? { kind: kind, sequence_number: 0 } : { sequence_number: 0 };
+              kind !== 0 ? { kind: kind, sequence_number: 0 } : { kind: 0, sequence_number: 0 };
 
             const leasedEp =
               to.ip?.length > 0
