@@ -8,7 +8,8 @@ export const SPHERON_TESTNET_WSS_URL =
   'wss://arbitrum-sepolia.core.chainstack.com/f89a40155b4b82dc5c601286fcac4ffb';
 export const SPHERON_TESTNET_EXPLORER_URL = 'https://sepolia.arbiscan.io/';
 
-export const SPHERON_DEVNET_RPC_URL = 'https://spheron-devnet-eth.rpc.caldera.xyz/infra-partner-http';
+export const SPHERON_DEVNET_RPC_URL =
+  'https://spheron-devnet-eth.rpc.caldera.xyz/infra-partner-http';
 export const SPHERON_DEVNET_WSS_URL = 'wss://spheron-devnet-eth.rpc.caldera.xyz/ws';
 export const SPHERON_DEVNET_EXPLORER_URL = 'https://spheron-devnet-eth.explorer.caldera.xyz';
 

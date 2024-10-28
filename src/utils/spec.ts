@@ -7,15 +7,19 @@ export const decompressProviderSpec = (input: string): object => {
     .replace(/k:/g, '"Key":')
     .replace(/v:/g, '"Value":');
 
-  // Add quotes around string values (excluding numbers and already quoted values)
-  formattedString = formattedString.replace(/:(\w+([./-]\w+)*)([},\]])/g, ':"$1"$3');
+  // Add quotes around values (excluding numbers, booleans, and already quoted values)
+  formattedString = formattedString.replace(/:([\w\s./-]+)([},\]])/g, (match, p1, p2) => {
+    // If the value is not already quoted and is not a number/boolean, add quotes
+    if (!/^".*"$/.test(p1) && isNaN(Number(p1)) && p1 !== 'true' && p1 !== 'false') {
+      return `:"${p1.trim()}"${p2}`;
+    }
+    return match;
+  });
 
   // Parse the formatted string into JSON
   try {
-    console.log({ input, formattedString });
     return JSON.parse(formattedString);
   } catch (error) {
-    console.error('Error parsing JSON:', error);
     throw error;
   }
 };

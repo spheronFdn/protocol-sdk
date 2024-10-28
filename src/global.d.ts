@@ -1,4 +1,4 @@
-import { BrowserProvider } from "ethers";
+import { BrowserProvider } from 'ethers';
 
 declare global {
   interface Window {

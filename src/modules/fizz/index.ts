@@ -64,7 +64,11 @@ export class FizzModule {
       const finalAmount = (Number(amount.toString()) - 1) / 10 ** decimals;
       const withdrawAmount = ethers.parseUnits(finalAmount.toFixed(decimals), decimals);
 
-      const result = await contract.withdrawFizzNodeEarnings(rewardWallet, tokenAddress, withdrawAmount);
+      const result = await contract.withdrawFizzNodeEarnings(
+        rewardWallet,
+        tokenAddress,
+        withdrawAmount
+      );
       const receipt = await result.wait();
       console.log('Withdraw earnings successful -> ', receipt);
       if (onSuccessCallback) onSuccessCallback(receipt);
@@ -90,7 +94,7 @@ export class FizzModule {
         balance: response[2].toString(),
       };
 
-      console.log("fizz earnings -> ", fizzEarnings);
+      console.log('fizz earnings -> ', fizzEarnings);
 
       return fizzEarnings;
     } catch (error) {
@@ -362,8 +366,8 @@ export class FizzModule {
           name = Name;
           region = Region;
         } catch {
-          name = "";
-          region = "";
+          name = '';
+          region = '';
         }
       }
 
@@ -406,8 +410,8 @@ export class FizzModule {
           name = Name;
           region = Region;
         } catch {
-          name = "";
-          region = "";
+          name = '';
+          region = '';
         }
       }
 
@@ -449,8 +453,8 @@ export class FizzModule {
             name = Name;
             region = Region;
           } catch {
-            name = "";
-            region = "";
+            name = '';
+            region = '';
           }
         }
         return {
