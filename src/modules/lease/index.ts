@@ -7,6 +7,7 @@ import { Lease, LeaseState, LeaseWithOrderDetails } from './types';
 import { getLeaseStateAsString } from '@utils/lease';
 import { DEFAULT_PAGE_SIZE } from '@config/index';
 import { FizzModule } from '@modules/fizz';
+import { decompressOrderSpec, decompressProviderSpec } from '@utils/spec';
 
 export class LeaseModule {
   private provider: ethers.Provider;
@@ -138,11 +139,13 @@ export class LeaseModule {
             symbol: tokenDetails?.symbol,
             decimal: tokenDetails?.decimal,
           },
+          specs: decompressOrderSpec(order.specs.specs),
+          numOfBlocks: order.numOfBlocks,
         };
       })
     );
 
-    console.log("leases -> ", leaseWithToken);
+    console.log('leases -> ', leaseWithToken);
 
     return {
       leases: leaseWithToken,

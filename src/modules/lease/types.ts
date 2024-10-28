@@ -38,4 +38,6 @@ export interface LeaseWithOrderDetails extends Lease {
     symbol?: string;
     decimal?: number;
   };
+  specs: Record<string, any>;
+  numOfBlocks: number;
 }
