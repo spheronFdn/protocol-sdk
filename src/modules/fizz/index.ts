@@ -879,14 +879,16 @@ export class FizzModule {
 
   async removeFizzAttribute(category: string) {
     try {
-      const contractAddress = FizzAttributeRegistryDev;
-      const contractAbi = FizzAttributeRegistryAbi;
       const provider = new ethers.BrowserProvider(window.ethereum);
       await provider.send('eth_requestAccounts', []);
       const signer = await provider.getSigner();
+
+      const contractAddress = FizzAttributeRegistryDev;
+      const contractAbi = FizzAttributeRegistryAbi;
+
       const contract = new ethers.Contract(contractAddress, contractAbi, signer);
 
-      const tx = await contract.removeFizzAttribute(category);
+      const tx = await contract.removeAttributes(category);
 
       const receipt = await tx.wait();
 
