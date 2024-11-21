@@ -876,4 +876,26 @@ export class FizzModule {
       throw error;
     }
   }
+
+  async removeFizzAttribute(category: string) {
+    try {
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      await provider.send('eth_requestAccounts', []);
+      const signer = await provider.getSigner();
+
+      const contractAddress = FizzAttributeRegistryDev;
+      const contractAbi = FizzAttributeRegistryAbi;
+
+      const contract = new ethers.Contract(contractAddress, contractAbi, signer);
+
+      const tx = await contract.removeAttributes(category);
+
+      const receipt = await tx.wait();
+
+      return receipt;
+    } catch (error) {
+      console.log('Error in removeFizzAttribute -> ', error);
+      throw error;
+    }
+  }
 }
