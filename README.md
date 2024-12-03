@@ -139,7 +139,7 @@ const sdk = new SpheronSDK("testnet", "your-private-key");
 
 ### Examples
 
-Refer to the [Examples Directory](./examples) for sample code demonstrating how to use various modules of the SDK.
+Refer to the [Examples Directory](./example) for sample code demonstrating how to use various modules of the SDK.
 
 **Example: Creating a Deployment**
 
