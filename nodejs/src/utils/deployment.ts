@@ -275,17 +275,34 @@ export const yamlToOrderDetails = (yamlString: string): any => {
       Services: parsedResource,
     };
 
+    const attributes = [];
+
+    if (placements[firstPlacement].attributes?.region) {
+      attributes.push({
+        Key: 'region',
+        Value: placements[firstPlacement].attributes.region,
+      });
+    }
+
+    if (placements[firstPlacement].attributes?.desired_fizz) {
+      attributes.push({
+        Key: 'desired_fizz',
+        Value: placements[firstPlacement].attributes.desired_fizz,
+      });
+    }
+
+    if (placements[firstPlacement].attributes?.desired_provider) {
+      attributes.push({
+        Key: 'desired_provider',
+        Value: placements[firstPlacement].attributes.desired_provider,
+      });
+    }
+
+    const placementsRequirement = attributes.length > 0 ? { Attributes: attributes } : {};
+
     const specNew = {
       Name: firstPlacement,
-      PlacementsRequirement: {
-        Attributes: [
-          {
-            Key: "region",
-            Value:
-              placements[firstPlacement].attributes?.region || "us-central",
-          },
-        ],
-      },
+      PlacementsRequirement: placementsRequirement,
       Services: parsedResource,
     };
     const compressedSpec = compressOrderSpec(specNew);
@@ -494,7 +511,7 @@ export const getManifestIcl = (yamlInput: any): any => {
     {
       name: placement,
       services: Object.entries(input.services).map(([serviceName, serviceData], index) => {
-        const { image, expose, env, command, args } = serviceData as any;
+        const { image, expose, env, command, args, credentials, pull_policy } = serviceData as any;
         const { cpu, memory, storage, gpu } = input.profiles.compute[serviceName].resources;
         const count = input.deployment[serviceName][placement].count;
 
@@ -504,6 +521,8 @@ export const getManifestIcl = (yamlInput: any): any => {
           command: command,
           args: args,
           env: env,
+          credentials,
+          pull_policy,
           resources: {
             id: index + 1,
             cpu: {

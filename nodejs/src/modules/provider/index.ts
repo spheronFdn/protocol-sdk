@@ -132,8 +132,8 @@ export class ProviderModule {
           name = Name;
           region = Region;
         } catch {
-          name = "";
-          region = "";
+          name = '';
+          region = '';
         }
       }
 
@@ -177,8 +177,8 @@ export class ProviderModule {
           name = Name;
           region = Region;
         } catch {
-          name = "";
-          region = "";
+          name = '';
+          region = '';
         }
       }
 
@@ -221,8 +221,8 @@ export class ProviderModule {
             name = Name;
             region = Region;
           } catch {
-            name = "";
-            region = "";
+            name = '';
+            region = '';
           }
         }
         return {
@@ -239,7 +239,7 @@ export class ProviderModule {
           // tier: ProviderTrustTier[provider.tier],
           joinTimestamp: Number(provider.joinTimestamp.toString()),
           rewardWallet: provider.rewardWallet,
-        }
+        };
       });
 
       return providers;

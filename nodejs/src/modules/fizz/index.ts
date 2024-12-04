@@ -157,7 +157,7 @@ export class FizzModule {
 
       const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
       const fizzCounter = await contract.nextFizzId();
-      console.log("Total Fizz Nodes -> ", fizzCounter);
+      console.log('Total Fizz Nodes -> ', fizzCounter);
       return fizzCounter;
     } catch (error) {
       console.error('Failed to fetch Total Fizz Nodes: ', error);
