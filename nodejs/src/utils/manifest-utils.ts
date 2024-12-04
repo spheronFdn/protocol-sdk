@@ -42,6 +42,9 @@ export type Accept = {
 export type Expose = {
   port: number;
   as: number;
+  port_range: number | string;
+  port_range_as: number | string;
+  use_public_port: boolean;
   proto?: string;
   to?: ExposeTo[];
   accept: Accept;
@@ -135,6 +138,9 @@ export function manifestExpose(service: Service, sdl: any): ServiceExpose[] {
     expose.to
       ? expose.to.map((to) => ({
           port: expose.port,
+          portRange: expose.port_range,
+          portRangeAs: expose.port_range_as,
+          usePublicPort: expose.use_public_port,
           externalPort: expose.as || 0,
           proto: parseServiceProto(expose.proto),
           service: manifestExposeService(to),
