@@ -109,8 +109,7 @@ export class SpheronProviderModule {
     authToken: string,
     leaseId: string,
     service = '',
-    tail = 100000,
-    startup = false
+    tail = 100000
   ) {
     if (!leaseId) {
       console.log('Lease ID not found');
@@ -121,7 +120,7 @@ export class SpheronProviderModule {
       // eslint-disable-next-line prettier/prettier
       url: `${
         this.providerHostUrl
-      }/lease/${leaseId}/${GSEQ}/${OSEQ}/logs?follow=false&tail=${tail}&startup=${startup}${
+      }/lease/${leaseId}/${GSEQ}/${OSEQ}/kubeevents?follow=false&tail=${tail}${
         service ? `&service=${service}` : ''
       }`,
       method: 'GET',
@@ -148,18 +147,18 @@ export class SpheronProviderModule {
     authToken: string,
     leaseId: string,
     service = '',
-    tail = 100000
+    tail = 100000,
+    startup = false
   ) {
     if (!leaseId) {
       console.log('Lease ID not found');
       return;
     }
-
     const reqBody = {
       // eslint-disable-next-line prettier/prettier
       url: `${
         this.providerHostUrl
-      }/lease/${leaseId}/${GSEQ}/${OSEQ}/logs?follow=false&tail=${tail}${
+      }/lease/${leaseId}/${GSEQ}/${OSEQ}/logs?follow=false&tail=${tail}&startup=${startup}${
         service ? `&service=${service}` : ''
       }`,
       method: 'GET',
