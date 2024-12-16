@@ -23,6 +23,7 @@ export const USDTTestnet = '0x01e65Ad8F4824037Ed8b3111A6c232D1b8458Bea';
 export const USDCTestnet = '0xbb132eB1b36D87ef7Ac63c95c05a8a56eCDac3fd';
 export const DAITestnet = '0x1fFC5C93E3037aa387D3A988e9aCF2Cd11C8B782';
 export const WETHTestnet = '0xcB66efD46915F97Dd97951a98941ca8d02642aaa';
+export const CSTTestnet = '0xA76CF27b51eb93c417CcE78af5cf0a3E2D9aa55c';
 
 export const contractAddresses = {
   testnet: {
@@ -47,6 +48,7 @@ export const contractAddresses = {
     USDC: USDCTestnet,
     DAI: DAITestnet,
     WETH: WETHTestnet,
+    CST: CSTTestnet,
   },
   mainnet: {
     accessControlManager: AccessControlManagerTestnet,
@@ -70,5 +72,6 @@ export const contractAddresses = {
     USDC: USDCTestnet,
     DAI: DAITestnet,
     WETH: WETHTestnet,
+    CST: CSTTestnet,
   },
 };

@@ -103,6 +103,14 @@ export const tokenMap: Record<NetworkType, IToken[]> = {
       address: contractAddresses.testnet.WETH,
       // logo: WethIcon,
     },
+    {
+      id: 5,
+      name: 'CST',
+      symbol: 'CST',
+      decimal: 6,
+      address: contractAddresses.testnet.CST,
+      // logo: cstIcon,
+    },
   ],
   mainnet: [],
 };
