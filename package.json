@@ -1,6 +1,6 @@
 {
   "name": "@spheron/protocol-sdk",
-  "version": "1.0.0-devnet.20",
+  "version": "1.0.0-devnet.21",
   "description": "Spheron Protocol SDK",
   "repository": {
     "type": "git",
@@ -50,7 +50,7 @@
     "typescript": "^5.5.4"
   },
   "dependencies": {
-    "ethers": "^6.13.1"
+    "ethers": "^6.13.4"
   },
   "publishConfig": {
     "access": "public"
