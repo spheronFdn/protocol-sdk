@@ -112,13 +112,7 @@ const convertSize = (storage: string): number => {
 const convertToMaxPricePerBlock = (token: string, tokenPrice: number) => {
   // Define the number of blocks per day (4 blocks per second)
   const blocksPerDay = 14400;
-  // Adjust for USDT precision
-  // if (token === "USDT" || token === "USDC") {
-  //   // Convert USDT price from 6 decimals to 18 decimals by adding 12 zeroes
-  //   tokenPrice *= 10 ** 12;
-  // }
   tokenPrice *= 10 ** 18;
-  // Calculate maxPricePerBlock
   const maxPricePerBlock = Math.round(tokenPrice / blocksPerDay);
   return maxPricePerBlock;
 };
@@ -261,21 +255,16 @@ export const yamlToOrderDetails = (yamlString: string): any => {
       };
     });
 
-    const spec = {
-      Name: firstPlacement,
-      PlacementsRequirement: {
-        ProviderWallets: null,
-        Attributes: [
-          {
-            Key: 'region',
-            Value: placements[firstPlacement].attributes?.region || 'us-central',
-          },
-        ],
+    const attributes = [
+      {
+        Key: 'cpu_model',
+        Value: 'any',
       },
-      Services: parsedResource,
-    };
-
-    const attributes = [];
+      {
+        Key: 'bandwidth',
+        Value: 'any',
+      },
+    ];
 
     if (placements[firstPlacement].attributes?.region) {
       attributes.push({
@@ -308,16 +297,9 @@ export const yamlToOrderDetails = (yamlString: string): any => {
     const compressedSpec = compressOrderSpec(specNew);
 
     const orderDetails = {
-      // name: profiles.name || name || "",
-      // region: placements[firstPlacement].attributes?.region || "",
-      // metrics: [BigInt(0), BigInt(0), BigInt(0)],
-      // uptime: 0,
-      // reputation: 0,
-      // slashes: 0,
       maxPrice: typeof maxPrice === 'number' ? BigInt(maxPrice) : BigInt(0),
       numOfBlocks: BigInt(convertTimeToNumber(profiles.duration)), // > 24 hours = 4 * 86400
       token: getTokenDetails(denom, networkType as NetworkType)?.address,
-      // spec: JSON.stringify(spec),
       spec: compressedSpec,
       version: BigInt(Number(sdl.version)),
       mode: profiles.mode === 'fizz' ? 0 : 1, // Make util function for mode
