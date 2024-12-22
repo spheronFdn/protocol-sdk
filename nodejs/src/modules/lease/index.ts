@@ -154,8 +154,6 @@ export class LeaseModule {
       })
     );
 
-    console.log('leases -> ', leaseWithToken);
-
     return {
       leases: leaseWithToken,
       activeCount,
@@ -174,7 +172,7 @@ export class LeaseModule {
       const receipt = await tx.wait();
       return receipt;
     } catch (error) {
-      console.log('Error in close lease ->', error);
+      console.error('Error in close lease ->', error);
       const errorMessage = handleContractError(error, contractAbi);
       throw errorMessage;
     }
@@ -194,8 +192,7 @@ export class LeaseModule {
     timeout = 60000
   ) {
     if (!this.websocketProvider) {
-      console.log('Please pass websocket provider in constructor');
-      return;
+      throw new Error('Please pass websocket provider in constructor');
     }
     const { signer } = await initializeSigner({ wallet: this.wallet });
     const account = await signer.getAddress();

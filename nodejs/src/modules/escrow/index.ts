@@ -91,7 +91,6 @@ export class EscrowModule {
 
       const result = await contract.deposit(tokenAddress, depositAmount);
       const receipt = await result.wait();
-      console.log('Deposit balance successful -> ', receipt);
       if (onSuccessCallback) onSuccessCallback(receipt);
       return receipt;
     } catch (error) {
@@ -124,7 +123,6 @@ export class EscrowModule {
 
       const result = await contract.withdraw(tokenAddress, withdrawAmount);
       const receipt = await result.wait();
-      console.log('Withdraw balance successful -> ', receipt);
       if (onSuccessCallback) onSuccessCallback(receipt);
       return receipt;
     } catch (error) {
@@ -159,7 +157,6 @@ export class EscrowModule {
         withdrawAmount
       );
       const receipt = await result.wait();
-      console.log('Withdraw earnings successfull -> ', receipt);
       if (onSuccessCallback) onSuccessCallback(receipt);
       return receipt;
     } catch (error) {
@@ -194,7 +191,6 @@ export class EscrowModule {
         withdrawAmount
       );
       const receipt = await result.wait();
-      console.log('Withdraw earnings successful -> ', receipt);
       if (onSuccessCallback) onSuccessCallback(receipt);
       return receipt;
     } catch (error) {

@@ -28,7 +28,12 @@ export class DeploymentModule {
     this.providerModule = new ProviderModule(provider);
   }
 
-  async createDeployment(iclYaml: string, providerProxyUrl: string) {
+  async createDeployment(
+    iclYaml: string,
+    providerProxyUrl: string,
+    createOrderMatchedCallback?: (transactionHash: string) => void,
+    createOrderFailedCallback?: (transactionHash: string) => void
+  ) {
     try {
       const { error, orderDetails: details } = yamlToOrderDetails(iclYaml);
       if (error) {
@@ -39,8 +44,8 @@ export class DeploymentModule {
       const tokenDetails = getTokenDetails(token, networkType as NetworkType);
       const decimal =
         tokenDetails?.symbol === 'USDT' ||
-        tokenDetails?.symbol === 'USDC' ||
-        tokenDetails?.symbol === 'CST'
+          tokenDetails?.symbol === 'USDC' ||
+          tokenDetails?.symbol === 'CST'
           ? 18
           : tokenDetails?.decimal;
       const totalCost = Number(maxPrice.toString() / 10 ** (decimal || 0)) * Number(numOfBlocks);
@@ -62,10 +67,10 @@ export class DeploymentModule {
         const newOrderEvent: any = this.orderModule.listenToOrderCreated(
           60_000,
           () => {
-            console.log(`Order Matched. Txn Hash: ${transaction.hash}`);
+            createOrderMatchedCallback?.(transaction.hash);
           },
           () => {
-            console.log(`Could not find Lease. Txn Hash: ${transaction.hash}`);
+            createOrderFailedCallback?.(transaction.hash);
           }
         );
         const { orderId, providerAddress } = await newOrderEvent;
@@ -85,7 +90,6 @@ export class DeploymentModule {
             orderId.toString(),
             sdlManifest
           );
-          console.log(`Deployment Created Successfully! Lease ID: ${orderId}`);
           return { leaseId: orderId, transaction };
         } catch (error) {
           throw new Error('Error occured in sending manifest');
@@ -99,7 +103,15 @@ export class DeploymentModule {
     }
   }
 
-  async updateDeployment(leaseId: string, iclYaml: string, providerProxyUrl: string) {
+  async updateDeployment(
+    leaseId: string,
+    iclYaml: string,
+    providerProxyUrl: string,
+    updatedOrderLeaseCallback?: (orderId: string, providerAddress: string) => void,
+    updatedOrderLeaseFailedCallback?: () => void,
+    updateOrderAcceptedCallback?: (orderId: string) => void,
+    updateOrderFailedCallback?: () => void
+  ) {
     try {
       const { error, orderDetails: details } = yamlToOrderDetails(iclYaml);
       if (error) {
@@ -112,8 +124,8 @@ export class DeploymentModule {
       const tokenDetails = getTokenDetails(token, networkType as NetworkType);
       const decimal =
         tokenDetails?.symbol === 'USDT' ||
-        tokenDetails?.symbol === 'USDC' ||
-        tokenDetails?.symbol === 'CST'
+          tokenDetails?.symbol === 'USDC' ||
+          tokenDetails?.symbol === 'CST'
           ? 18
           : tokenDetails?.decimal;
       const totalCost = Number(maxPrice.toString() / 10 ** (decimal || 0)) * Number(numOfBlocks);
@@ -134,24 +146,23 @@ export class DeploymentModule {
       const updatedOrderLease: any = this.orderModule.listenToOrderUpdated(
         120_000,
         (orderId, providerAddress) => {
-          console.log(`Order Updated with ID: ${orderId}`);
+          updatedOrderLeaseCallback?.(orderId, providerAddress);
         },
         () => {
-          console.log('Order Updation Failed');
+          updatedOrderLeaseFailedCallback?.();
         }
       );
       const updateOrderAcceptance: any = this.orderModule.listenToOrderUpdateAccepted(
         120_000,
         (orderId) => {
-          console.log(`Update Order Request Accepted for lease ID: ${orderId}`);
+          updateOrderAcceptedCallback?.(orderId);
         },
         () => {
-          console.log('Order Update did not get accepted');
+          updateOrderFailedCallback?.();
         }
       );
 
-      const updateOrderResponse = await this.orderModule.updateOrder(leaseId, details);
-      console.log('Update order response', updateOrderResponse);
+      await this.orderModule.updateOrder(leaseId, details);
       const updateOrderAcceptanceResponse = await updateOrderAcceptance;
 
       const { orderId, providerAddress } = updateOrderAcceptanceResponse;
@@ -169,9 +180,7 @@ export class DeploymentModule {
         orderId as string,
         sdlManifest
       );
-      console.log('Update order', updateOrder);
       const updateOrderLeaseResponse = await updatedOrderLease;
-      console.log(`Deployment Updated Successfully! Lease ID: ${orderId}`);
       return { ...updateOrderLeaseResponse };
     } catch (error) {
       console.error('Error in updating deployment: ', error);
@@ -199,10 +208,9 @@ export class DeploymentModule {
       );
       const authToken = await createAuthorizationToken(this.wallet);
       const leaseInfo = await spheronProvider.getLeaseStatus(certificate, authToken, leaseId);
-      console.log(`Deployment Details Fetched Successfully! Lease ID: ${leaseId}`);
       return leaseInfo;
     } catch (error) {
-      console.log('Error in getting lease Info', error);
+      console.error('Error in getting lease Info', error);
       throw error;
     }
   }
@@ -219,10 +227,9 @@ export class DeploymentModule {
 
       const closeLeaseResponse = await this.leaseModule.closeLease(leaseId);
 
-      console.log(`Deployment Closed Successfully! Lease ID: ${leaseId}`);
       return closeLeaseResponse;
     } catch (error) {
-      console.log('Error in closing lease: ', error);
+      console.error('Error in closing lease: ', error);
       throw error;
     }
   }

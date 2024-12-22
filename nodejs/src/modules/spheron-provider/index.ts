@@ -27,7 +27,7 @@ export class SpheronProviderModule {
       });
       return response;
     } catch (error) {
-      console.log('Error in close deployment ->', error);
+      console.error('Error in close deployment ->', error);
       throw error;
     }
   }
@@ -44,7 +44,7 @@ export class SpheronProviderModule {
       });
       return response;
     } catch (error) {
-      console.log('Error in getting deployment version ->', error);
+      console.error('Error in getting deployment version ->', error);
       throw error;
     }
   }
@@ -72,15 +72,14 @@ export class SpheronProviderModule {
       });
       return response;
     } catch (error) {
-      console.log('Error in submit manifest  ->', error);
+      console.error('Error in submit manifest  ->', error);
       throw error;
     }
   }
 
   async getLeaseStatus(certificate: string, authToken: string, leaseId: string) {
     if (!leaseId) {
-      console.log('Lease ID not found');
-      return;
+      throw new Error('Lease ID not found');
     }
 
     const reqBody = {
@@ -99,7 +98,7 @@ export class SpheronProviderModule {
       });
       return response;
     } catch (error) {
-      console.log('Error in get lease status ->', error);
+      console.error('Error in get lease status ->', error);
       throw error;
     }
   }
@@ -112,17 +111,14 @@ export class SpheronProviderModule {
     tail = 100000
   ) {
     if (!leaseId) {
-      console.log('Lease ID not found');
-      return;
+      throw new Error('Lease ID not found');
     }
 
     const reqBody = {
       // eslint-disable-next-line prettier/prettier
-      url: `${
-        this.providerHostUrl
-      }/lease/${leaseId}/${GSEQ}/${OSEQ}/kubeevents?follow=false&tail=${tail}${
-        service ? `&service=${service}` : ''
-      }`,
+      url: `${this.providerHostUrl
+        }/lease/${leaseId}/${GSEQ}/${OSEQ}/kubeevents?follow=false&tail=${tail}${service ? `&service=${service}` : ''
+        }`,
       method: 'GET',
       authToken,
       certificate,
@@ -137,7 +133,7 @@ export class SpheronProviderModule {
       });
       return response;
     } catch (error) {
-      console.log('Error in get kube events ->', error);
+      console.error('Error in get kube events ->', error);
       throw error;
     }
   }
@@ -151,16 +147,13 @@ export class SpheronProviderModule {
     startup = false
   ) {
     if (!leaseId) {
-      console.log('Lease ID not found');
-      return;
+      throw new Error('Lease ID not found');
     }
     const reqBody = {
       // eslint-disable-next-line prettier/prettier
-      url: `${
-        this.providerHostUrl
-      }/lease/${leaseId}/${GSEQ}/${OSEQ}/logs?follow=false&tail=${tail}&startup=${startup}${
-        service ? `&service=${service}` : ''
-      }`,
+      url: `${this.providerHostUrl
+        }/lease/${leaseId}/${GSEQ}/${OSEQ}/logs?follow=false&tail=${tail}&startup=${startup}${service ? `&service=${service}` : ''
+        }`,
       method: 'GET',
       authToken,
       certificate,
@@ -175,7 +168,7 @@ export class SpheronProviderModule {
       });
       return response;
     } catch (error) {
-      console.log('Error in get lease logs ->', error);
+      console.error('Error in get lease logs ->', error);
       throw error;
     }
   }
@@ -187,13 +180,11 @@ export class SpheronProviderModule {
     serviceName: string
   ) {
     if (!leaseId) {
-      console.log('Lease ID not found');
-      return;
+      throw new Error('Lease ID not found');
     }
 
     if (!serviceName) {
-      console.log('Service name not found');
-      return;
+      throw new Error('Service name not found');
     }
 
     const reqBody = {
@@ -212,15 +203,14 @@ export class SpheronProviderModule {
       });
       return response;
     } catch (error) {
-      console.log('Error in get lease service status ->', error);
+      console.error('Error in get lease service status ->', error);
       throw error;
     }
   }
 
   async leaseShell(certificate: string, authToken: string, leaseId: string) {
     if (!leaseId) {
-      console.log('Lease ID not found');
-      return;
+      throw new Error('Lease ID not found');
     }
 
     const reqBody = {
@@ -239,7 +229,7 @@ export class SpheronProviderModule {
       });
       return response;
     } catch (error) {
-      console.log('Error in leaseShell ->', error);
+      console.error('Error in leaseShell ->', error);
       throw error;
     }
   }
@@ -256,7 +246,7 @@ export class SpheronProviderModule {
       const closeDeployment = await this.closeDeployment(certificate, authToken);
       return { lease: leaseResponse, closeDeployment };
     } catch (error) {
-      console.log('Error in close deployment and Lease ->', error);
+      console.error('Error in close deployment and Lease ->', error);
       throw error;
     }
   }
