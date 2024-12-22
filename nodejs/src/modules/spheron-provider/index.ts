@@ -116,9 +116,11 @@ export class SpheronProviderModule {
 
     const reqBody = {
       // eslint-disable-next-line prettier/prettier
-      url: `${this.providerHostUrl
-        }/lease/${leaseId}/${GSEQ}/${OSEQ}/kubeevents?follow=false&tail=${tail}${service ? `&service=${service}` : ''
-        }`,
+      url: `${
+        this.providerHostUrl
+      }/lease/${leaseId}/${GSEQ}/${OSEQ}/kubeevents?follow=false&tail=${tail}${
+        service ? `&service=${service}` : ''
+      }`,
       method: 'GET',
       authToken,
       certificate,
@@ -151,9 +153,11 @@ export class SpheronProviderModule {
     }
     const reqBody = {
       // eslint-disable-next-line prettier/prettier
-      url: `${this.providerHostUrl
-        }/lease/${leaseId}/${GSEQ}/${OSEQ}/logs?follow=false&tail=${tail}&startup=${startup}${service ? `&service=${service}` : ''
-        }`,
+      url: `${
+        this.providerHostUrl
+      }/lease/${leaseId}/${GSEQ}/${OSEQ}/logs?follow=false&tail=${tail}&startup=${startup}${
+        service ? `&service=${service}` : ''
+      }`,
       method: 'GET',
       authToken,
       certificate,

@@ -44,8 +44,8 @@ export class DeploymentModule {
       const tokenDetails = getTokenDetails(token, networkType as NetworkType);
       const decimal =
         tokenDetails?.symbol === 'USDT' ||
-          tokenDetails?.symbol === 'USDC' ||
-          tokenDetails?.symbol === 'CST'
+        tokenDetails?.symbol === 'USDC' ||
+        tokenDetails?.symbol === 'CST'
           ? 18
           : tokenDetails?.decimal;
       const totalCost = Number(maxPrice.toString() / 10 ** (decimal || 0)) * Number(numOfBlocks);
@@ -124,8 +124,8 @@ export class DeploymentModule {
       const tokenDetails = getTokenDetails(token, networkType as NetworkType);
       const decimal =
         tokenDetails?.symbol === 'USDT' ||
-          tokenDetails?.symbol === 'USDC' ||
-          tokenDetails?.symbol === 'CST'
+        tokenDetails?.symbol === 'USDC' ||
+        tokenDetails?.symbol === 'CST'
           ? 18
           : tokenDetails?.decimal;
       const totalCost = Number(maxPrice.toString() / 10 ** (decimal || 0)) * Number(numOfBlocks);

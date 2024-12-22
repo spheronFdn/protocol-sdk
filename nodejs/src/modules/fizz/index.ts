@@ -204,7 +204,6 @@ export class FizzModule {
         units: attr[1],
       }));
       return decoratedAttributes;
-
     } catch (error) {
       console.error('Failed to retrieve attributes: ', error);
       const errorMessage = handleContractError(error, FizzAttributeRegistryAbi);
@@ -229,7 +228,6 @@ export class FizzModule {
         units: attr[1],
       }));
       return decoratedAttributes;
-
     } catch (error) {
       console.error('Failed to retrieve pending attributes: ', error);
       const errorMessage = handleContractError(error, FizzAttributeRegistryAbi);
