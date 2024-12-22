@@ -34,7 +34,6 @@ export class OrderModule {
 
       const tx = await contract.createOrder(orderDetails);
       const receipt = await tx.wait();
-      console.log('Order created successfully');
       return receipt;
     } catch (error) {
       console.error('Error creating order -> ', error);
@@ -53,7 +52,6 @@ export class OrderModule {
 
       const receipt = await tx.wait();
 
-      console.log('Order Update Request Sent');
       return receipt;
     } catch (error) {
       console.error('Error in updating order -> ', error);
@@ -106,8 +104,7 @@ export class OrderModule {
     onFailureCallback: () => void
   ) {
     if (!this.websocketProvider) {
-      console.log('Please pass websocket provider in constructor');
-      return;
+      throw new Error('Please pass websocket provider in constructor');
     }
     const { signer } = await initializeSigner({ wallet: this.wallet });
     const account = await signer.getAddress();
@@ -156,8 +153,7 @@ export class OrderModule {
     onFailureCallback: () => void
   ) {
     if (!this.websocketProvider) {
-      console.log('Please pass websocket provider in constructor');
-      return;
+      throw new Error('Please pass websocket provider in constructor');
     }
 
     const { signer } = await initializeSigner({ wallet: this.wallet });
@@ -193,8 +189,7 @@ export class OrderModule {
     onFailureCallback: () => void
   ) {
     if (!this.websocketProvider) {
-      console.log('Please pass websocket provider in constructor');
-      return;
+      throw new Error('Please pass websocket provider in constructor');
     }
 
     const { signer } = await initializeSigner({ wallet: this.wallet });

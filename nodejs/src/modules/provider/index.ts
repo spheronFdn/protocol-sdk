@@ -20,13 +20,11 @@ export class ProviderModule {
 
   async getProviderDetails(providerAddress: string) {
     if (!providerAddress) {
-      console.log('Pass Provider Address');
-      return;
+      throw new Error('Pass Provider Address');
     }
 
     if (!isValidEthereumAddress(providerAddress)) {
-      console.log('Pass Valid Address');
-      return;
+      throw new Error('Pass Valid Address');
     }
     try {
       const contractAbi = ProviderRegistryAbi;
@@ -47,7 +45,7 @@ export class ProviderModule {
 
       return providerDetailsData;
     } catch (error) {
-      console.log('Error in get Provider Details ->', error);
+      console.error('Error in get Provider Details ->', error);
       const errorMessage = handleContractError(error, ProviderRegistryAbi);
       throw errorMessage;
     }
@@ -55,18 +53,15 @@ export class ProviderModule {
 
   async getProviderPendingAttributes(providerAddress: string, category: Category) {
     if (!providerAddress) {
-      console.log('Pass Provider Address');
-      return;
+      throw new Error('Pass Provider Address');
     }
 
     if (!isValidEthereumAddress(providerAddress)) {
-      console.log('Pass Valid Address');
-      return;
+      throw new Error('Pass Valid Address');
     }
 
     if (!category) {
-      console.log('Please pass a category');
-      return;
+      throw new Error('Please pass a category');
     }
     try {
       const contractAbi = ProviderAttributeRegistryAbi;
@@ -77,7 +72,7 @@ export class ProviderModule {
 
       return response;
     } catch (error) {
-      console.log('Error in get Provider Pending Attrs ->', error);
+      console.error('Error in get Provider Pending Attrs ->', error);
       const errorMessage = handleContractError(error, ProviderAttributeRegistryAbi);
       throw errorMessage;
     }
@@ -85,18 +80,15 @@ export class ProviderModule {
 
   async getProviderAttributes(providerAddress: string, category: Category) {
     if (!providerAddress) {
-      console.log('Pass Provider Address');
-      return;
+      throw new Error('Pass Provider Address');
     }
 
     if (!isValidEthereumAddress(providerAddress)) {
-      console.log('Pass Valid Address');
-      return;
+      throw new Error('Pass Valid Address');
     }
 
     if (!category) {
-      console.log('Please pass a category');
-      return;
+      throw new Error('Please pass a category');
     }
     try {
       const contractAbi = ProviderAttributeRegistryAbi;
@@ -107,7 +99,7 @@ export class ProviderModule {
 
       return response;
     } catch (error) {
-      console.log('Error in get Provider Attrs ->', error);
+      console.error('Error in get Provider Attrs ->', error);
       const errorMessage = handleContractError(error, ProviderAttributeRegistryAbi);
       throw errorMessage;
     }
@@ -259,16 +251,10 @@ export class ProviderModule {
 
       const attributes: Attribute[] = await contract.getAttributes(providerAddress, category);
 
-      console.log('attributes raw -> ', attributes);
-
       const decoratedAttributes = attributes.map((attr: any) => ({
         id: attr[0],
         units: attr[1],
       }));
-      console.log(
-        `Attributes for ${providerAddress} in category ${category} retrieved successfully:`,
-        decoratedAttributes
-      );
       return decoratedAttributes;
     } catch (error) {
       console.error('Failed to retrieve attributes: ', error);
@@ -293,10 +279,6 @@ export class ProviderModule {
         id: attr[0],
         units: attr[1],
       }));
-      console.log(
-        `Pending Attributes for ${providerAddress} in category ${category} retrieved successfully:`,
-        decoratedAttributes
-      );
       return decoratedAttributes;
     } catch (error) {
       console.error('Failed to retrieve pending attributes: ', error);
