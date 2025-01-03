@@ -91,7 +91,8 @@ const decompressOrderSpecData = (compressed: string): object => {
   };
 
   // Preprocess and parse the input string
-  const preprocessedString = preprocess(compressed);
+
+  const preprocessedString = preprocess(compressed.replace(/\s/g, ''));
   const parsed = JSON.parse(preprocessedString);
   return transform(parsed, true);
 };
