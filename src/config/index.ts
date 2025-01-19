@@ -1,4 +1,9 @@
-import { DAI, USDC, USDT, WETH } from '@contracts/addresses';
+import {
+  DAIDev as DAI,
+  USDCDev as USDC,
+  USDTDev as USDT,
+  WETHDev as WETH,
+} from '@contracts/addresses';
 
 // Testnet URLs
 // export const SPHERON_TESTNET_RPC_URL = 'https://sepolia-rollup.arbitrum.io/rpc';
@@ -9,9 +14,10 @@ export const SPHERON_TESTNET_WSS_URL =
 export const SPHERON_TESTNET_EXPLORER_URL = 'https://sepolia.arbiscan.io/';
 
 export const SPHERON_DEVNET_RPC_URL =
-  'https://spheron-devnet-eth.rpc.caldera.xyz/infra-partner-http';
-export const SPHERON_DEVNET_WSS_URL = 'wss://spheron-devnet-eth.rpc.caldera.xyz/ws';
-export const SPHERON_DEVNET_EXPLORER_URL = 'https://spheron-devnet-eth.explorer.caldera.xyz';
+  'https://summer-evocative-gas.base-sepolia.quiknode.pro/a73ba0ae6a2d4c16c1729c80a243f0a00e9f5737';
+export const SPHERON_DEVNET_WSS_URL =
+  'wss://summer-evocative-gas.base-sepolia.quiknode.pro/a73ba0ae6a2d4c16c1729c80a243f0a00e9f5737';
+export const SPHERON_DEVNET_EXPLORER_URL = 'https://sepolia.basescan.org/';
 
 export interface IToken {
   id: number;

@@ -39,7 +39,7 @@ export class EscrowModule {
       const contractAddress = Escrow;
       const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
 
-      const response = await contract.getUserData(providerAddress, tokenAddress);
+      const response = await contract.getUserData(providerAddress, tokenAddress, false);
 
       const userData: { lockedBalance: string; unlockedBalance: string } = {
         lockedBalance: response[0].toString(),

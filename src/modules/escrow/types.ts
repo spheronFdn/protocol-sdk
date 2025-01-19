@@ -20,6 +20,7 @@ export interface TransactionData {
   tokenAddress: string;
   amount: number;
   decimals: number;
+  beneficiaryAddress?: string;
   onSuccessCallback?: (data: unknown) => void;
   onFailureCallback?: (data: unknown) => void;
 }

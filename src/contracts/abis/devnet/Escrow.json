@@ -28,7 +28,7 @@
       },
       {
         "internalType": "uint32",
-        "name": "_providerFeePercentage",
+        "name": "_protocolFeePercentage",
         "type": "uint32"
       },
       {
@@ -85,7 +85,58 @@
   },
   {
     "inputs": [],
+    "name": "DifferentOwnerExists",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "EnforcedPause",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "ExpectedPause",
+    "type": "error"
+  },
+  {
+    "inputs": [],
     "name": "FailedInnerCall",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "available",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "required",
+        "type": "uint256"
+      }
+    ],
+    "name": "InsufficientBalance",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "InvalidAddress",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "InvalidAmount",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "InvalidOperator",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "MinimumDepositNotMet",
     "type": "error"
   },
   {
@@ -105,21 +156,48 @@
     "type": "error"
   },
   {
+    "inputs": [],
+    "name": "TokenNotAccepted",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "TransferFailed",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "UnauthorizedAccess",
+    "type": "error"
+  },
+  {
     "anonymous": false,
     "inputs": [
       {
-        "indexed": false,
-        "internalType": "bool",
-        "name": "_status",
-        "type": "bool"
+        "indexed": true,
+        "internalType": "enum Escrow.AddressType",
+        "name": "_type",
+        "type": "uint8"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "_newAddress",
+        "type": "address"
       }
     ],
-    "name": "DepositStatusChanged",
+    "name": "AddressUpdated",
     "type": "event"
   },
   {
     "anonymous": false,
     "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "from",
+        "type": "address"
+      },
       {
         "indexed": true,
         "internalType": "uint256",
@@ -137,22 +215,15 @@
         "internalType": "uint256",
         "name": "amount",
         "type": "uint256"
-      }
-    ],
-    "name": "FizzNodeEarningsWithdrawal",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
+      },
       {
         "indexed": false,
-        "internalType": "address",
-        "name": "fizzRegistry",
-        "type": "address"
+        "internalType": "uint8",
+        "name": "movementType",
+        "type": "uint8"
       }
     ],
-    "name": "FizzRegistryUpdated",
+    "name": "FizzMovement",
     "type": "event"
   },
   {
@@ -221,63 +292,13 @@
     "anonymous": false,
     "inputs": [
       {
-        "indexed": true,
-        "internalType": "address",
-        "name": "provider",
-        "type": "address"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "token",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      }
-    ],
-    "name": "ProtocolFeesWithdrawal",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "provider",
-        "type": "address"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "token",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      }
-    ],
-    "name": "ProviderEarningsWithdrawal",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
         "indexed": false,
         "internalType": "address",
-        "name": "providerRegistry",
+        "name": "account",
         "type": "address"
       }
     ],
-    "name": "ProviderRegistryUpdated",
+    "name": "Paused",
     "type": "event"
   },
   {
@@ -361,33 +382,13 @@
       {
         "indexed": true,
         "internalType": "address",
-        "name": "_tokenRegistry",
+        "name": "from",
         "type": "address"
-      }
-    ],
-    "name": "TokenRegistryContractUpdated",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
+      },
       {
         "indexed": true,
         "internalType": "address",
-        "name": "_treasury",
-        "type": "address"
-      }
-    ],
-    "name": "TreasurySet",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "user",
+        "name": "to",
         "type": "address"
       },
       {
@@ -399,11 +400,30 @@
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "deposit",
+        "name": "amount",
         "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint8",
+        "name": "movementType",
+        "type": "uint8"
       }
     ],
-    "name": "UserDeposit",
+    "name": "TokenMovement",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      }
+    ],
+    "name": "Unpaused",
     "type": "event"
   },
   {
@@ -457,44 +477,6 @@
     "type": "event"
   },
   {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "user",
-        "type": "address"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "token",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      }
-    ],
-    "name": "UserWithdraw",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "bool",
-        "name": "_status",
-        "type": "bool"
-      }
-    ],
-    "name": "WithdrawalStatusChanged",
-    "type": "event"
-  },
-  {
     "inputs": [],
     "name": "DEFAULT_ADMIN_ROLE",
     "outputs": [
@@ -509,16 +491,15 @@
   },
   {
     "inputs": [],
-    "name": "changeDepositStatus",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "changeWithdrawalStatus",
-    "outputs": [],
-    "stateMutability": "nonpayable",
+    "name": "MAX_PROTOCOL_FEE_PERCENTAGE",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -535,6 +516,29 @@
       }
     ],
     "name": "deposit",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_token",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_amount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "_operator",
+        "type": "address"
+      }
+    ],
+    "name": "depositForOperator",
     "outputs": [],
     "stateMutability": "payable",
     "type": "function"
@@ -574,19 +578,19 @@
     "name": "fizzNodeEarnings",
     "outputs": [
       {
-        "internalType": "uint256",
+        "internalType": "uint128",
         "name": "earned",
-        "type": "uint256"
+        "type": "uint128"
       },
       {
-        "internalType": "uint256",
+        "internalType": "uint128",
         "name": "withdrawn",
-        "type": "uint256"
+        "type": "uint128"
       },
       {
-        "internalType": "uint256",
+        "internalType": "uint128",
         "name": "balance",
-        "type": "uint256"
+        "type": "uint128"
       }
     ],
     "stateMutability": "view",
@@ -613,47 +617,6 @@
         "internalType": "contract IFizzRegistry",
         "name": "",
         "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "_fizzId",
-        "type": "uint256"
-      },
-      {
-        "internalType": "address",
-        "name": "_token",
-        "type": "address"
-      }
-    ],
-    "name": "getFizzNodeEarnings",
-    "outputs": [
-      {
-        "components": [
-          {
-            "internalType": "uint256",
-            "name": "earned",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "withdrawn",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "balance",
-            "type": "uint256"
-          }
-        ],
-        "internalType": "struct Escrow.FizzTokenData",
-        "name": "",
-        "type": "tuple"
       }
     ],
     "stateMutability": "view",
@@ -695,19 +658,19 @@
       {
         "components": [
           {
-            "internalType": "uint256",
+            "internalType": "uint128",
             "name": "earned",
-            "type": "uint256"
+            "type": "uint128"
           },
           {
-            "internalType": "uint256",
+            "internalType": "uint128",
             "name": "withdrawn",
-            "type": "uint256"
+            "type": "uint128"
           },
           {
-            "internalType": "uint256",
+            "internalType": "uint128",
             "name": "balance",
-            "type": "uint256"
+            "type": "uint128"
           }
         ],
         "internalType": "struct Escrow.ProviderTokenData",
@@ -748,6 +711,11 @@
         "internalType": "address",
         "name": "_token",
         "type": "address"
+      },
+      {
+        "internalType": "bool",
+        "name": "_isOperator",
+        "type": "bool"
       }
     ],
     "name": "getUserData",
@@ -755,14 +723,14 @@
       {
         "components": [
           {
-            "internalType": "uint256",
+            "internalType": "uint128",
             "name": "lockedBalance",
-            "type": "uint256"
+            "type": "uint128"
           },
           {
-            "internalType": "uint256",
+            "internalType": "uint128",
             "name": "unlockedBalance",
-            "type": "uint256"
+            "type": "uint128"
           }
         ],
         "internalType": "struct Escrow.UserTokenData",
@@ -819,6 +787,30 @@
     "inputs": [
       {
         "internalType": "address",
+        "name": "_operator",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_token",
+        "type": "address"
+      }
+    ],
+    "name": "isOperatorAddress",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
         "name": "_user",
         "type": "address"
       },
@@ -831,6 +823,11 @@
         "internalType": "uint256",
         "name": "amount",
         "type": "uint256"
+      },
+      {
+        "internalType": "bool",
+        "name": "_isOperator",
+        "type": "bool"
       }
     ],
     "name": "lockTokens",
@@ -839,8 +836,49 @@
     "type": "function"
   },
   {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "operatorBalance",
+    "outputs": [
+      {
+        "internalType": "uint128",
+        "name": "lockedBalance",
+        "type": "uint128"
+      },
+      {
+        "internalType": "uint128",
+        "name": "unlockedBalance",
+        "type": "uint128"
+      },
+      {
+        "internalType": "address",
+        "name": "owner",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [],
-    "name": "pauseDeposit",
+    "name": "pause",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "paused",
     "outputs": [
       {
         "internalType": "bool",
@@ -853,12 +891,12 @@
   },
   {
     "inputs": [],
-    "name": "pauseWithdrawal",
+    "name": "protocolFeePercentage",
     "outputs": [
       {
-        "internalType": "bool",
+        "internalType": "uint32",
         "name": "",
-        "type": "bool"
+        "type": "uint32"
       }
     ],
     "stateMutability": "view",
@@ -880,32 +918,19 @@
     "name": "providerEarnings",
     "outputs": [
       {
-        "internalType": "uint256",
+        "internalType": "uint128",
         "name": "earned",
-        "type": "uint256"
+        "type": "uint128"
       },
       {
-        "internalType": "uint256",
+        "internalType": "uint128",
         "name": "withdrawn",
-        "type": "uint256"
+        "type": "uint128"
       },
       {
-        "internalType": "uint256",
+        "internalType": "uint128",
         "name": "balance",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "providerFeePercentage",
-    "outputs": [
-      {
-        "internalType": "uint32",
-        "name": "",
-        "type": "uint32"
+        "type": "uint128"
       }
     ],
     "stateMutability": "view",
@@ -964,50 +989,21 @@
     "inputs": [
       {
         "internalType": "uint32",
-        "name": "_fizzNodePercentage",
+        "name": "_protocolFee",
         "type": "uint32"
-      }
-    ],
-    "name": "setFizeNodePercentage",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
+      },
       {
         "internalType": "uint32",
-        "name": "_providerFeePercentage",
+        "name": "_userFee",
         "type": "uint32"
-      }
-    ],
-    "name": "setProviderFeePercentage",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_treasury",
-        "type": "address"
-      }
-    ],
-    "name": "setTreasury",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
+      },
       {
         "internalType": "uint32",
-        "name": "_userFeePercentage",
+        "name": "_fizzNodeFee",
         "type": "uint32"
       }
     ],
-    "name": "setUserFeePercentage",
+    "name": "setPercentages",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -1026,19 +1022,6 @@
         "internalType": "bool",
         "name": "",
         "type": "bool"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "token",
-    "outputs": [
-      {
-        "internalType": "contract IERC20",
-        "name": "",
-        "type": "address"
       }
     ],
     "stateMutability": "view",
@@ -1083,6 +1066,11 @@
         "internalType": "uint256",
         "name": "_fees",
         "type": "uint256"
+      },
+      {
+        "internalType": "bool",
+        "name": "_isOperator",
+        "type": "bool"
       }
     ],
     "name": "transferLocked",
@@ -1121,6 +1109,11 @@
         "internalType": "uint256",
         "name": "_fees",
         "type": "uint256"
+      },
+      {
+        "internalType": "bool",
+        "name": "_isOperator",
+        "type": "bool"
       }
     ],
     "name": "transferLockedFizz",
@@ -1157,6 +1150,11 @@
         "internalType": "uint256",
         "name": "amount",
         "type": "uint256"
+      },
+      {
+        "internalType": "bool",
+        "name": "_isOperator",
+        "type": "bool"
       }
     ],
     "name": "unlockTokens",
@@ -1165,14 +1163,8 @@
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_fizzRegistry",
-        "type": "address"
-      }
-    ],
-    "name": "updateFizzRegistryAdress",
+    "inputs": [],
+    "name": "unpause",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -1181,37 +1173,16 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "_providerRegistry",
+        "name": "_newAddress",
         "type": "address"
-      }
-    ],
-    "name": "updateProviderAdress",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
+      },
       {
-        "internalType": "address",
-        "name": "_providerRegistry",
-        "type": "address"
+        "internalType": "enum Escrow.AddressType",
+        "name": "_type",
+        "type": "uint8"
       }
     ],
-    "name": "updateProviderRegistryAdress",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_tokenRegistry",
-        "type": "address"
-      }
-    ],
-    "name": "updateTokenRegistryContract",
+    "name": "updateAddress",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -1232,14 +1203,14 @@
     "name": "userBalance",
     "outputs": [
       {
-        "internalType": "uint256",
+        "internalType": "uint128",
         "name": "lockedBalance",
-        "type": "uint256"
+        "type": "uint128"
       },
       {
-        "internalType": "uint256",
+        "internalType": "uint128",
         "name": "unlockedBalance",
-        "type": "uint256"
+        "type": "uint128"
       }
     ],
     "stateMutability": "view",
@@ -1279,11 +1250,6 @@
   {
     "inputs": [
       {
-        "internalType": "uint256",
-        "name": "_fizzId",
-        "type": "uint256"
-      },
-      {
         "internalType": "address",
         "name": "_token",
         "type": "address"
@@ -1292,27 +1258,14 @@
         "internalType": "uint256",
         "name": "_amount",
         "type": "uint256"
-      }
-    ],
-    "name": "withdrawFizzNodeEarnings",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_token",
-        "type": "address"
       },
       {
-        "internalType": "uint256",
-        "name": "_amount",
-        "type": "uint256"
+        "internalType": "address",
+        "name": "_operator",
+        "type": "address"
       }
     ],
-    "name": "withdrawProtocolFees",
+    "name": "withdrawFromOperator",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
