@@ -20,7 +20,7 @@ export interface Lease {
   leaseId: string;
   fizzId: string;
   requestId: string;
-  resourceAttribute: ResourceAttributes;
+  // resourceAttribute: ResourceAttributes;
   acceptedPrice: number;
   providerAddress: string;
   tenantAddress: string;
