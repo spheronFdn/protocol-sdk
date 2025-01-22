@@ -41,22 +41,10 @@ export class LeaseModule {
     const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
     const response = await contract.leases(leaseId);
 
-    const resourceAttribute = {
-      cpuUnits: Number(response.resourceAttribute[0]),
-      cpuAttributes: response.resourceAttribute[1],
-      ramUnits: Number(response.resourceAttribute[2]),
-      ramAttributes: response.resourceAttribute[3],
-      gpuUnits: Number(response.resourceAttribute[4]),
-      gpuAttributes: response.resourceAttribute[5],
-      endpointsKind: Number(response.resourceAttribute[6]),
-      endpointsSequenceNumber: Number(response.resourceAttribute[7]),
-    };
-
     const lease: Lease = {
       leaseId: response.leaseId.toString(),
       fizzId: response.fizzId.toString(),
       requestId: response.requestId.toString(),
-      resourceAttribute,
       acceptedPrice: Number(response.acceptedPrice),
       providerAddress: response.providerAddress.toString(),
       tenantAddress: response.tenantAddress.toString(),

@@ -42,7 +42,7 @@ export class EscrowModule {
         }
       }
 
-      const response = await contract.getUserData(userWalletAddress, tokenAddress);
+      const response = await contract.getUserData(userWalletAddress, tokenAddress, false);
 
       const userData: { lockedBalance: string; unlockedBalance: string; token: any } = {
         lockedBalance: response[0].toString(),

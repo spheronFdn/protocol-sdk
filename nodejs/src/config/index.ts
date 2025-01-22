@@ -1,22 +1,21 @@
 import { contractAddresses } from '@contracts/addresses';
 
 // Testnet URLs
-// export const SPHERON_DEVNET_HTTP_URL = 'https://spheron-devnet-eth.rpc.caldera.xyz/http';
-export const SPHERON_DEVNET_HTTP_URL =
-  'https://spheron-devnet-eth.rpc.caldera.xyz/infra-partner-http';
-export const SPHERON_DEVNET_WSS_URL = 'wss://spheron-devnet-eth.rpc.caldera.xyz/ws';
-export const SPHERON_DEVNET_EXPLORER_URL = 'https://spheron-devnet-eth.explorer.caldera.xyz';
+export const SPHERON_TESTNET_HTTP_URL =
+  'https://base-sepolia.g.alchemy.com/v2/MYm8w99-g3L5Vbxe-Z3RRcDy7P2BH_0n';
+export const SPHERON_TESTNET_WSS_URL = 'wss://base-sepolia.g.alchemy.com/v2/MYm8w99-g3L5Vbxe-Z3RRcDy7P2BH_0n';
+export const SPHERON_TESTNET_EXPLORER_URL = 'https://sepolia.basescan.org';
 
 export const rpcUrls = {
   testnet: {
-    HTTP_URL: SPHERON_DEVNET_HTTP_URL,
-    WSS_URL: SPHERON_DEVNET_WSS_URL,
-    EXPORER_URL: SPHERON_DEVNET_EXPLORER_URL,
+    HTTP_URL: SPHERON_TESTNET_HTTP_URL,
+    WSS_URL: SPHERON_TESTNET_WSS_URL,
+    EXPORER_URL: SPHERON_TESTNET_EXPLORER_URL,
   },
   mainnet: {
-    HTTP_URL: SPHERON_DEVNET_HTTP_URL,
-    WSS_URL: SPHERON_DEVNET_WSS_URL,
-    EXPORER_URL: SPHERON_DEVNET_EXPLORER_URL,
+    HTTP_URL: SPHERON_TESTNET_HTTP_URL,
+    WSS_URL: SPHERON_TESTNET_WSS_URL,
+    EXPORER_URL: SPHERON_TESTNET_EXPLORER_URL,
   },
 };
 
@@ -45,15 +44,17 @@ export type NetworkType = 'testnet' | 'mainnet';
 
 export const networkMap: Record<NetworkType, INetwork> = {
   testnet: {
-    chainId: 89138,
-    chainName: 'Spheron Devnet',
-    rpcUrls: ['https://spheron-devnet-eth.rpc.caldera.xyz/http'],
+    chainId: 84532,
+    chainName: "Base Sepolia",
+    rpcUrls: [
+      SPHERON_TESTNET_HTTP_URL,
+    ],
     nativeCurrency: {
-      name: 'Ethereum',
-      symbol: 'ETH',
+      name: "Sepolia Ether",
+      symbol: "ETH",
       decimals: 18,
     },
-    blockExplorerUrls: ['https://spheron-devnet-eth.explorer.caldera.xyz/'],
+    blockExplorerUrls: ["https://sepolia.basescan.org/"],
   },
   // TODO: NEED TO UPDATE WHEN MAINNET RELEASE
   mainnet: {

@@ -15,15 +15,20 @@
         "internalType": "address",
         "name": "_access",
         "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_slashingPercentage",
-        "type": "uint256"
       }
     ],
     "stateMutability": "nonpayable",
     "type": "constructor"
+  },
+  {
+    "inputs": [],
+    "name": "AlreadyPaused",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "AlreadySlashed",
+    "type": "error"
   },
   {
     "inputs": [],
@@ -33,16 +38,6 @@
   {
     "inputs": [],
     "name": "EnforcedPause",
-    "type": "error"
-  },
-  {
-    "inputs": [],
-    "name": "EraNotPaused",
-    "type": "error"
-  },
-  {
-    "inputs": [],
-    "name": "EraPaused",
     "type": "error"
   },
   {
@@ -62,11 +57,6 @@
   },
   {
     "inputs": [],
-    "name": "NoAttribute",
-    "type": "error"
-  },
-  {
-    "inputs": [],
     "name": "NoReward",
     "type": "error"
   },
@@ -82,17 +72,12 @@
   },
   {
     "inputs": [],
+    "name": "NotPaused",
+    "type": "error"
+  },
+  {
+    "inputs": [],
     "name": "ProviderCantClaimRewards",
-    "type": "error"
-  },
-  {
-    "inputs": [],
-    "name": "ProviderNotActive",
-    "type": "error"
-  },
-  {
-    "inputs": [],
-    "name": "ReentrancyGuardReentrantCall",
     "type": "error"
   },
   {
@@ -104,82 +89,6 @@
     "inputs": [],
     "name": "ZeroEra",
     "type": "error"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "string",
-        "name": "name",
-        "type": "string"
-      },
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "registry",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "baseReward",
-        "type": "uint256"
-      }
-    ],
-    "name": "CategoryAdded",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "string",
-        "name": "name",
-        "type": "string"
-      },
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "registry",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "baseReward",
-        "type": "uint256"
-      }
-    ],
-    "name": "CategoryRemoved",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "pausedEra",
-        "type": "uint256"
-      }
-    ],
-    "name": "EraCountPaused",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "resumedEra",
-        "type": "uint256"
-      }
-    ],
-    "name": "EraCountUnpaused",
-    "type": "event"
   },
   {
     "anonymous": false,
@@ -212,6 +121,56 @@
     "inputs": [
       {
         "indexed": false,
+        "internalType": "string",
+        "name": "name",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "registry",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "baseReward",
+        "type": "uint256"
+      }
+    ],
+    "name": "ProviderCategoryAdded",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "name",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "registry",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "baseReward",
+        "type": "uint256"
+      }
+    ],
+    "name": "ProviderCategoryRemoved",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
         "internalType": "address",
         "name": "provider",
         "type": "address"
@@ -224,6 +183,57 @@
       }
     ],
     "name": "ProviderDenialStatusUpdated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "pausedEra",
+        "type": "uint256"
+      }
+    ],
+    "name": "ProviderEraCountPaused",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "resumedEra",
+        "type": "uint256"
+      }
+    ],
+    "name": "ProviderEraCountUnpaused",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "provider",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "era",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "accumulatedRewards",
+        "type": "uint256"
+      }
+    ],
+    "name": "ProviderPaused",
     "type": "event"
   },
   {
@@ -276,6 +286,57 @@
       {
         "indexed": false,
         "internalType": "uint256",
+        "name": "rewardAmount",
+        "type": "uint256"
+      }
+    ],
+    "name": "ProviderRewardClaimed",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "enum TrustTier",
+        "name": "tier",
+        "type": "uint8"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "multiplier",
+        "type": "uint256"
+      }
+    ],
+    "name": "ProviderRewardMultiplierUpdated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "rewardToken",
+        "type": "address"
+      }
+    ],
+    "name": "ProviderRewardTokenUpdated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "provider",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
         "name": "era",
         "type": "uint256"
       },
@@ -284,9 +345,34 @@
         "internalType": "uint256",
         "name": "slashedAmount",
         "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint8",
+        "name": "percentage",
+        "type": "uint8"
       }
     ],
     "name": "ProviderSlashed",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "provider",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "era",
+        "type": "uint256"
+      }
+    ],
+    "name": "ProviderUnpaused",
     "type": "event"
   },
   {
@@ -312,44 +398,6 @@
       }
     ],
     "name": "ProviderUnslashed",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "provider",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "rewardAmount",
-        "type": "uint256"
-      }
-    ],
-    "name": "RewardClaimed",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "enum TrustTier",
-        "name": "tier",
-        "type": "uint8"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "multiplier",
-        "type": "uint256"
-      }
-    ],
-    "name": "RewardMultiplierUpdated",
     "type": "event"
   },
   {
@@ -417,17 +465,17 @@
   {
     "inputs": [
       {
-        "internalType": "address",
+        "internalType": "address[]",
         "name": "_provider",
-        "type": "address"
+        "type": "address[]"
       },
       {
-        "internalType": "uint256",
+        "internalType": "uint256[]",
         "name": "_amount",
-        "type": "uint256"
+        "type": "uint256[]"
       }
     ],
-    "name": "addProviderPendingReward",
+    "name": "addProviderPendingRewards",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -508,36 +556,6 @@
   },
   {
     "inputs": [],
-    "name": "getAllCategories",
-    "outputs": [
-      {
-        "components": [
-          {
-            "internalType": "string",
-            "name": "name",
-            "type": "string"
-          },
-          {
-            "internalType": "address",
-            "name": "registry",
-            "type": "address"
-          },
-          {
-            "internalType": "uint256",
-            "name": "baseReward",
-            "type": "uint256"
-          }
-        ],
-        "internalType": "struct ProviderRewardsManager.Category[]",
-        "name": "",
-        "type": "tuple[]"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
     "name": "getCurrentEra",
     "outputs": [
       {
@@ -582,33 +600,24 @@
             "type": "uint256"
           },
           {
+            "internalType": "bool",
+            "name": "isPaused",
+            "type": "bool"
+          },
+          {
             "internalType": "uint256",
-            "name": "totalRewards",
+            "name": "pausedEra",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "accumulatedRewardsBeforePause",
             "type": "uint256"
           }
         ],
         "internalType": "struct ProviderRewardsManager.Provider",
         "name": "",
         "type": "tuple"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "string",
-        "name": "category",
-        "type": "string"
-      }
-    ],
-    "name": "getProviderBaseRewardsPerEra",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -667,25 +676,6 @@
   {
     "inputs": [
       {
-        "internalType": "address",
-        "name": "_provider",
-        "type": "address"
-      }
-    ],
-    "name": "getProviderTotalMultiplierPoints",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "enum TrustTier",
         "name": "tier",
         "type": "uint8"
@@ -703,14 +693,8 @@
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_provider",
-        "type": "address"
-      }
-    ],
-    "name": "isDenied",
+    "inputs": [],
+    "name": "isEraPaused",
     "outputs": [
       {
         "internalType": "bool",
@@ -722,8 +706,38 @@
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "isPaused",
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "isEraSlashed",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "isPausedProvider",
     "outputs": [
       {
         "internalType": "bool",
@@ -749,6 +763,19 @@
     "type": "function"
   },
   {
+    "inputs": [
+      {
+        "internalType": "address[]",
+        "name": "_providers",
+        "type": "address[]"
+      }
+    ],
+    "name": "pauseRewardsForProviders",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
     "inputs": [],
     "name": "paused",
     "outputs": [
@@ -768,6 +795,40 @@
       {
         "internalType": "uint256",
         "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "pausedPeriods",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "startEra",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "endEra",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "accumulatedRewardsBeforePause",
         "type": "uint256"
       }
     ],
@@ -898,8 +959,18 @@
         "type": "uint256"
       },
       {
+        "internalType": "bool",
+        "name": "isPaused",
+        "type": "bool"
+      },
+      {
         "internalType": "uint256",
-        "name": "totalRewards",
+        "name": "pausedEra",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "accumulatedRewardsBeforePause",
         "type": "uint256"
       }
     ],
@@ -932,25 +1003,7 @@
         "type": "uint256[]"
       }
     ],
-    "name": "removeSlashErasForMultipleProviders",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_provider",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256[]",
-        "name": "_eras",
-        "type": "uint256[]"
-      }
-    ],
-    "name": "removeSlashErasForProvider",
+    "name": "removeSlashErasForProviders",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -990,14 +1043,14 @@
   {
     "inputs": [
       {
-        "internalType": "address",
-        "name": "_provider",
-        "type": "address"
+        "internalType": "address[]",
+        "name": "_providers",
+        "type": "address[]"
       },
       {
-        "internalType": "bool",
+        "internalType": "bool[]",
         "name": "_deny",
-        "type": "bool"
+        "type": "bool[]"
       }
     ],
     "name": "setDenied",
@@ -1026,24 +1079,6 @@
   {
     "inputs": [
       {
-        "internalType": "address",
-        "name": "_provider",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_era",
-        "type": "uint256"
-      }
-    ],
-    "name": "setSlashForEra",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "address[]",
         "name": "_providers",
         "type": "address[]"
@@ -1052,37 +1087,16 @@
         "internalType": "uint256[]",
         "name": "_eras",
         "type": "uint256[]"
+      },
+      {
+        "internalType": "uint8[]",
+        "name": "_slashedPercentage",
+        "type": "uint8[]"
       }
     ],
-    "name": "setSlashForEraMultipleProviders",
+    "name": "setSlashEraForProviders",
     "outputs": [],
     "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "_slashingPercentage",
-        "type": "uint256"
-      }
-    ],
-    "name": "setSlashingPercentage",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "slashingPercentage",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -1095,6 +1109,19 @@
   {
     "inputs": [],
     "name": "unpauseEraCount",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address[]",
+        "name": "_providers",
+        "type": "address[]"
+      }
+    ],
+    "name": "unpauseRewardsForProviders",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -1121,6 +1148,19 @@
       }
     ],
     "name": "updateProviderAttrRegistry",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_rewardToken",
+        "type": "address"
+      }
+    ],
+    "name": "updateRewardToken",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

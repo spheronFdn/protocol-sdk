@@ -39,6 +39,7 @@ export class DeploymentModule {
       if (error) {
         throw new Error('Please verify YAML format');
       }
+      console.log("details: ", details);
       const sdlManifest = getManifestIcl(iclYaml);
       const { token, maxPrice, numOfBlocks } = details;
       const tokenDetails = getTokenDetails(token, networkType as NetworkType);

@@ -47,6 +47,11 @@
   },
   {
     "inputs": [],
+    "name": "FizzNotLinkedToProvider",
+    "type": "error"
+  },
+  {
+    "inputs": [],
     "name": "InvalidAddress",
     "type": "error"
   },
