@@ -57,17 +57,17 @@ const convertTimeToNumber = (timeStr: string): number => {
   // Calculate the total units based on the time unit
   switch (unit) {
     case 'min':
-      return num * 60 * 4;
+      return num * 60 * 0.5;
     case 'h':
-      return num * 60 * 60 * 4;
+      return num * 60 * 60 * 0.5;
     case 'd':
-      return num * 24 * 60 * 60 * 4;
+      return num * 24 * 60 * 60 * 0.5;
     case 'mon':
       // Assuming a month as 30 days
-      return num * 30 * 24 * 60 * 60 * 4;
+      return num * 30 * 24 * 60 * 60 * 0.5;
     case 'y':
       // Assuming a year as 365 days
-      return num * 365 * 24 * 60 * 60 * 4;
+      return num * 365 * 24 * 60 * 60 * 0.5;
     default:
       console.error('Unsupported time unit:', unit);
       return 0;
@@ -110,8 +110,8 @@ const convertSize = (storage: string): number => {
 };
 
 const convertToMaxPricePerBlock = (token: string, tokenPrice: number) => {
-  // Define the number of blocks per day (4 blocks per second)
-  const blocksPerDay = 14400;
+  // Define the number of blocks per day (0.5 blocks per second)
+  const blocksPerDay = 1800;
   tokenPrice *= 10 ** 18;
   const maxPricePerBlock = Math.round(tokenPrice / blocksPerDay);
   return maxPricePerBlock;
@@ -431,7 +431,7 @@ export const exportToYaml = (obj: any, orderServices: any) => {
     services,
 
     profiles: {
-      duration: getTimeInMaxUnits(Number(obj.numOfBlocks) / 4),
+      duration: getTimeInMaxUnits(Number(obj.numOfBlocks) / 0.5),
       mode: JSON.parse(obj.specs.specs)?.mode?.toString() === '0' ? 'fizz' : 'provider',
       tier: [getTierKey(obj.specs.tier)],
       compute,
