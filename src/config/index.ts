@@ -14,9 +14,9 @@ export const SPHERON_TESTNET_WSS_URL =
 export const SPHERON_TESTNET_EXPLORER_URL = 'https://sepolia.arbiscan.io/';
 
 export const SPHERON_DEVNET_RPC_URL =
-  'https://summer-evocative-gas.base-sepolia.quiknode.pro/a73ba0ae6a2d4c16c1729c80a243f0a00e9f5737';
+  'https://base-sepolia.g.alchemy.com/v2/MYm8w99-g3L5Vbxe-Z3RRcDy7P2BH_0n';
 export const SPHERON_DEVNET_WSS_URL =
-  'wss://summer-evocative-gas.base-sepolia.quiknode.pro/a73ba0ae6a2d4c16c1729c80a243f0a00e9f5737';
+  'wss://base-sepolia.g.alchemy.com/v2/MYm8w99-g3L5Vbxe-Z3RRcDy7P2BH_0n';
 export const SPHERON_DEVNET_EXPLORER_URL = 'https://sepolia.basescan.org/';
 
 export interface IToken {
