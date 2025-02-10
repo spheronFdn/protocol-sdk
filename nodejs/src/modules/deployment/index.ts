@@ -32,7 +32,8 @@ export class DeploymentModule {
     iclYaml: string,
     providerProxyUrl: string,
     createOrderMatchedCallback?: (transactionHash: string) => void,
-    createOrderFailedCallback?: (transactionHash: string) => void
+    createOrderFailedCallback?: (transactionHash: string) => void,
+    isOperator: boolean = false
   ) {
     try {
       const { error, orderDetails: details } = yamlToOrderDetails(iclYaml);
@@ -44,8 +45,8 @@ export class DeploymentModule {
       const tokenDetails = getTokenDetails(token, networkType as NetworkType);
       const decimal =
         tokenDetails?.symbol === 'USDT' ||
-        tokenDetails?.symbol === 'USDC' ||
-        tokenDetails?.symbol === 'CST'
+          tokenDetails?.symbol === 'USDC' ||
+          tokenDetails?.symbol === 'CST'
           ? 18
           : tokenDetails?.decimal;
       const totalCost = Number(maxPrice.toString() / 10 ** (decimal || 0)) * Number(numOfBlocks);
@@ -57,7 +58,8 @@ export class DeploymentModule {
 
       const tokenBalance = await this.escrowModule.getUserBalance(
         tokenDetails?.symbol || '',
-        account
+        account,
+        isOperator
       );
       if (Number(tokenBalance.unlockedBalance) / 10 ** (tokenDetails?.decimal || 0) < totalCost) {
         throw new Error('Insufficient Balance');
@@ -110,7 +112,8 @@ export class DeploymentModule {
     updatedOrderLeaseCallback?: (orderId: string, providerAddress: string) => void,
     updatedOrderLeaseFailedCallback?: () => void,
     updateOrderAcceptedCallback?: (orderId: string) => void,
-    updateOrderFailedCallback?: () => void
+    updateOrderFailedCallback?: () => void,
+    isOperator: boolean = false
   ) {
     try {
       const { error, orderDetails: details } = yamlToOrderDetails(iclYaml);
@@ -124,8 +127,8 @@ export class DeploymentModule {
       const tokenDetails = getTokenDetails(token, networkType as NetworkType);
       const decimal =
         tokenDetails?.symbol === 'USDT' ||
-        tokenDetails?.symbol === 'USDC' ||
-        tokenDetails?.symbol === 'CST'
+          tokenDetails?.symbol === 'USDC' ||
+          tokenDetails?.symbol === 'CST'
           ? 18
           : tokenDetails?.decimal;
       const totalCost = Number(maxPrice.toString() / 10 ** (decimal || 0)) * Number(numOfBlocks);
@@ -137,7 +140,8 @@ export class DeploymentModule {
 
       const tokenBalance = await this.escrowModule.getUserBalance(
         tokenDetails?.symbol || '',
-        account
+        account,
+        isOperator
       );
       if (Number(tokenBalance.unlockedBalance) / 10 ** (tokenDetails?.decimal || 0) < totalCost) {
         throw new Error('Insufficient Balance');
