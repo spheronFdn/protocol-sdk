@@ -16,7 +16,7 @@ export class EscrowModule {
     this.wallet = wallet;
   }
 
-  async getUserBalance(token: string, walletAddress?: string) {
+  async getUserBalance(token: string, walletAddress?: string, isOperator?: boolean) {
     try {
       const contractAbi = EscrowAbi;
       const contractAddress = Escrow;
@@ -42,7 +42,7 @@ export class EscrowModule {
         }
       }
 
-      const response = await contract.getUserData(userWalletAddress, tokenAddress, false);
+      const response = await contract.getUserData(userWalletAddress, tokenAddress, !!isOperator);
 
       const userData: { lockedBalance: string; unlockedBalance: string; token: any } = {
         lockedBalance: response[0].toString(),
