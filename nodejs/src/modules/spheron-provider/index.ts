@@ -99,7 +99,7 @@ export class SpheronProviderModule {
       return response;
     } catch (error) {
       console.error('Error in get lease status ->', error);
-      throw error;
+      return { services: null, forwarded_ports: null };
     }
   }
 
