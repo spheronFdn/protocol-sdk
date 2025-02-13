@@ -160,7 +160,6 @@ export class LeaseModule {
       const receipt = await tx.wait();
       return receipt;
     } catch (error) {
-      console.error('Error in close lease ->', error);
       const errorMessage = handleContractError(error, contractAbi);
       throw errorMessage;
     }

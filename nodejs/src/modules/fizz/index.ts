@@ -54,7 +54,6 @@ export class FizzModule {
 
       return { tx, receipt };
     } catch (error) {
-      console.error('Fizz registration failed: ', error);
       const errorMessage = handleContractError(error, FizzRegistryAbi);
       throw errorMessage;
     }
@@ -75,7 +74,6 @@ export class FizzModule {
 
       return { tx, receipt };
     } catch (error) {
-      console.error('Update Fizz Name failed: ', error);
       const errorMessage = handleContractError(error, FizzRegistryAbi);
       throw errorMessage;
     }
@@ -111,7 +109,6 @@ export class FizzModule {
         rewardWallet,
       };
     } catch (error) {
-      console.error('Failed to retrieve Fizz details: ', error);
       const errorMessage = handleContractError(error, FizzRegistryAbi);
       throw errorMessage;
     }
@@ -141,7 +138,6 @@ export class FizzModule {
 
       return result;
     } catch (error) {
-      console.error('Failed to fetch Fizz Node details: ', error);
       const errorMessage = handleContractError(error, FizzRegistryAbi);
       throw errorMessage;
     }
@@ -156,7 +152,6 @@ export class FizzModule {
       const fizzCounter = await contract.nextFizzId();
       return fizzCounter;
     } catch (error) {
-      console.error('Failed to fetch Total Fizz Nodes: ', error);
       const errorMessage = handleContractError(error, FizzRegistryAbi);
       throw errorMessage;
     }
@@ -184,7 +179,6 @@ export class FizzModule {
 
       return fizzNodes;
     } catch (error) {
-      console.error('Failed to fetch all Fizz Nodes: ', error);
       const errorMessage = handleContractError(error, FizzRegistryAbi);
       throw errorMessage;
     }
@@ -205,7 +199,6 @@ export class FizzModule {
       }));
       return decoratedAttributes;
     } catch (error) {
-      console.error('Failed to retrieve attributes: ', error);
       const errorMessage = handleContractError(error, FizzAttributeRegistryAbi);
       throw errorMessage;
     }
@@ -229,7 +222,6 @@ export class FizzModule {
       }));
       return decoratedAttributes;
     } catch (error) {
-      console.error('Failed to retrieve pending attributes: ', error);
       const errorMessage = handleContractError(error, FizzAttributeRegistryAbi);
       throw errorMessage;
     }
@@ -251,7 +243,6 @@ export class FizzModule {
 
       return resource;
     } catch (error) {
-      console.error('Failed to retrieve resource: ', error);
       const errorMessage = handleContractError(error, ResourceRegistryAbi);
       throw errorMessage;
     }
@@ -303,7 +294,6 @@ export class FizzModule {
 
       return leases;
     } catch (error) {
-      console.error('Failed to retrieve fizz leases: ', error);
       const errorMessage = handleContractError(error, ComputeLeaseAbi);
       throw errorMessage;
     }
@@ -339,7 +329,6 @@ export class FizzModule {
         });
       });
     } catch (error) {
-      console.error('Error in listenToFizzCreated -> ', error);
       const errorMessage = handleContractError(error, FizzRegistryAbi);
       throw errorMessage;
     }
@@ -360,7 +349,6 @@ export class FizzModule {
 
       return receipt;
     } catch (error) {
-      console.error('Error in updateFizzSpecs -> ', error);
       const errorMessage = handleContractError(error, FizzRegistryAbi);
       throw errorMessage;
     }
@@ -401,7 +389,6 @@ export class FizzModule {
         });
       });
     } catch (error) {
-      console.error('Error in listenToFizzNodeUpdated -> ', error);
       const errorMessage = handleContractError(error, FizzRegistryAbi);
       throw errorMessage;
     }
@@ -422,7 +409,6 @@ export class FizzModule {
 
       return receipt;
     } catch (error) {
-      console.error('Error in updateFizzRegion -> ', error);
       const errorMessage = handleContractError(error, FizzRegistryAbi);
       throw errorMessage;
     }
@@ -463,7 +449,6 @@ export class FizzModule {
         });
       });
     } catch (error) {
-      console.error('Error in listenToFizzNodeUpdated -> ', error);
       const errorMessage = handleContractError(error, FizzRegistryAbi);
       throw errorMessage;
     }
@@ -484,7 +469,6 @@ export class FizzModule {
 
       return receipt;
     } catch (error) {
-      console.error('Error in updateFizzProvider -> ', error);
       const errorMessage = handleContractError(error, FizzRegistryAbi);
       throw errorMessage;
     }
@@ -525,7 +509,6 @@ export class FizzModule {
         });
       });
     } catch (error) {
-      console.error('Error in listenToFizzNodeUpdated -> ', error);
       const errorMessage = handleContractError(error, FizzRegistryAbi);
       throw errorMessage;
     }
@@ -546,7 +529,6 @@ export class FizzModule {
 
       return receipt;
     } catch (error) {
-      console.error('Error in addAcceptedPayment -> ', error);
       const errorMessage = handleContractError(error, FizzRegistryAbi);
       throw errorMessage;
     }
@@ -587,7 +569,6 @@ export class FizzModule {
         });
       });
     } catch (error) {
-      console.error('Error in listenToAddAcceptedPayment -> ', error);
       const errorMessage = handleContractError(error, FizzRegistryAbi);
       throw errorMessage;
     }
@@ -608,7 +589,6 @@ export class FizzModule {
 
       return receipt;
     } catch (error) {
-      console.error('Error in removeAcceptedPayment -> ', error);
       const errorMessage = handleContractError(error, FizzRegistryAbi);
       throw errorMessage;
     }
@@ -649,7 +629,6 @@ export class FizzModule {
         });
       });
     } catch (error) {
-      console.error('Error in listenToRemoveAcceptedPayment -> ', error);
       const errorMessage = handleContractError(error, FizzRegistryAbi);
       throw errorMessage;
     }

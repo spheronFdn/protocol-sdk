@@ -45,8 +45,8 @@ export class DeploymentModule {
       const tokenDetails = getTokenDetails(token, networkType as NetworkType);
       const decimal =
         tokenDetails?.symbol === 'USDT' ||
-          tokenDetails?.symbol === 'USDC' ||
-          tokenDetails?.symbol === 'CST'
+        tokenDetails?.symbol === 'USDC' ||
+        tokenDetails?.symbol === 'CST'
           ? 18
           : tokenDetails?.decimal;
       const totalCost = Number(maxPrice.toString() / 10 ** (decimal || 0)) * Number(numOfBlocks);
@@ -100,7 +100,6 @@ export class DeploymentModule {
         throw error;
       }
     } catch (error) {
-      console.error('Error creating deployment: ', error);
       throw error;
     }
   }
@@ -127,8 +126,8 @@ export class DeploymentModule {
       const tokenDetails = getTokenDetails(token, networkType as NetworkType);
       const decimal =
         tokenDetails?.symbol === 'USDT' ||
-          tokenDetails?.symbol === 'USDC' ||
-          tokenDetails?.symbol === 'CST'
+        tokenDetails?.symbol === 'USDC' ||
+        tokenDetails?.symbol === 'CST'
           ? 18
           : tokenDetails?.decimal;
       const totalCost = Number(maxPrice.toString() / 10 ** (decimal || 0)) * Number(numOfBlocks);
@@ -187,7 +186,6 @@ export class DeploymentModule {
       const updateOrderLeaseResponse = await updatedOrderLease;
       return { ...updateOrderLeaseResponse };
     } catch (error) {
-      console.error('Error in updating deployment: ', error);
       throw error;
     }
   }
@@ -214,7 +212,43 @@ export class DeploymentModule {
       const leaseInfo = await spheronProvider.getLeaseStatus(certificate, authToken, leaseId);
       return leaseInfo;
     } catch (error) {
-      console.error('Error in getting lease Info', error);
+      throw error;
+    }
+  }
+
+  async getDeploymentLogs(
+    leaseId: string,
+    providerProxyUrl: string,
+    logsOptions?: { service?: string; tail?: number; startup?: boolean }
+  ) {
+    try {
+      if (!this.wallet) {
+        throw new Error('Unable to access wallet');
+      }
+
+      if (!leaseId) {
+        throw new Error('Provider Lease Id');
+      }
+      const { providerAddress, fizzId } = await this.leaseModule.getLeaseDetails(leaseId);
+      const port = fizzId?.toString() !== '0' ? 8543 : 8443;
+      const { certificate, hostUri }: { certificate: string; hostUri: string } =
+        (await this.providerModule.getProviderDetails(providerAddress)) as any;
+
+      const spheronProvider = new SpheronProviderModule(
+        `https://${hostUri}:${port}`,
+        `${providerProxyUrl}/ws-data`
+      );
+      const authToken = await createAuthorizationToken(this.wallet);
+      const leaseLogs = await spheronProvider.getLeaseLogs(
+        certificate,
+        authToken,
+        leaseId,
+        logsOptions?.service,
+        logsOptions?.tail,
+        logsOptions?.startup
+      );
+      return leaseLogs;
+    } catch (error) {
       throw error;
     }
   }
@@ -233,7 +267,6 @@ export class DeploymentModule {
 
       return closeLeaseResponse;
     } catch (error) {
-      console.error('Error in closing lease: ', error);
       throw error;
     }
   }

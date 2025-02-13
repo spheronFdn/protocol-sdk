@@ -3,7 +3,8 @@ import { contractAddresses } from '@contracts/addresses';
 // Testnet URLs
 export const SPHERON_TESTNET_HTTP_URL =
   'https://base-sepolia.g.alchemy.com/v2/MYm8w99-g3L5Vbxe-Z3RRcDy7P2BH_0n';
-export const SPHERON_TESTNET_WSS_URL = 'wss://base-sepolia.g.alchemy.com/v2/MYm8w99-g3L5Vbxe-Z3RRcDy7P2BH_0n';
+export const SPHERON_TESTNET_WSS_URL =
+  'wss://base-sepolia.g.alchemy.com/v2/MYm8w99-g3L5Vbxe-Z3RRcDy7P2BH_0n';
 export const SPHERON_TESTNET_EXPLORER_URL = 'https://sepolia.basescan.org';
 
 export const rpcUrls = {
@@ -45,16 +46,14 @@ export type NetworkType = 'testnet' | 'mainnet';
 export const networkMap: Record<NetworkType, INetwork> = {
   testnet: {
     chainId: 84532,
-    chainName: "Base Sepolia",
-    rpcUrls: [
-      SPHERON_TESTNET_HTTP_URL,
-    ],
+    chainName: 'Base Sepolia',
+    rpcUrls: [SPHERON_TESTNET_HTTP_URL],
     nativeCurrency: {
-      name: "Sepolia Ether",
-      symbol: "ETH",
+      name: 'Sepolia Ether',
+      symbol: 'ETH',
       decimals: 18,
     },
-    blockExplorerUrls: ["https://sepolia.basescan.org/"],
+    blockExplorerUrls: ['https://sepolia.basescan.org/'],
   },
   // TODO: NEED TO UPDATE WHEN MAINNET RELEASE
   mainnet: {

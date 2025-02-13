@@ -77,7 +77,6 @@ export const requestPipeline = async ({
       return res.text();
     }
   } catch (error) {
-    console.error('Error in Request Pipeline ->', error);
     throw error;
   }
 };

@@ -56,7 +56,6 @@ export class EscrowModule {
 
       return userData;
     } catch (error) {
-      console.error('Error in getUserData:', error);
       const errorMessage = handleContractError(error, EscrowAbi);
       throw errorMessage;
     }
@@ -94,7 +93,6 @@ export class EscrowModule {
       if (onSuccessCallback) onSuccessCallback(receipt);
       return receipt;
     } catch (error) {
-      console.error('Error balance deposit -> ', error);
       if (onFailureCallback) onFailureCallback(error);
       const errorMessage = handleContractError(error, EscrowAbi);
       throw errorMessage;
@@ -126,7 +124,6 @@ export class EscrowModule {
       if (onSuccessCallback) onSuccessCallback(receipt);
       return receipt;
     } catch (error) {
-      console.error('Error in balance withdraw -> ', error);
       if (onFailureCallback) onFailureCallback(error);
       const errorMessage = handleContractError(error, EscrowAbi);
       throw errorMessage;
@@ -160,7 +157,6 @@ export class EscrowModule {
       if (onSuccessCallback) onSuccessCallback(receipt);
       return receipt;
     } catch (error) {
-      console.error('Error withdrawing provider earnings-> ', error);
       if (onFailureCallback) onFailureCallback(error);
       const errorMessage = handleContractError(error, EscrowAbi);
       throw errorMessage;
@@ -194,7 +190,6 @@ export class EscrowModule {
       if (onSuccessCallback) onSuccessCallback(receipt);
       return receipt;
     } catch (error) {
-      console.error('Error withdrawing fizz earnings -> ', error);
       if (onFailureCallback) onFailureCallback(error);
       const errorMessage = handleContractError(error, EscrowAbi);
       throw errorMessage;
@@ -218,7 +213,6 @@ export class EscrowModule {
 
       return providerEarnings;
     } catch (error) {
-      console.error('Error in getProviderEarnings:', error);
       const errorMessage = handleContractError(error, EscrowAbi);
       throw errorMessage;
     }
@@ -239,7 +233,6 @@ export class EscrowModule {
 
       return fizzEarnings;
     } catch (error) {
-      console.error('Error in getFizzEarnings:', error);
       const errorMessage = handleContractError(error, EscrowAbi);
       throw errorMessage;
     }

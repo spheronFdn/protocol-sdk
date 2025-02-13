@@ -308,7 +308,6 @@ export const yamlToOrderDetails = (yamlString: string): any => {
 
     return { error: false, orderDetails };
   } catch (error) {
-    console.error('Error parsing YAML:', error);
     return {
       error: true,
       message: (error as any)?.message || 'Error parsing YAML',
