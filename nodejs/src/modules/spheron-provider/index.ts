@@ -27,7 +27,6 @@ export class SpheronProviderModule {
       });
       return response;
     } catch (error) {
-      console.error('Error in close deployment ->', error);
       throw error;
     }
   }
@@ -44,7 +43,6 @@ export class SpheronProviderModule {
       });
       return response;
     } catch (error) {
-      console.error('Error in getting deployment version ->', error);
       throw error;
     }
   }
@@ -72,7 +70,6 @@ export class SpheronProviderModule {
       });
       return response;
     } catch (error) {
-      console.error('Error in submit manifest  ->', error);
       throw error;
     }
   }
@@ -98,7 +95,6 @@ export class SpheronProviderModule {
       });
       return response;
     } catch (error) {
-      console.error('Error in get lease status ->', error);
       return { services: null, forwarded_ports: null };
     }
   }
@@ -135,7 +131,6 @@ export class SpheronProviderModule {
       });
       return response;
     } catch (error) {
-      console.error('Error in get kube events ->', error);
       throw error;
     }
   }
@@ -172,8 +167,7 @@ export class SpheronProviderModule {
       });
       return response;
     } catch (error) {
-      console.error('Error in get lease logs ->', error);
-      throw error;
+      return [];
     }
   }
 
@@ -207,7 +201,6 @@ export class SpheronProviderModule {
       });
       return response;
     } catch (error) {
-      console.error('Error in get lease service status ->', error);
       throw error;
     }
   }
@@ -233,7 +226,6 @@ export class SpheronProviderModule {
       });
       return response;
     } catch (error) {
-      console.error('Error in leaseShell ->', error);
       throw error;
     }
   }
@@ -250,7 +242,6 @@ export class SpheronProviderModule {
       const closeDeployment = await this.closeDeployment(certificate, authToken);
       return { lease: leaseResponse, closeDeployment };
     } catch (error) {
-      console.error('Error in close deployment and Lease ->', error);
       throw error;
     }
   }

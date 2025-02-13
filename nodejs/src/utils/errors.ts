@@ -50,18 +50,14 @@ export const handleContractError = (error: any, abi: any[]) => {
       const decodedError: any = iface.parseError(error.data);
       const errorMessage = decodedError ? errorMessages[decodedError?.name] : '';
       if (errorMessage) {
-        console.error(errorMessage);
         return errorMessage;
       } else {
-        console.error('Unhandled error: ', decodedError?.name || '');
         return 'An error occurred while processing your transaction.';
       }
     } catch (decodeError) {
-      console.error('Failed to decode the error:', decodeError);
       return 'Failed to decode the error.';
     }
   } else {
-    console.error('Transaction failed without revert data:', error);
     return 'Transaction failed without revert data.';
   }
 };

@@ -36,7 +36,6 @@ export class OrderModule {
       const receipt = await tx.wait();
       return receipt;
     } catch (error) {
-      console.error('Error creating order -> ', error);
       const errorMessage = handleContractError(error, OrderRequestAbi);
       throw errorMessage;
     }
@@ -54,7 +53,6 @@ export class OrderModule {
 
       return receipt;
     } catch (error) {
-      console.error('Error in updating order -> ', error);
       const errorMessage = handleContractError(error, OrderRequestAbi);
       throw errorMessage;
     }
