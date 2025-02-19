@@ -2,7 +2,14 @@ import { OrderRequestTestnet as OrderRequest, BidTestnet as Bid } from '@contrac
 import OrderRequestAbi from '@contracts/abis/testnet/OrderRequest.json';
 import BidAbi from '@contracts/abis/testnet/Bid.json';
 import { ethers } from 'ethers';
-import { InitialOrder, OrderDetails, Tier } from './types';
+import {
+  InitialOrder,
+  OrderDetails,
+  OrderMatchedEvent,
+  Tier,
+  OrderUpdateAcceptedEvent,
+  OrderUpdatedEvent,
+} from './types';
 import { getTokenDetails, initializeSigner } from '@utils/index';
 import { getOrderStateAsString } from '@utils/order';
 import { handleContractError } from '@utils/errors';
@@ -26,14 +33,14 @@ export class OrderModule {
     this.wallet = wallet;
   }
 
-  async createOrder(orderDetails: OrderDetails) {
+  async createOrder(orderDetails: OrderDetails): Promise<ethers.ContractTransactionReceipt | null> {
     try {
       const { signer } = await initializeSigner({ wallet: this.wallet });
 
       const contract = new ethers.Contract(OrderRequest, OrderRequestAbi, signer);
 
-      const tx = await contract.createOrder(orderDetails);
-      const receipt = await tx.wait();
+      const tx: ethers.ContractTransactionResponse = await contract.createOrder(orderDetails);
+      const receipt: ethers.ContractTransactionReceipt | null = await tx.wait();
       return receipt;
     } catch (error) {
       const errorMessage = handleContractError(error, OrderRequestAbi);
@@ -41,16 +48,20 @@ export class OrderModule {
     }
   }
 
-  async updateOrder(orderId: string, orderDetails: OrderDetails) {
+  async updateOrder(
+    orderId: string,
+    orderDetails: OrderDetails
+  ): Promise<ethers.ContractTransactionReceipt | null> {
     try {
       const { signer } = await initializeSigner({ wallet: this.wallet });
 
       const contract = new ethers.Contract(OrderRequest, OrderRequestAbi, signer);
 
-      const tx = await contract.updateInitialOrder(orderId, orderDetails);
-
-      const receipt = await tx.wait();
-
+      const tx: ethers.ContractTransactionResponse = await contract.updateInitialOrder(
+        orderId,
+        orderDetails
+      );
+      const receipt: ethers.ContractTransactionReceipt | null = await tx.wait();
       return receipt;
     } catch (error) {
       const errorMessage = handleContractError(error, OrderRequestAbi);
@@ -58,7 +69,7 @@ export class OrderModule {
     }
   }
 
-  async getOrderDetails(leaseId: string) {
+  async getOrderDetails(leaseId: string): Promise<InitialOrder> {
     const contractAbi = OrderRequestAbi;
     const contractAddress = OrderRequest;
 
@@ -100,7 +111,7 @@ export class OrderModule {
       creatorAddress: string
     ) => void,
     onFailureCallback: () => void
-  ) {
+  ): Promise<OrderMatchedEvent> {
     if (!this.websocketProvider) {
       throw new Error('Please pass websocket provider in constructor');
     }
@@ -116,7 +127,7 @@ export class OrderModule {
       this.createTimeoutId = setTimeout(() => {
         contract.off('OrderMatched');
         onFailureCallback();
-        reject({ error: true, msg: 'Order creation Failed' });
+        reject({ error: true, msg: 'Order creation failed' });
       }, timeoutTime);
 
       contract.on(
@@ -149,7 +160,7 @@ export class OrderModule {
       acceptedPrice?: string
     ) => void,
     onFailureCallback: () => void
-  ) {
+  ): Promise<OrderUpdatedEvent> {
     if (!this.websocketProvider) {
       throw new Error('Please pass websocket provider in constructor');
     }
@@ -185,7 +196,7 @@ export class OrderModule {
     timeoutTime = 60000,
     onSuccessCallback: (orderId: string, providerAddress: string) => void,
     onFailureCallback: () => void
-  ) {
+  ): Promise<OrderUpdateAcceptedEvent> {
     if (!this.websocketProvider) {
       throw new Error('Please pass websocket provider in constructor');
     }

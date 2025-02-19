@@ -43,17 +43,18 @@ const errorMessages: Record<string, string> = {
   ArrayMismatch: 'The arrays provided do not match.',
 };
 
-export const handleContractError = (error: any, abi: any[]) => {
-  if (error.data) {
+export const handleContractError = (error: unknown, abi: ethers.InterfaceAbi): string => {
+  if (
+    typeof error === 'object' &&
+    error !== null &&
+    'data' in error &&
+    typeof error.data === 'string'
+  ) {
     try {
       const iface = new ethers.Interface(abi);
-      const decodedError: any = iface.parseError(error.data);
-      const errorMessage = decodedError ? errorMessages[decodedError?.name] : '';
-      if (errorMessage) {
-        return errorMessage;
-      } else {
-        return 'An error occurred while processing your transaction.';
-      }
+      const decodedError: ethers.ErrorDescription | null = iface.parseError(error.data);
+      const errorMessage = decodedError ? errorMessages[decodedError.name] : '';
+      return errorMessage || 'An error occurred while processing your transaction.';
     } catch (decodeError) {
       return 'Failed to decode the error.';
     }

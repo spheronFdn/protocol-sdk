@@ -1,8 +1,17 @@
 import * as yaml from 'js-yaml';
 import { getTokenDetails } from '@utils/index';
 import { networkType, NetworkType } from '@config/index';
-import { manifestExpose, serviceResourceEndpoints } from './manifest-utils';
+import {
+  GPUAttributesManifest,
+  ICL,
+  manifestExpose,
+  Service,
+  ServiceManifest,
+  serviceResourceEndpoints,
+} from './manifest-utils';
 import { compressOrderSpec } from './spec';
+import { CSTTestnet } from '@contracts/addresses';
+import { OrderDetails } from '@modules/order/types';
 
 enum Tier {
   One,
@@ -162,49 +171,90 @@ const convertGpuAttributes = (gpu: GPUInput): ConvertedGPU => {
   };
 };
 
-export const yamlToOrderDetails = (yamlString: string): any => {
+interface Pricing {
+  amount: number;
+  token?: string;
+  denom?: string;
+}
+
+interface Placement {
+  pricing: Record<string, Pricing>;
+  attributes?: {
+    region?: string;
+    desired_fizz?: string;
+    desired_provider?: string;
+  };
+}
+
+interface ComputeProfile {
+  resources: {
+    cpu: { units: number };
+    memory: { size: string };
+    storage: { size: string } | { size: string }[];
+    gpu?: GPUInput;
+  };
+}
+
+interface Profile {
+  placement: Record<string, Placement>;
+  compute: Record<string, ComputeProfile>;
+  duration: string;
+  mode?: string;
+  tier?: string;
+}
+
+interface IclYaml {
+  profiles: Profile;
+  services: Record<string, Service>;
+  deployment: Record<string, Record<string, { count?: number }>>;
+  version: string;
+}
+
+export const yamlToOrderDetails = (
+  yamlString: string
+): { error: boolean; orderDetails?: OrderDetails; message?: string } => {
   try {
-    const sdl = yaml.load(yamlString) as any;
+    const icl = yaml.load(yamlString) as IclYaml;
 
     let maxPrice = 0;
     let denom: string = '';
-    const profiles = sdl.profiles || {};
-    const services = sdl.services || {};
+    const profiles = icl.profiles || {};
+    const services = icl.services || {};
     const placements = profiles.placement || {};
-    const firstPlacement = Object.keys(placements)[0];
+    const firstPlacementKey = Object.keys(placements)[0];
+    const firstPlacement = placements[firstPlacementKey];
 
-    if (Object.keys(placements[firstPlacement].pricing).length > 0) {
+    if (firstPlacement?.pricing && Object.keys(firstPlacement.pricing).length > 0) {
       if (
-        Object.keys(placements[firstPlacement].pricing).some((key) => {
-          return (
-            placements[firstPlacement].pricing?.[key].amount.toString() === '' ||
-            isNaN(placements[firstPlacement].pricing?.[key].amount)
-          );
+        Object.keys(firstPlacement.pricing).some((key) => {
+          const amount = firstPlacement.pricing?.[key]?.amount;
+          return amount === undefined || isNaN(amount);
         })
       ) {
         throw new Error('Please set a valid amount');
       }
-      maxPrice = Object.keys(placements[firstPlacement].pricing).reduce((acc, curr) => {
-        denom = !denom
-          ? placements[firstPlacement].pricing?.[curr]?.token ||
-            placements[firstPlacement].pricing?.[curr]?.denom
-          : denom;
+      maxPrice = Object.keys(firstPlacement.pricing).reduce((acc, curr) => {
+        denom =
+          denom ||
+          firstPlacement.pricing?.[curr]?.token ||
+          firstPlacement.pricing?.[curr]?.denom ||
+          '';
         const maxPricePerHours = convertToMaxPricePerBlock(
           denom,
-          placements[firstPlacement].pricing?.[curr].amount.toString()
+          Number(firstPlacement.pricing?.[curr].amount)
         );
         return acc + (maxPricePerHours as number);
       }, 0);
     }
 
-    let parsedResource = Object.keys(profiles.compute).map((computeProfile, index) => {
-      const obj = profiles.compute[`${computeProfile}`];
+    const parsedResource = Object.keys(profiles.compute || {}).map((computeProfile, index) => {
+      const obj = profiles.compute?.[computeProfile];
+      if (!obj) return null;
 
-      const placementKeys = Object.keys(firstPlacement);
       let replicaCount = 1;
 
-      for (const key of placementKeys) {
-        const count = sdl.deployment[computeProfile]?.[key]?.count;
+      for (const key of Object.keys(firstPlacement || {})) {
+        const count = icl.deployment?.[computeProfile]?.[key]?.count;
         if (count !== undefined) {
           replicaCount = count;
           break;
@@ -216,37 +266,37 @@ export const yamlToOrderDetails = (yamlString: string): any => {
         Resources: {
           ID: index + 1,
           CPU: {
-            Units: parseInt((obj.resources?.cpu?.units * 1000).toString()),
+            Units: obj.resources?.cpu ? Math.round(obj.resources.cpu.units * 1000) : 0,
             Attributes: [],
           },
           Memory: {
-            Units: convertSize(obj.resources?.memory?.size),
+            Units: obj.resources?.memory ? convertSize(obj.resources.memory.size) : 0,
             Attributes: [],
           },
-          Storage: Array.isArray(obj?.resources?.storage)
-            ? obj?.resources?.storage?.map((storage: { size: string }) => {
-                return {
-                  Name: 'default',
-                  Attributes: [],
-                  Units: convertSize(storage.size),
-                };
-              })
-            : [
+          Storage: Array.isArray(obj.resources?.storage)
+            ? obj.resources.storage.map((storage) => ({
+                Name: 'default',
+                Attributes: [],
+                Units: convertSize(storage.size),
+              }))
+            : obj.resources?.storage
+            ? [
                 {
                   Name: 'default',
                   Attributes: [],
-                  Units: convertSize(obj?.resources?.storage.size),
+                  Units: convertSize(obj.resources.storage.size),
                 },
-              ],
+              ]
+            : [],
           GPU:
-            Object.keys(obj?.resources?.gpu || {}).length > 0
+            obj.resources?.gpu && Object.keys(obj.resources.gpu).length > 0
               ? convertGpuAttributes(obj.resources.gpu)
               : {
                   Units: 0,
                   Attributes: [],
                 },
           Endpoints:
-            serviceResourceEndpoints(services[computeProfile], sdl)?.map((item) => ({
+            serviceResourceEndpoints(services[computeProfile], icl as ICL)?.map((item) => ({
               Kind: item.kind,
               SequenceNumber: item.sequence_number,
             })) || [],
@@ -266,31 +316,31 @@ export const yamlToOrderDetails = (yamlString: string): any => {
       },
     ];
 
-    if (placements[firstPlacement].attributes?.region) {
+    if (firstPlacement?.attributes?.region) {
       attributes.push({
         Key: 'region',
-        Value: placements[firstPlacement].attributes.region,
+        Value: firstPlacement.attributes.region,
       });
     }
 
-    if (placements[firstPlacement].attributes?.desired_fizz) {
+    if (firstPlacement?.attributes?.desired_fizz) {
       attributes.push({
         Key: 'desired_fizz',
-        Value: placements[firstPlacement].attributes.desired_fizz,
+        Value: firstPlacement.attributes.desired_fizz,
       });
     }
 
-    if (placements[firstPlacement].attributes?.desired_provider) {
+    if (firstPlacement?.attributes?.desired_provider) {
       attributes.push({
         Key: 'desired_provider',
-        Value: placements[firstPlacement].attributes.desired_provider,
+        Value: firstPlacement.attributes.desired_provider,
       });
     }
 
     const placementsRequirement = attributes.length > 0 ? { Attributes: attributes } : {};
 
     const specNew = {
-      Name: firstPlacement,
+      Name: firstPlacementKey,
       PlacementsRequirement: placementsRequirement,
       Services: parsedResource,
     };
@@ -298,19 +348,22 @@ export const yamlToOrderDetails = (yamlString: string): any => {
 
     const orderDetails = {
       maxPrice: typeof maxPrice === 'number' ? BigInt(maxPrice) : BigInt(0),
-      numOfBlocks: BigInt(convertTimeToNumber(profiles.duration)), // > 24 hours = 4 * 86400
-      token: getTokenDetails(denom, networkType as NetworkType)?.address,
+      numOfBlocks: BigInt(convertTimeToNumber(profiles.duration || '1h')), // > 24 hours = 4 * 86400
+      token: getTokenDetails(denom, networkType as NetworkType)?.address || CSTTestnet,
       spec: compressedSpec,
-      version: BigInt(Number(sdl.version)),
+      version: BigInt(Number(icl.version)),
       mode: profiles.mode === 'fizz' ? 0 : 1, // Make util function for mode
-      tier: validTiers[profiles.tier] || [...validTiers['secured'], ...validTiers['community']],
+      tier: validTiers[profiles.tier || 'community'] || [
+        ...validTiers['secured'],
+        ...validTiers['community'],
+      ],
     };
 
     return { error: false, orderDetails };
   } catch (error) {
     return {
       error: true,
-      message: (error as any)?.message || 'Error parsing YAML',
+      message: (error as Error)?.message || 'Error parsing YAML',
     };
   }
 };
@@ -352,106 +405,6 @@ export const getKeysForTiersString = (tiersString: string): string[] => {
   return getKeysByTierValues(tiersArray);
 };
 
-export const exportToYaml = (obj: any, orderServices: any) => {
-  const services = {} as any;
-  const compute = {} as any;
-  const pricing = {} as any;
-  const deployment = {} as any;
-  JSON.parse(obj.specs.specs).Resources.forEach((resource: any, index: any) => {
-    const serviceName = Object.keys(orderServices.services)[index];
-    const images = orderServices.services[serviceName]
-      ? `${
-          orderServices.services[serviceName]?.container_statuses[0]?.image?.split('/')[1] || ''
-        }/${orderServices.services[serviceName]?.container_statuses[0]?.image.split('/')[2]}`
-      : '';
-
-    services[serviceName] = {
-      image: images,
-      expose: orderServices.forwarded_ports[serviceName]
-        ? [
-            {
-              port: orderServices.forwarded_ports[serviceName][0]?.port,
-              as: orderServices.forwarded_ports[serviceName][0].externalPort,
-              to: [{ global: true }],
-            },
-          ]
-        : [],
-      env: [],
-    };
-
-    compute[serviceName] = {
-      resources: {
-        cpu: { units: resource.Resources.CPU.Units / 1000 },
-        memory: {
-          size: `${resource.Resources.Memory.Units / (1024 * 1024 * 1024)}Gi`,
-        },
-        storage: [
-          {
-            size: `${resource.Resources.Storage[0].Units / (1024 * 1024 * 1024)}Gi`,
-          },
-        ],
-
-        ...(resource.Resources.GPU.Units > 0 && {
-          gpu: {
-            units: resource.Resources.GPU.Units,
-            attributes:
-              resource.Resources.GPU.Attributes.length > 0
-                ? {
-                    vendor: {
-                      [`${resource.Resources.GPU.Attributes[0].Key.split('/')[1]}`]: [
-                        {
-                          model: resource.Resources.GPU.Attributes[0].Key.split('/')[3],
-                        },
-                      ],
-                    },
-                  }
-                : [],
-          },
-        }),
-      },
-    };
-
-    pricing[serviceName] = {
-      token: obj.token.symbol,
-      amount: '',
-    };
-
-    deployment[serviceName] = {
-      [`${JSON.parse(obj.specs.specs).Name}`]: {
-        profile: serviceName,
-        count: resource.ReplicaCount,
-      },
-    };
-  });
-
-  const yamlObject = {
-    version: '1.0',
-
-    services,
-
-    profiles: {
-      duration: getTimeInMaxUnits(Number(obj.numOfBlocks) / 0.5),
-      mode: JSON.parse(obj.specs.specs)?.mode?.toString() === '0' ? 'fizz' : 'provider',
-      tier: [getTierKey(obj.specs.tier)],
-      compute,
-      placement: {
-        [`${JSON.parse(obj.specs.specs).Name}`]: {
-          attributes: {
-            region: getRegion(JSON.parse(obj.specs.specs)),
-          },
-          pricing,
-        },
-      },
-    },
-
-    deployment,
-  };
-
-  const updateYaml = yaml.dump(yamlObject);
-
-  return updateYaml;
-};
-
 interface Model {
   model: string;
 }
@@ -460,13 +413,8 @@ interface Input {
   vendor: Record<string, Model[]>;
 }
 
-interface Output {
-  key: string;
-  value: string;
-}
-
-function convertGpuAttributesSdl(input: Input): Output[] {
-  const output: Output[] = [];
+function convertGpuAttributesIcl(input: Input): GPUAttributesManifest[] {
+  const output: GPUAttributesManifest[] = [];
 
   for (const vendor in input.vendor) {
     if (input.vendor.hasOwnProperty(vendor)) {
@@ -482,17 +430,19 @@ function convertGpuAttributesSdl(input: Input): Output[] {
   return output;
 }
 
-export const getManifestIcl = (yamlInput: any): any => {
-  const input = yaml.load(yamlInput) as any;
+export const getManifestIcl = (
+  yamlInput: string
+): { name: string; services: ServiceManifest[] }[] => {
+  const input = yaml.load(yamlInput) as IclYaml;
 
-  const placements = input.profiles.placement;
+  const placements = input.profiles?.placement;
   const placement = Object.keys(placements)[0];
 
   return [
     {
       name: placement,
       services: Object.entries(input.services).map(([serviceName, serviceData], index) => {
-        const { image, expose, env, command, args, credentials, pull_policy } = serviceData as any;
+        const { image, env, command, args, credentials, pull_policy } = serviceData as Service;
         const { cpu, memory, storage, gpu } = input.profiles.compute[serviceName].resources;
         const count = input.deployment[serviceName][placement].count;
 
@@ -530,90 +480,15 @@ export const getManifestIcl = (yamlInput: any): any => {
               units: {
                 val: gpu?.units.toString() || '0',
               },
-              attributes: gpu?.attributes ? convertGpuAttributesSdl(gpu?.attributes) : [],
+              attributes: gpu?.attributes ? convertGpuAttributesIcl(gpu?.attributes) : [],
             },
-            endpoints: serviceResourceEndpoints(serviceData as any, input),
+            endpoints: serviceResourceEndpoints(serviceData, input),
           },
-          count: count,
-          expose: manifestExpose(serviceData as any, input),
+          count,
+          expose: manifestExpose(serviceData, input),
           params: null,
         };
       }),
     },
   ];
-};
-
-export const sampleIcl = `# Welcome to the Spheron Network! 🚀☁
-# This file is called a Infrastructure Composition Language (ICL)
-# ICL is a human friendly data standard for declaring deployment attributes.
-# The ICL file is a "form" to request resources from the Network.
-# ICL is compatible with the YAML standard and similar to Docker Compose files.
-
----
-version: "1.0"
-services:
-  gpu-test:
-    image: ghcr.io/open-webui/open-webui:ollama
-    expose:
-      - port: 8888
-        as: 80
-        to:
-          - global: true
-    env:
-      - TEST=test
-profiles:
-  name: hello-world
-  duration: 2min
-  tier:
-    - community
-  compute:
-    gpu-test:
-      resources:
-        cpu:
-          units: 1
-        memory:
-          size: 20Gi
-        storage:
-          - size: 100Gi
-        gpu:
-          units: 1
-          attributes:
-            vendor:
-              nvidia:
-                - model: a40
-                - model: a10
-                - model: rtx4090
-                - model: rtx3090Ti
-                - model: rtx4080
-                - model: rtx3090
-                - model: h100
-                - model: a100
-                - model: v100
-                - model: rtx3060
-                - model: p100
-                - model: rtx4000
-                - model: rtxa4000
-                - model: rtx2070
-                - model: gtx1080
-                - model: 1080Ti
-  placement:
-    westcoast:
-      attributes:
-        region: us-central
-      pricing:
-        gpu-test:
-          denom: USDT
-          amount: 50000000
-deployment:
-  gpu-test:
-    westcoast:
-      profile: gpu-test
-      count: 1
-`;
-
-export const getRegion = (specs: any): string | undefined => {
-  const regionAttribute = specs.PlacementsRequirement.Attributes.find(
-    (attribute: any) => attribute.Key === 'region'
-  );
-  return regionAttribute?.Value;
 };

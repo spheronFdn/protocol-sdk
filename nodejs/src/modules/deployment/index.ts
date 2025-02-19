@@ -2,12 +2,19 @@ import { NetworkType, networkType } from '@config/index';
 import { EscrowModule } from '@modules/escrow';
 import { LeaseModule } from '@modules/lease';
 import { OrderModule } from '@modules/order';
+import {
+  OrderMatchedEvent,
+  OrderUpdateAcceptedEvent,
+  OrderUpdatedEvent,
+} from '@modules/order/types';
 import { ProviderModule } from '@modules/provider';
+import { IProvider } from '@modules/provider/types';
 import { SpheronProviderModule } from '@modules/spheron-provider';
 import { getManifestIcl, yamlToOrderDetails } from '@utils/deployment';
 import { getTokenDetails } from '@utils/index';
 import { createAuthorizationToken } from '@utils/provider-auth';
 import { ethers } from 'ethers';
+import { CreateDeploymentResponse } from './types';
 
 export class DeploymentModule {
   private wallet: ethers.Wallet | undefined;
@@ -34,22 +41,18 @@ export class DeploymentModule {
     createOrderMatchedCallback?: (transactionHash: string) => void,
     createOrderFailedCallback?: (transactionHash: string) => void,
     isOperator: boolean = false
-  ) {
+  ): Promise<CreateDeploymentResponse> {
     try {
       const { error, orderDetails: details } = yamlToOrderDetails(iclYaml);
-      if (error) {
+      if (error || typeof details === 'undefined') {
         throw new Error('Please verify YAML format');
       }
       const sdlManifest = getManifestIcl(iclYaml);
       const { token, maxPrice, numOfBlocks } = details;
       const tokenDetails = getTokenDetails(token, networkType as NetworkType);
-      const decimal =
-        tokenDetails?.symbol === 'USDT' ||
-        tokenDetails?.symbol === 'USDC' ||
-        tokenDetails?.symbol === 'CST'
-          ? 18
-          : tokenDetails?.decimal;
-      const totalCost = Number(maxPrice.toString() / 10 ** (decimal || 0)) * Number(numOfBlocks);
+      const decimal = 18;
+      const totalCost =
+        Number(Number(maxPrice.toString()) / 10 ** (decimal || 0)) * Number(numOfBlocks);
 
       if (!this.wallet) {
         throw new Error('Unable to access wallet');
@@ -66,19 +69,21 @@ export class DeploymentModule {
       }
       try {
         const transaction = await this.orderModule.createOrder(details);
-        const newOrderEvent: any = this.orderModule.listenToOrderCreated(
+        const newOrderEvent: Promise<OrderMatchedEvent> = this.orderModule.listenToOrderCreated(
           60_000,
           () => {
-            createOrderMatchedCallback?.(transaction.hash);
+            createOrderMatchedCallback?.(transaction?.hash || '');
           },
           () => {
-            createOrderFailedCallback?.(transaction.hash);
+            createOrderFailedCallback?.(transaction?.hash || '');
           }
         );
         const { orderId, providerAddress } = await newOrderEvent;
 
-        const { certificate, hostUri }: { certificate: string; hostUri: string } =
-          (await this.providerModule.getProviderDetails(providerAddress)) as any;
+        const providerDetails: IProvider = await this.providerModule.getProviderDetails(
+          providerAddress
+        );
+        const { certificate, hostUri } = providerDetails;
         const authToken = await createAuthorizationToken(this.wallet);
         const port = details.mode === 0 ? 8543 : 8443;
         const spheronProvider = new SpheronProviderModule(
@@ -116,21 +121,15 @@ export class DeploymentModule {
   ) {
     try {
       const { error, orderDetails: details } = yamlToOrderDetails(iclYaml);
-      if (error) {
+      if (error || typeof details === 'undefined') {
         throw new Error('Please verify YAML format');
       }
-      delete details.creator;
-      delete details.id;
       const sdlManifest = getManifestIcl(iclYaml);
       const { token, maxPrice, numOfBlocks } = details;
       const tokenDetails = getTokenDetails(token, networkType as NetworkType);
-      const decimal =
-        tokenDetails?.symbol === 'USDT' ||
-        tokenDetails?.symbol === 'USDC' ||
-        tokenDetails?.symbol === 'CST'
-          ? 18
-          : tokenDetails?.decimal;
-      const totalCost = Number(maxPrice.toString() / 10 ** (decimal || 0)) * Number(numOfBlocks);
+      const decimal = 18;
+      const totalCost =
+        Number(Number(maxPrice.toString()) / 10 ** (decimal || 0)) * Number(numOfBlocks);
 
       if (!this.wallet) {
         throw new Error('Unable to access wallet');
@@ -146,7 +145,7 @@ export class DeploymentModule {
         throw new Error('Insufficient Balance');
       }
 
-      const updatedOrderLease: any = this.orderModule.listenToOrderUpdated(
+      const updatedOrderLease: Promise<OrderUpdatedEvent> = this.orderModule.listenToOrderUpdated(
         120_000,
         (orderId, providerAddress) => {
           updatedOrderLeaseCallback?.(orderId, providerAddress);
@@ -155,22 +154,25 @@ export class DeploymentModule {
           updatedOrderLeaseFailedCallback?.();
         }
       );
-      const updateOrderAcceptance: any = this.orderModule.listenToOrderUpdateAccepted(
-        120_000,
-        (orderId) => {
-          updateOrderAcceptedCallback?.(orderId);
-        },
-        () => {
-          updateOrderFailedCallback?.();
-        }
-      );
+      const updateOrderAcceptance: Promise<OrderUpdateAcceptedEvent> =
+        this.orderModule.listenToOrderUpdateAccepted(
+          120_000,
+          (orderId) => {
+            updateOrderAcceptedCallback?.(orderId);
+          },
+          () => {
+            updateOrderFailedCallback?.();
+          }
+        );
 
       await this.orderModule.updateOrder(leaseId, details);
       const updateOrderAcceptanceResponse = await updateOrderAcceptance;
 
       const { orderId, providerAddress } = updateOrderAcceptanceResponse;
-      const { certificate, hostUri }: { certificate: string; hostUri: string } =
-        (await this.providerModule.getProviderDetails(providerAddress)) as any;
+      const providerDetails: IProvider = await this.providerModule.getProviderDetails(
+        providerAddress
+      );
+      const { certificate, hostUri } = providerDetails;
       const port = details.mode === 0 ? 8543 : 8443;
       const spheronProvider = new SpheronProviderModule(
         `https://${hostUri}:${port}`,
@@ -201,8 +203,10 @@ export class DeploymentModule {
       }
       const { providerAddress, fizzId } = await this.leaseModule.getLeaseDetails(leaseId);
       const port = fizzId?.toString() !== '0' ? 8543 : 8443;
-      const { certificate, hostUri }: { certificate: string; hostUri: string } =
-        (await this.providerModule.getProviderDetails(providerAddress)) as any;
+      const providerDetails: IProvider = await this.providerModule.getProviderDetails(
+        providerAddress
+      );
+      const { certificate, hostUri } = providerDetails;
 
       const spheronProvider = new SpheronProviderModule(
         `https://${hostUri}:${port}`,
@@ -231,8 +235,10 @@ export class DeploymentModule {
       }
       const { providerAddress, fizzId } = await this.leaseModule.getLeaseDetails(leaseId);
       const port = fizzId?.toString() !== '0' ? 8543 : 8443;
-      const { certificate, hostUri }: { certificate: string; hostUri: string } =
-        (await this.providerModule.getProviderDetails(providerAddress)) as any;
+      const providerDetails: IProvider = await this.providerModule.getProviderDetails(
+        providerAddress
+      );
+      const { certificate, hostUri } = providerDetails;
 
       const spheronProvider = new SpheronProviderModule(
         `https://${hostUri}:${port}`,

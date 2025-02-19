@@ -7,13 +7,18 @@ export type ServiceExposeHttpOptions = {
   nextCases: string[];
 };
 
+export type Hosts = string[] | null;
+
 export type ServiceExpose = {
   port: number;
+  portRange: string | number;
+  portRangeAs: string | number;
+  usePublicPort: boolean;
   externalPort: number;
   proto: string;
-  service: any;
+  service: string;
   global: boolean;
-  hosts: any;
+  hosts: Hosts;
   httpOptions: ServiceExposeHttpOptions;
   ip: string;
   endpointSequenceNumber: number;
@@ -35,9 +40,7 @@ export type HTTPOptions = {
   next_cases: string[];
 };
 
-export type Accept = {
-  items?: string[];
-};
+export type Accept = string[] | null;
 
 export type Expose = {
   port: number;
@@ -72,68 +75,83 @@ export type ServiceImageCredentials = {
   password: string;
 };
 
-export type Service = {
+export interface Service {
   image: string;
+  pull_policy?: string;
   command: string[] | null;
   args: string[] | null;
   env: string[] | null;
   expose: Expose[];
   dependencies?: Dependency[];
-  params?: ServiceParams;
+  params?: ServiceParams | null;
   credentials?: ServiceImageCredentials;
+}
+
+export type ICL = {
+  services: Record<string, Service>;
 };
 
-function computeEndpointSequenceNumbers(sdl: any) {
+export interface GPUAttributesManifest {
+  key: string;
+  value: string;
+}
+export interface ServiceManifest extends Omit<Service, 'expose'> {
+  name: string;
+  resources: {
+    cpu: { units: { val: string } };
+    memory: { size: { val: string } };
+    storage: { size: { val: string } } | { size: { val: string } }[];
+    gpu?: { units: { val: string }; attributes: GPUAttributesManifest[] };
+  };
+  count: number | undefined;
+  expose: ServiceExpose[];
+}
+
+function computeEndpointSequenceNumbers(icl: ICL): Record<string, number> {
   return Object.fromEntries(
-    Object.values(sdl.services).flatMap(
-      (service: any) =>
-        service.expose?.flatMap((expose: any) =>
+    Object.values(icl.services).flatMap(
+      (service) =>
+        service.expose?.flatMap((expose) =>
           expose.to
             ? expose.to
-                .filter((to: any) => to.global && to.ip?.length > 0)
-                .map((to: any) => to.ip)
+                .filter((to) => to.global && to.ip?.length > 0)
+                .map((to) => to.ip)
                 .sort()
-                .map((ip: any, index: number) => [ip, index + 1])
+                .map((ip, index) => [ip, index + 1])
             : []
         ) || []
     )
   );
 }
 
-function parseServiceProto(proto?: string) {
+function parseServiceProto(proto?: string): string {
   const raw = proto?.toUpperCase();
-  let result = 'TCP';
-
   switch (raw) {
     case 'TCP':
     case '':
     case undefined:
-      result = 'TCP';
-      break;
+      return 'TCP';
     case 'UDP':
-      result = 'UDP';
-      break;
+      return 'UDP';
     default:
       throw new Error('ErrUnsupportedServiceProtocol');
   }
-
-  return result;
 }
 
-function manifestExposeService(to: ExposeTo) {
+function manifestExposeService(to: ExposeTo): string {
   return to.service || '';
 }
 
-function manifestExposeGlobal(to: ExposeTo) {
+function manifestExposeGlobal(to: ExposeTo): boolean {
   return to.global || false;
 }
 
-function manifestExposeHosts(expose: Expose) {
+function manifestExposeHosts(expose: Expose): Hosts {
   return expose.accept || null;
 }
 
-export function manifestExpose(service: Service, sdl: any): ServiceExpose[] {
-  const endpointSequenceNumbers = computeEndpointSequenceNumbers(sdl);
+export function manifestExpose(service: Service, icl: ICL): ServiceExpose[] {
+  const endpointSequenceNumbers = computeEndpointSequenceNumbers(icl);
   return service.expose?.flatMap((expose) =>
     expose.to
       ? expose.to.map((to) => ({
@@ -174,14 +192,13 @@ function exposeShouldBeIngress(expose: {
   global: boolean;
   externalPort: number;
   port: number;
-}) {
+}): boolean {
   const externalPort = expose.externalPort === 0 ? expose.port : expose.externalPort;
-
   return expose.global && expose.proto === 'TCP' && externalPort === 80;
 }
 
-export function serviceResourceEndpoints(service: Service, sdl: any) {
-  const endpointSequenceNumbers = computeEndpointSequenceNumbers(sdl);
+export function serviceResourceEndpoints(service: Service, icl: ICL) {
+  const endpointSequenceNumbers = computeEndpointSequenceNumbers(icl);
   const endpoints = service.expose?.flatMap((expose) =>
     expose.to
       ? expose.to
@@ -193,20 +210,12 @@ export function serviceResourceEndpoints(service: Service, sdl: any) {
               proto: parseServiceProto(expose.proto),
               global: !!to.global,
             };
-
             const kind = exposeShouldBeIngress(exposeSpec) ? 0 : 1;
-
-            const defaultEp =
-              kind !== 0 ? { kind: kind, sequence_number: 0 } : { kind: 0, sequence_number: 0 };
-
+            const defaultEp = { kind, sequence_number: 0 };
             const leasedEp =
               to.ip?.length > 0
-                ? {
-                    kind: 2,
-                    sequence_number: endpointSequenceNumbers[to.ip] || 0,
-                  }
+                ? { kind: 2, sequence_number: endpointSequenceNumbers[to.ip] || 0 }
                 : undefined;
-
             return leasedEp ? [defaultEp, leasedEp] : [defaultEp];
           })
       : []

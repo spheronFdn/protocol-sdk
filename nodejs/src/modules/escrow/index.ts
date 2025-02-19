@@ -2,7 +2,7 @@ import EscrowAbi from '@contracts/abis/testnet/Escrow.json';
 import TokenAbi from '@contracts/abis/testnet/TestToken.json';
 import { EscrowTestnet as Escrow } from '@contracts/addresses';
 import { ethers } from 'ethers';
-import { DepositData, TransactionData } from './types';
+import { DepositData, TransactionData, UserBalance } from './types';
 import { networkType, tokenMap } from '@config/index';
 import { initializeSigner } from '@utils/index';
 import { handleContractError } from '@utils/errors';
@@ -28,7 +28,7 @@ export class EscrowModule {
       if (!tokenDetails) {
         throw new Error('Provided token symbol is invalid.');
       }
-      const tokenAddress: any =
+      const tokenAddress: string =
         tokenDetails?.address || '0x0000000000000000000000000000000000000000';
 
       let userWalletAddress;
@@ -44,7 +44,7 @@ export class EscrowModule {
 
       const response = await contract.getUserData(userWalletAddress, tokenAddress, isOperator);
 
-      const userData: { lockedBalance: string; unlockedBalance: string; token: any } = {
+      const userData: UserBalance = {
         lockedBalance: response[0].toString(),
         unlockedBalance: response[1].toString(),
         token: {
@@ -77,7 +77,7 @@ export class EscrowModule {
         throw new Error('Provided token symbol is invalid.');
       }
       const decimals = tokenDetails?.decimal ?? 18;
-      const tokenAddress: any = tokenDetails?.address;
+      const tokenAddress: string = tokenDetails?.address;
 
       const contract = new ethers.Contract(contractAddress, contractABI, signer);
       const tokenContract = new ethers.Contract(tokenAddress, tokenABI, signer);
@@ -112,7 +112,7 @@ export class EscrowModule {
         throw new Error('Provided token symbol is invalid.');
       }
       const decimals = tokenDetails?.decimal ?? 18;
-      const tokenAddress: any = tokenDetails?.address;
+      const tokenAddress: string = tokenDetails?.address;
 
       const contract = new ethers.Contract(contractAddress, contractABI, signer);
 

@@ -6,7 +6,14 @@ import {
   ProviderAttributeRegistryTestnet as ProviderAttributeRegistry,
 } from '@contracts/addresses';
 import { ethers } from 'ethers';
-import { Attribute, Category, IProvider, Provider, ProviderStatus } from './types';
+import {
+  Attribute,
+  Category,
+  IProvider,
+  Provider,
+  ProviderStatus,
+  RawProviderAttribute,
+} from './types';
 import { isValidEthereumAddress } from '@utils/index';
 import { handleContractError } from '@utils/errors';
 import { decompressProviderSpec } from '@utils/spec';
@@ -18,7 +25,7 @@ export class ProviderModule {
     this.provider = provider;
   }
 
-  async getProviderDetails(providerAddress: string) {
+  async getProviderDetails(providerAddress: string): Promise<IProvider> {
     if (!providerAddress) {
       throw new Error('Pass Provider Address');
     }
@@ -102,7 +109,7 @@ export class ProviderModule {
     }
   }
 
-  async getProvider(providerId: bigint): Promise<any> {
+  async getProvider(providerId: bigint): Promise<Provider> {
     try {
       const contractAddress = ProviderRegistry;
       const contractAbi = ProviderRegistryAbi;
@@ -117,7 +124,10 @@ export class ProviderModule {
         region = Region;
       } catch {
         try {
-          const { Name, Region } = decompressProviderSpec(providerData.spec) as any;
+          const { Name, Region } = decompressProviderSpec(providerData.spec) as {
+            Name: string;
+            Region: string;
+          };
           name = Name;
           region = Region;
         } catch {
@@ -145,7 +155,7 @@ export class ProviderModule {
     }
   }
 
-  async getProviderByAddress(walletAddress: string): Promise<any> {
+  async getProviderByAddress(walletAddress: string): Promise<Provider> {
     try {
       const contractAddress = ProviderRegistry;
       const contractAbi = ProviderRegistryAbi;
@@ -161,7 +171,10 @@ export class ProviderModule {
         region = Region;
       } catch {
         try {
-          const { Name, Region } = decompressProviderSpec(providerData.spec) as any;
+          const { Name, Region } = decompressProviderSpec(providerData.spec) as {
+            Name: string;
+            Region: string;
+          };
           name = Name;
           region = Region;
         } catch {
@@ -180,6 +193,7 @@ export class ProviderModule {
         status: providerData.status,
         tier: providerData.tier,
         joinTimestamp: providerData.joinTimestamp,
+        walletAddress,
         rewardWallet: providerData.rewardWallet,
       };
     } catch (error) {
@@ -196,15 +210,18 @@ export class ProviderModule {
       const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
       const providersData = await contract.getAllProviders();
 
-      const providers: Provider[] = providersData.map((provider: any) => {
+      const providers: Provider[] = providersData.map((provider: Provider) => {
         let name, region;
         try {
-          const { Name, Region } = JSON.parse(provider.spec);
+          const { Name, Region } = JSON.parse(provider.spec as string);
           name = Name;
           region = Region;
         } catch {
           try {
-            const { Name, Region } = decompressProviderSpec(provider.spec) as any;
+            const { Name, Region } = decompressProviderSpec(provider.spec as string) as {
+              Name: string;
+              Region: string;
+            };
             name = Name;
             region = Region;
           } catch {
@@ -215,7 +232,7 @@ export class ProviderModule {
         return {
           name,
           region,
-          providerId: provider.providerId.toString(),
+          providerId: (provider.providerId as bigint).toString(),
           walletAddress: provider.walletAddress,
           paymentsAccepted: provider.paymentsAccepted,
           spec: provider.spec,
@@ -243,9 +260,12 @@ export class ProviderModule {
 
       const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
 
-      const attributes: Attribute[] = await contract.getAttributes(providerAddress, category);
+      const attributes: RawProviderAttribute[] = await contract.getAttributes(
+        providerAddress,
+        category
+      );
 
-      const decoratedAttributes = attributes.map((attr: any) => ({
+      const decoratedAttributes = attributes.map((attr: RawProviderAttribute) => ({
         id: attr[0],
         units: attr[1],
       }));
@@ -263,12 +283,12 @@ export class ProviderModule {
 
       const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
 
-      const attributes: Attribute[] = await contract.getPendingAttributes(
+      const attributes: RawProviderAttribute[] = await contract.getPendingAttributes(
         providerAddress,
         category
       );
 
-      const decoratedAttributes = attributes.map((attr: any) => ({
+      const decoratedAttributes = attributes.map((attr: RawProviderAttribute) => ({
         id: attr[0],
         units: attr[1],
       }));

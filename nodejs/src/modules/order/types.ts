@@ -18,7 +18,7 @@ export interface OrderDetails {
   numOfBlocks: bigint;
   token: string;
   spec: string;
-  version: number;
+  version: number | bigint;
   mode: Mode;
   tier: Tier[];
 }
@@ -41,9 +41,6 @@ export interface InitialOrder {
   id: number;
   name: string;
   region: string;
-  uptime: number;
-  reputation: number;
-  slashes: number;
   maxPrice: number;
   numOfBlocks: number;
   token?: {
@@ -54,4 +51,24 @@ export interface InitialOrder {
   creator: string;
   state: OrderState;
   specs: OrderSpecs;
+}
+
+export interface OrderMatchedEvent {
+  orderId: string;
+  providerAddress: string;
+  providerId: string | number | bigint;
+  acceptedPrice: string | number | bigint;
+  creatorAddress: string;
+}
+
+export interface OrderUpdatedEvent {
+  orderId: string;
+  providerAddress: string;
+  tenantAddress: string;
+  acceptedPrice: string | number | bigint;
+}
+
+export interface OrderUpdateAcceptedEvent {
+  orderId: string;
+  providerAddress: string;
 }

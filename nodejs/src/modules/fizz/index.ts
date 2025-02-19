@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import FizzRegistryAbi from '@contracts/abis/testnet/FizzRegistry.json';
 import FizzAttributeRegistryAbi from '@contracts/abis/testnet/FizzAttributeRegistry.json';
 import ResourceRegistryAbi from '@contracts/abis/testnet/ResourceRegistry.json';
@@ -17,6 +16,9 @@ import {
   FizzLease,
   Resource,
   FizzAttribute,
+  FizzDetails,
+  RawFizzNode,
+  RawFizzAttribute,
   // FizzProviderTrustTier,
 } from './types';
 import { initializeSigner } from '@utils/index';
@@ -79,7 +81,7 @@ export class FizzModule {
     }
   }
 
-  async getFizzById(fizzId: bigint): Promise<unknown> {
+  async getFizzById(fizzId: bigint): Promise<FizzDetails> {
     try {
       const contractAddress = FizzRegistryTestnet;
       const contractAbi = FizzRegistryAbi;
@@ -122,7 +124,7 @@ export class FizzModule {
       const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
 
       const fizzId = await contract.addressToFizzId(walletAddress);
-      const fizzNode: any = await this.getFizzById(fizzId);
+      const fizzNode: FizzDetails = await this.getFizzById(fizzId);
 
       const result: FizzNode = {
         region: fizzNode.spec?.split(',')?.[7] ?? '',
@@ -166,7 +168,7 @@ export class FizzModule {
 
       const allFizzNodes = await contract.getAllFizzNodes();
 
-      const fizzNodes: FizzNode[] = allFizzNodes.map((fizzNode: any) => ({
+      const fizzNodes: FizzNode[] = allFizzNodes.map((fizzNode: RawFizzNode) => ({
         fizzId: fizzNode[0],
         providerId: fizzNode[1],
         spec: fizzNode[2],
@@ -191,9 +193,12 @@ export class FizzModule {
 
       const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
 
-      const attributes: FizzAttribute[] = await contract.getAttributes(providerAddress, category);
+      const attributes: RawFizzAttribute[] = await contract.getAttributes(
+        providerAddress,
+        category
+      );
 
-      const decoratedAttributes = attributes.map((attr: any) => ({
+      const decoratedAttributes = attributes.map((attr: RawFizzAttribute) => ({
         id: attr[0],
         units: attr[1],
       }));
@@ -211,12 +216,12 @@ export class FizzModule {
 
       const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
 
-      const attributes: FizzAttribute[] = await contract.getPendingAttributes(
+      const attributes: RawFizzAttribute[] = await contract.getPendingAttributes(
         providerAddress,
         category
       );
 
-      const decoratedAttributes = attributes.map((attr: any) => ({
+      const decoratedAttributes = attributes.map((attr: RawFizzAttribute) => ({
         id: attr[0],
         units: attr[1],
       }));
@@ -375,8 +380,8 @@ export class FizzModule {
           reject({ error: true, msg: 'Fizz update failed' });
         }, timeoutTime);
 
-        contract.on('FizzNodeSpecUpdated', (fizzId: bigint, specs: string) => {
-          const fizz: any = this.getFizzById(fizzId);
+        contract.on('FizzNodeSpecUpdated', async (fizzId: bigint, specs: string) => {
+          const fizz: FizzDetails = await this.getFizzById(fizzId);
           if (
             fizz.walletAddress.toString().toLowerCase() === accounts[0].toString().toLowerCase()
           ) {
@@ -435,8 +440,8 @@ export class FizzModule {
           reject({ error: true, msg: 'Fizz update failed' });
         }, timeoutTime);
 
-        contract.on('FizzNodeRegionUpdated', (fizzId: bigint, region: string) => {
-          const fizz: any = this.getFizzById(fizzId);
+        contract.on('FizzNodeRegionUpdated', async (fizzId: bigint, region: string) => {
+          const fizz: FizzDetails = await this.getFizzById(fizzId);
           if (
             fizz.walletAddress.toString().toLowerCase() === accounts[0].toString().toLowerCase()
           ) {
@@ -495,8 +500,8 @@ export class FizzModule {
           reject({ error: true, msg: 'Fizz update failed' });
         }, timeoutTime);
 
-        contract.on('FizzNodeProviderIdUpdated', (fizzId: bigint, providerId: bigint) => {
-          const fizz: any = this.getFizzById(fizzId);
+        contract.on('FizzNodeProviderIdUpdated', async (fizzId: bigint, providerId: bigint) => {
+          const fizz: FizzDetails = await this.getFizzById(fizzId);
           if (
             fizz.walletAddress.toString().toLowerCase() === accounts[0].toString().toLowerCase()
           ) {
@@ -555,8 +560,8 @@ export class FizzModule {
           reject({ error: true, msg: 'Fizz update failed' });
         }, timeoutTime);
 
-        contract.on('PaymentAdded', (fizzId: bigint, tokenAddress: string) => {
-          const fizz: any = this.getFizzById(fizzId);
+        contract.on('PaymentAdded', async (fizzId: bigint, tokenAddress: string) => {
+          const fizz: FizzDetails = await this.getFizzById(fizzId);
           if (
             fizz.walletAddress.toString().toLowerCase() === accounts[0].toString().toLowerCase()
           ) {
@@ -615,8 +620,8 @@ export class FizzModule {
           reject({ error: true, msg: 'Fizz update failed' });
         }, timeoutTime);
 
-        contract.on('PaymentRemoved', (fizzId: bigint, tokenAddress: string) => {
-          const fizz: any = this.getFizzById(fizzId);
+        contract.on('PaymentRemoved', async (fizzId: bigint, tokenAddress: string) => {
+          const fizz: FizzDetails = await this.getFizzById(fizzId);
           if (
             fizz.walletAddress.toString().toLowerCase() === accounts[0].toString().toLowerCase()
           ) {
