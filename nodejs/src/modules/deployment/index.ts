@@ -14,7 +14,7 @@ import { getManifestIcl, yamlToOrderDetails } from '@utils/deployment';
 import { getTokenDetails } from '@utils/index';
 import { createAuthorizationToken } from '@utils/provider-auth';
 import { ethers } from 'ethers';
-import { CreateDeploymentResponse } from './types';
+import { CreateDeploymentResponse, DeploymentResponse } from './types';
 
 export class DeploymentModule {
   private wallet: ethers.Wallet | undefined;
@@ -192,7 +192,7 @@ export class DeploymentModule {
     }
   }
 
-  async getDeployment(leaseId: string, providerProxyUrl: string) {
+  async getDeployment(leaseId: string, providerProxyUrl: string): Promise<DeploymentResponse> {
     try {
       if (!this.wallet) {
         throw new Error('Unable to access wallet');
@@ -224,7 +224,7 @@ export class DeploymentModule {
     leaseId: string,
     providerProxyUrl: string,
     logsOptions?: { service?: string; tail?: number; startup?: boolean }
-  ) {
+  ): Promise<string[]> {
     try {
       if (!this.wallet) {
         throw new Error('Unable to access wallet');
