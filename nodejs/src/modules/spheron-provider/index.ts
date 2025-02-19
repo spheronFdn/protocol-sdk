@@ -1,6 +1,7 @@
 import { GSEQ, OSEQ } from '@config/index';
 import { LeaseModule } from '@modules/lease';
 import { requestPipeline } from '@utils/index';
+import { ServiceManifest } from '@utils/manifest-utils';
 import { ethers } from 'ethers';
 
 export class SpheronProviderModule {
@@ -47,8 +48,12 @@ export class SpheronProviderModule {
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async submitManfiest(certificate: string, authToken: string, leaseId: string, sdlManifest: any) {
+  async submitManfiest(
+    certificate: string,
+    authToken: string,
+    leaseId: string,
+    sdlManifest: { name: string; services: ServiceManifest[] }[]
+  ) {
     // if (!certificate) {
     //   console.log('Certificate not found');
     //   return;

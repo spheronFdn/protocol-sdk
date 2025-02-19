@@ -2,15 +2,15 @@ export interface IProvider {
   spec: string;
   hostUri: string;
   certificate: string;
-  paymentsAccepted: any;
+  paymentsAccepted: string[];
   status: string;
   trust: number;
   timestamp: number;
 }
 
 export interface Attribute {
-  id: bigint;
-  units: bigint;
+  id: bigint | string;
+  units: bigint | string;
 }
 
 export enum ProviderStatus {
@@ -33,12 +33,12 @@ export enum ProviderTrustTier {
 }
 
 export interface Provider {
-  providerId: bigint;
+  providerId?: bigint;
   name: string;
   region: string;
+  spec?: string;
   walletAddress: string;
   paymentsAccepted: string[];
-  attributes: string;
   hostUri: string;
   certificate: string;
   status: ProviderStatus;
@@ -48,3 +48,5 @@ export interface Provider {
 }
 
 export type Category = 'CPU' | 'GPU';
+
+export type RawProviderAttribute = [id: string, units: string];

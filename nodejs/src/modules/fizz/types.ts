@@ -6,6 +6,17 @@ export interface FizzParams {
   rewardWallet: string;
 }
 
+export type RawFizzNode = [
+  bigint, // fizzId
+  bigint, // providerId
+  string, // spec
+  string, // walletAddress
+  string[], // paymentsAccepted
+  bigint, // status
+  bigint, // joinTimestamp
+  string // rewardWallet
+];
+
 export interface FizzNode {
   fizzId: bigint;
   providerId: bigint;
@@ -14,6 +25,17 @@ export interface FizzNode {
   walletAddress: string;
   paymentsAccepted: string[];
   status: number;
+  joinTimestamp: bigint;
+  rewardWallet: string;
+}
+
+export interface FizzDetails {
+  region: string;
+  providerId: bigint;
+  spec: string;
+  walletAddress: string;
+  paymentsAccepted: string[];
+  status: bigint;
   joinTimestamp: bigint;
   rewardWallet: string;
 }
@@ -90,6 +112,8 @@ export interface FizzProvider {
 }
 
 export interface FizzAttribute {
-  id: bigint;
-  units: bigint;
+  id: bigint | string;
+  units: bigint | string;
 }
+
+export type RawFizzAttribute = [id: string, units: string];

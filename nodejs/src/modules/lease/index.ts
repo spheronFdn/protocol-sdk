@@ -9,6 +9,8 @@ import { DEFAULT_PAGE_SIZE } from '@config/index';
 import { FizzModule } from '@modules/fizz';
 import { ProviderModule } from '@modules/provider';
 import { handleContractError } from '@utils/errors';
+import { FizzDetails } from '@modules/fizz/types';
+import { Provider } from '@modules/provider/types';
 
 export class LeaseModule {
   private provider: ethers.Provider;
@@ -120,10 +122,10 @@ export class LeaseModule {
 
         let region;
         if (lease.fizzId.toString() !== '0') {
-          const fizz: any = await this.fizzModule.getFizzById(BigInt(lease.fizzId));
+          const fizz: FizzDetails = await this.fizzModule.getFizzById(BigInt(lease.fizzId));
           region = fizz?.region;
         } else {
-          const provider: any = await this.providerModule.getProviderByAddress(
+          const provider: Provider = await this.providerModule.getProviderByAddress(
             lease.providerAddress
           );
           region = provider?.region;

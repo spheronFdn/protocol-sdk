@@ -30,3 +30,15 @@ export interface DepositData {
   onSuccessCallback?: (data: unknown) => void;
   onFailureCallback?: (data: unknown) => void;
 }
+
+export interface TokenDetails {
+  name: string;
+  symbol: string;
+  decimal: number;
+}
+
+export interface UserBalance {
+  lockedBalance: string;
+  unlockedBalance: string;
+  token: TokenDetails;
+}
