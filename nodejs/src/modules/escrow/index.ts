@@ -237,4 +237,28 @@ export class EscrowModule {
       throw errorMessage;
     }
   }
+
+  async depositForOperator(
+    tokenAddress: string,
+    amount: string,
+    operatorAddress: string,
+    onSuccessCallback?: (data: unknown) => void,
+    onFailureCallback?: (data: unknown) => void
+  ) {
+    try {
+      const { signer } = await initializeSigner({ wallet: this.wallet });
+      const contractABI = EscrowAbi;
+      const contractAddress = Escrow;
+      const contract = new ethers.Contract(contractAddress, contractABI, signer);
+
+      const result = await contract.depositForOperator(tokenAddress, amount, operatorAddress);
+      const receipt = await result.wait();
+      if (onSuccessCallback) onSuccessCallback(receipt);
+      return receipt;
+    } catch (error) {
+      if (onFailureCallback) onFailureCallback(error);
+      const errorMessage = handleContractError(error, EscrowAbi);
+      throw errorMessage;
+    }
+  }
 }
