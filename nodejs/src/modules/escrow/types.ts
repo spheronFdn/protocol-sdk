@@ -31,6 +31,10 @@ export interface DepositData {
   onFailureCallback?: (data: unknown) => void;
 }
 
+export interface DepositForOperatorData extends DepositData {
+  operatorAddress: string;
+}
+
 export interface TokenDetails {
   name: string;
   symbol: string;
