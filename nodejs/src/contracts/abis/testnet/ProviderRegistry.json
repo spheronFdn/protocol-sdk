@@ -1080,7 +1080,7 @@
         "type": "address"
       }
     ],
-    "name": "updateRewardAdress",
+    "name": "updateRewardAddress",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
