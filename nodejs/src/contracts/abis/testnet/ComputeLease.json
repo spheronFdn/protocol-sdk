@@ -253,7 +253,7 @@
       },
       {
         "internalType": "address",
-        "name": "_providerAdress",
+        "name": "_providerAddress",
         "type": "address"
       }
     ],
@@ -289,7 +289,7 @@
       },
       {
         "internalType": "address",
-        "name": "_providerAdress",
+        "name": "_providerAddress",
         "type": "address"
       },
       {
@@ -545,7 +545,7 @@
         "type": "address"
       }
     ],
-    "name": "updateEscrowAdress",
+    "name": "updateEscrowAddress",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -558,7 +558,7 @@
         "type": "address"
       }
     ],
-    "name": "updateOrderRequestAdress",
+    "name": "updateOrderRequestAddress",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
