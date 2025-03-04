@@ -4,6 +4,7 @@ import ProviderAttributeRegistryAbi from '@contracts/abis/testnet/ProviderAttrib
 import {
   ProviderRegistryTestnet as ProviderRegistry,
   ProviderAttributeRegistryTestnet as ProviderAttributeRegistry,
+  contractAddresses,
 } from '@contracts/addresses';
 import { ethers } from 'ethers';
 import {
@@ -17,12 +18,16 @@ import {
 import { isValidEthereumAddress } from '@utils/index';
 import { handleContractError } from '@utils/errors';
 import { decompressProviderSpec } from '@utils/spec';
+import { NetworkType } from '@config/index';
+import { abiMap } from '@contracts/abi-map';
 
 export class ProviderModule {
   private provider: ethers.Provider;
+  private networkType: NetworkType | undefined;
 
-  constructor(provider: ethers.Provider) {
+  constructor(provider: ethers.Provider, networkType?: NetworkType) {
     this.provider = provider;
+    this.networkType = networkType;
   }
 
   async getProviderDetails(providerAddress: string): Promise<IProvider> {
@@ -34,8 +39,8 @@ export class ProviderModule {
       throw new Error('Pass Valid Address');
     }
     try {
-      const contractAbi = ProviderRegistryAbi;
-      const contractAddress = ProviderRegistry;
+      const contractAbi = abiMap[this.networkType as NetworkType].providerRegistry;
+      const contractAddress = contractAddresses[this.networkType as NetworkType].providerRegistry;
 
       const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
       const response = await contract.getProviderByAddress(providerAddress);
@@ -70,8 +75,9 @@ export class ProviderModule {
       throw new Error('Please pass a category');
     }
     try {
-      const contractAbi = ProviderAttributeRegistryAbi;
-      const contractAddress = ProviderAttributeRegistry;
+      const contractAbi = abiMap[this.networkType as NetworkType].providerAttributeRegistry;
+      const contractAddress =
+        contractAddresses[this.networkType as NetworkType].providerAttributeRegistry;
 
       const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
       const response = await contract.getProviderPendingAttributes(providerAddress, category);
@@ -96,8 +102,9 @@ export class ProviderModule {
       throw new Error('Please pass a category');
     }
     try {
-      const contractAbi = ProviderAttributeRegistryAbi;
-      const contractAddress = ProviderAttributeRegistry;
+      const contractAbi = abiMap[this.networkType as NetworkType].providerAttributeRegistry;
+      const contractAddress =
+        contractAddresses[this.networkType as NetworkType].providerAttributeRegistry;
 
       const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
       const response = await contract.getProviderAttributes(providerAddress, category);
@@ -111,8 +118,8 @@ export class ProviderModule {
 
   async getProvider(providerId: bigint): Promise<Provider> {
     try {
-      const contractAddress = ProviderRegistry;
-      const contractAbi = ProviderRegistryAbi;
+      const contractAddress = contractAddresses[this.networkType as NetworkType].providerRegistry;
+      const contractAbi = abiMap[this.networkType as NetworkType].providerRegistry;
 
       const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
       const providerData = await contract.getProvider(providerId);
@@ -157,8 +164,8 @@ export class ProviderModule {
 
   async getProviderByAddress(walletAddress: string): Promise<Provider> {
     try {
-      const contractAddress = ProviderRegistry;
-      const contractAbi = ProviderRegistryAbi;
+      const contractAddress = contractAddresses[this.networkType as NetworkType].providerRegistry;
+      const contractAbi = abiMap[this.networkType as NetworkType].providerRegistry;
 
       const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
 
@@ -204,8 +211,8 @@ export class ProviderModule {
 
   async getAllProviders(): Promise<Provider[]> {
     try {
-      const contractAddress = ProviderRegistry;
-      const contractAbi = ProviderRegistryAbi;
+      const contractAddress = contractAddresses[this.networkType as NetworkType].providerRegistry;
+      const contractAbi = abiMap[this.networkType as NetworkType].providerRegistry;
 
       const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
       const providersData = await contract.getAllProviders();
@@ -255,8 +262,9 @@ export class ProviderModule {
 
   async getAttributes(providerAddress: string, category: string): Promise<Attribute[]> {
     try {
-      const contractAddress = ProviderAttributeRegistry;
-      const contractAbi = ProviderAttributeRegistryAbi;
+      const contractAddress =
+        contractAddresses[this.networkType as NetworkType].providerAttributeRegistry;
+      const contractAbi = abiMap[this.networkType as NetworkType].providerAttributeRegistry;
 
       const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
 
@@ -278,8 +286,9 @@ export class ProviderModule {
 
   async getPendingAttributes(providerAddress: string, category: string): Promise<Attribute[]> {
     try {
-      const contractAddress = ProviderAttributeRegistry;
-      const contractAbi = ProviderAttributeRegistryAbi;
+      const contractAddress =
+        contractAddresses[this.networkType as NetworkType].providerAttributeRegistry;
+      const contractAbi = abiMap[this.networkType as NetworkType].providerAttributeRegistry;
 
       const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
 

@@ -17,20 +17,15 @@ export class SpheronSDK {
   public deployment: DeploymentModule;
 
   constructor(networkType: NetworkType, privateKey?: string) {
-    if (networkType !== 'testnet') {
-      throw new Error(
-        "Please use 'testnet' as network type as Spheron Protocol's mainnet is not launched yet."
-      );
-    }
     const provider = new ethers.JsonRpcProvider(rpcUrls[networkType].HTTP_URL);
     const websocketProvider = new ethers.WebSocketProvider(rpcUrls[networkType].WSS_URL);
     const wallet = privateKey ? new ethers.Wallet(privateKey, provider) : undefined;
 
-    this.leases = new LeaseModule(provider, websocketProvider, wallet);
-    this.orders = new OrderModule(provider, websocketProvider, wallet);
-    this.escrow = new EscrowModule(provider, wallet);
-    this.provider = new ProviderModule(provider);
-    this.fizz = new FizzModule(provider, websocketProvider, wallet);
+    this.leases = new LeaseModule(provider, websocketProvider, wallet, networkType);
+    this.orders = new OrderModule(provider, websocketProvider, wallet, networkType);
+    this.escrow = new EscrowModule(provider, wallet, networkType);
+    this.provider = new ProviderModule(provider, networkType);
+    this.fizz = new FizzModule(provider, websocketProvider, wallet, networkType);
     this.deployment = new DeploymentModule(provider, websocketProvider, wallet);
   }
 }

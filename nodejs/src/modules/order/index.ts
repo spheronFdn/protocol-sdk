@@ -1,6 +1,4 @@
-import { OrderRequestTestnet as OrderRequest, BidTestnet as Bid } from '@contracts/addresses';
-import OrderRequestAbi from '@contracts/abis/testnet/OrderRequest.json';
-import BidAbi from '@contracts/abis/testnet/Bid.json';
+import { contractAddresses } from '@contracts/addresses';
 import { ethers } from 'ethers';
 import {
   InitialOrder,
@@ -13,6 +11,8 @@ import {
 import { getTokenDetails, initializeSigner } from '@utils/index';
 import { getOrderStateAsString } from '@utils/order';
 import { handleContractError } from '@utils/errors';
+import { NetworkType } from '@config/index';
+import { abiMap } from '@contracts/abi-map';
 
 export class OrderModule {
   private provider: ethers.Provider;
@@ -20,30 +20,37 @@ export class OrderModule {
   private createTimeoutId: NodeJS.Timeout | null;
   private updateTimeoutId: NodeJS.Timeout | null;
   private wallet: ethers.Wallet | undefined;
+  private networkType: NetworkType | undefined;
 
   constructor(
     provider: ethers.Provider,
     websocketProvider?: ethers.WebSocketProvider,
-    wallet?: ethers.Wallet
+    wallet?: ethers.Wallet,
+    networkType?: NetworkType
   ) {
     this.provider = provider;
     this.websocketProvider = websocketProvider;
     this.createTimeoutId = null;
     this.updateTimeoutId = null;
     this.wallet = wallet;
+    this.networkType = networkType;
   }
 
   async createOrder(orderDetails: OrderDetails): Promise<ethers.ContractTransactionReceipt | null> {
+    const contractAbi = abiMap[this.networkType as NetworkType].orderRequest;
     try {
       const { signer } = await initializeSigner({ wallet: this.wallet });
 
-      const contract = new ethers.Contract(OrderRequest, OrderRequestAbi, signer);
+      const contractAddress = contractAddresses[this.networkType as NetworkType].orderRequest;
+      const contractAbi = abiMap[this.networkType as NetworkType].orderRequest;
+
+      const contract = new ethers.Contract(contractAddress, contractAbi, signer);
 
       const tx: ethers.ContractTransactionResponse = await contract.createOrder(orderDetails);
       const receipt: ethers.ContractTransactionReceipt | null = await tx.wait();
       return receipt;
     } catch (error) {
-      const errorMessage = handleContractError(error, OrderRequestAbi);
+      const errorMessage = handleContractError(error, contractAbi);
       throw errorMessage;
     }
   }
@@ -52,10 +59,13 @@ export class OrderModule {
     orderId: string,
     orderDetails: OrderDetails
   ): Promise<ethers.ContractTransactionReceipt | null> {
+    const contractAbi = abiMap[this.networkType as NetworkType].orderRequest;
     try {
       const { signer } = await initializeSigner({ wallet: this.wallet });
 
-      const contract = new ethers.Contract(OrderRequest, OrderRequestAbi, signer);
+      const contractAddress = contractAddresses[this.networkType as NetworkType].orderRequest;
+
+      const contract = new ethers.Contract(contractAddress, contractAbi, signer);
 
       const tx: ethers.ContractTransactionResponse = await contract.updateInitialOrder(
         orderId,
@@ -64,14 +74,14 @@ export class OrderModule {
       const receipt: ethers.ContractTransactionReceipt | null = await tx.wait();
       return receipt;
     } catch (error) {
-      const errorMessage = handleContractError(error, OrderRequestAbi);
+      const errorMessage = handleContractError(error, contractAbi);
       throw errorMessage;
     }
   }
 
   async getOrderDetails(leaseId: string): Promise<InitialOrder> {
-    const contractAbi = OrderRequestAbi;
-    const contractAddress = OrderRequest;
+    const contractAbi = abiMap[this.networkType as NetworkType].orderRequest;
+    const contractAddress = contractAddresses[this.networkType as NetworkType].orderRequest;
 
     const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
     const response = await contract.getOrderById(leaseId);
@@ -118,8 +128,8 @@ export class OrderModule {
     const { signer } = await initializeSigner({ wallet: this.wallet });
     const account = await signer.getAddress();
 
-    const contractAbi = BidAbi;
-    const contractAddress = Bid;
+    const contractAbi = abiMap[this.networkType as NetworkType].bid;
+    const contractAddress = contractAddresses[this.networkType as NetworkType].bid;
 
     const contract = new ethers.Contract(contractAddress, contractAbi, this.websocketProvider);
 
@@ -168,8 +178,8 @@ export class OrderModule {
     const { signer } = await initializeSigner({ wallet: this.wallet });
     const account = await signer.getAddress();
 
-    const contractAbi = BidAbi;
-    const contractAddress = Bid;
+    const contractAbi = abiMap[this.networkType as NetworkType].bid;
+    const contractAddress = contractAddresses[this.networkType as NetworkType].bid;
 
     const contract = new ethers.Contract(contractAddress, contractAbi, this.websocketProvider);
 
@@ -204,8 +214,8 @@ export class OrderModule {
     const { signer } = await initializeSigner({ wallet: this.wallet });
     const account = await signer.getAddress();
 
-    const contractAbi = BidAbi;
-    const contractAddress = Bid;
+    const contractAbi = abiMap[this.networkType as NetworkType].bid;
+    const contractAddress = contractAddresses[this.networkType as NetworkType].bid;
 
     const contract = new ethers.Contract(contractAddress, contractAbi, this.websocketProvider);
 
