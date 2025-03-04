@@ -41,6 +41,11 @@ export interface INetwork {
   blockExplorerUrls: string[];
 }
 
+export interface RpcProvider {
+  HTTP_URL: string;
+  WSS_URL: string;
+}
+
 export type NetworkType = 'testnet' | 'mainnet';
 
 export const networkMap: Record<NetworkType, INetwork> = {
