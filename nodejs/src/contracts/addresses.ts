@@ -13,8 +13,8 @@ export const BidTestnet = '0x27930D6ee40E8DB57c713f063f4a97dc37dC3ffb';
 export const ResourceRegistryCPUTestnet = '0x67B8c2201Eef00d1a8193a2aF301312DD21a286B';
 export const ResourceRegistryGPUTestnet = '0x2B73F279044347A3B6c9F122Ec6b479b6C2beAc9';
 export const ResourceRegistryFactoryTestnet = '0xbb132eB1b36D87ef7Ac63c95c05a8a56eCDac3fd';
-export const ProviderRewardsManagerTestnet = '0x6fdbbD18A7575C0125c56Be4AfDbd1392C2be118';
-export const FizzRewardsManagerTestnet = '0xa0b6c8A205fe0B6851BA4Cc2f91BBE530A670519';
+export const ProviderRewardsManagerTestnet = '0x53717Bc3Ba4F84Fd44501b23A92c1F1a3Fc148f0';
+export const FizzRewardsManagerTestnet = '0x92991aCA11aDc8207a397A0bd3Cbc5C8E840b1A5';
 export const RewardTokenTestnet = '0xB28aA1E5074AE0222cf764e2934182775Ee7AB42';
 export const FizzNodeRewardTokenTestnet = '0xA2400EFe3d7a9E2281F32A66Df18CFFE651c69f3';
 
@@ -24,7 +24,7 @@ export const USDCTestnet = '0x816413630c39780677E1584D4a6DbAFd76b161F7';
 export const DAITestnet = '0xcF5F08686dBE94B88b93FB2E8E5482A7f432C892';
 export const WETHTestnet = '0xd74C08f8ffDF88C807367813Ad64a960618f4dcC';
 export const CSTTestnet = '0x8E5996A3963011Ca9dFa04E3CB773147F98C0e17';
-export const SPONTestnet = '0x8E5996A3963011Ca9dFa04E3CB773147F98C0e17';
+export const SPONTestnet = '0x76e593392523243ACD38ceD87c2007F14483a86B';
 
 export const contractAddresses = {
   testnet: {
