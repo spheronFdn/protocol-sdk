@@ -2,7 +2,7 @@ import EscrowAbi from '@contracts/abis/testnet/Escrow.json';
 import TokenAbi from '@contracts/abis/testnet/TestToken.json';
 import { EscrowTestnet as Escrow } from '@contracts/addresses';
 import { ethers } from 'ethers';
-import { DepositData, TransactionData, UserBalance } from './types';
+import { DepositData, DepositForOperatorData, TransactionData, UserBalance } from './types';
 import { networkType, tokenMap } from '@config/index';
 import { initializeSigner } from '@utils/index';
 import { handleContractError } from '@utils/errors';
@@ -233,6 +233,30 @@ export class EscrowModule {
 
       return fizzEarnings;
     } catch (error) {
+      const errorMessage = handleContractError(error, EscrowAbi);
+      throw errorMessage;
+    }
+  }
+
+  async depositForOperator({
+    token,
+    amount,
+    operatorAddress,
+    onSuccessCallback,
+    onFailureCallback,
+  }: DepositForOperatorData) {
+    try {
+      const { signer } = await initializeSigner({ wallet: this.wallet });
+      const contractABI = EscrowAbi;
+      const contractAddress = Escrow;
+      const contract = new ethers.Contract(contractAddress, contractABI, signer);
+
+      const result = await contract.depositForOperator(token, amount, operatorAddress);
+      const receipt = await result.wait();
+      if (onSuccessCallback) onSuccessCallback(receipt);
+      return receipt;
+    } catch (error) {
+      if (onFailureCallback) onFailureCallback(error);
       const errorMessage = handleContractError(error, EscrowAbi);
       throw errorMessage;
     }
