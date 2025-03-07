@@ -17,6 +17,32 @@ export type RawFizzNode = [
   string // rewardWallet
 ];
 
+export interface SubgraphFizzNode {
+  activeLease: number;
+  attributes: {
+    attributeId: string;
+    category: string;
+    id: string;
+    units: number;
+  }[];
+  earnings: any[];
+  fizzId: string;
+  isDenied: boolean;
+  joinTimestamp: string;
+  pendingRewards: string;
+  providerId: string;
+  rewardPerEra: string;
+  rewardWallet: string;
+  status: string;
+  walletAddress: string;
+  slashedAmount: string;
+  totalLease: number;
+  slashedEras: number;
+  spec: string;
+  paymentsAccepted: { id: string }[];
+  region: { id: string };
+}
+
 export interface FizzNode {
   fizzId: bigint;
   providerId: bigint;
