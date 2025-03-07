@@ -19,11 +19,14 @@ import {
   FizzDetails,
   RawFizzNode,
   RawFizzAttribute,
+  SubgraphFizzNode,
   // FizzProviderTrustTier,
 } from './types';
-import { initializeSigner } from '@utils/index';
+import { delay, initializeSigner } from '@utils/index';
 import { handleContractError } from '@utils/errors';
 import { ProviderModule } from '@modules/provider';
+import { fetchSubgraphData, getAllFizzNodesQuery } from '@utils/subgraph';
+import { getStatusNumberFromFizzStatus } from '@utils/fizz';
 
 export class FizzModule {
   private provider: ethers.Provider;
@@ -161,28 +164,58 @@ export class FizzModule {
 
   async getAllFizzNodes(): Promise<FizzNode[]> {
     try {
-      const contractAddress = FizzRegistryTestnet;
-      const contractAbi = FizzRegistryAbi;
+      const totalFizzNodes = (await this.getTotalFizzNodes()).toString();
+      const totalFizzNodesInt = parseInt(totalFizzNodes, 10);
+      const BATCH_SIZE = 1000;
+      const CHUNK_SIZE = 200;
+      const numBatches = Math.ceil(totalFizzNodesInt / BATCH_SIZE);
 
-      const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
+      const requests: Array<() => Promise<any>> = [];
+      for (let i = 0; i < numBatches; i++) {
+        const gt = i * BATCH_SIZE;
+        const variables = { first: BATCH_SIZE, gt };
+        requests.push(
+          () =>
+            fetchSubgraphData(getAllFizzNodesQuery, variables) as Promise<{
+              fizzNodes: SubgraphFizzNode[];
+            }>
+        );
+      }
 
-      const allFizzNodes = await contract.getAllFizzNodes();
+      const results: { fizzNodes: SubgraphFizzNode[] }[] = [];
+      for (let i = 0; i < requests.length; i += CHUNK_SIZE) {
+        const chunk = requests.slice(i, i + CHUNK_SIZE).map((req) => req());
+        const chunkResults = await Promise.allSettled(chunk);
 
-      const fizzNodes: FizzNode[] = allFizzNodes.map((fizzNode: RawFizzNode) => ({
-        fizzId: fizzNode[0],
-        providerId: fizzNode[1],
-        spec: fizzNode[2],
-        walletAddress: fizzNode[3],
-        paymentsAccepted: fizzNode[4],
-        status: fizzNode[5],
-        joinTimestamp: fizzNode[6],
-        rewardWallet: fizzNode[7],
+        chunkResults.forEach((result) => {
+          if (result.status === 'fulfilled') {
+            results.push(result.value);
+          } else {
+            console.error('Request failed:', result.reason);
+          }
+        });
+        if (i + CHUNK_SIZE < requests.length) {
+          await delay(1000);
+        }
+      }
+
+      const subgraphNodes = results.flatMap((result) => result.fizzNodes);
+
+      const fizzNodes: FizzNode[] = subgraphNodes.map((fizzNode: SubgraphFizzNode) => ({
+        fizzId: BigInt(fizzNode.fizzId),
+        providerId: BigInt(fizzNode.providerId),
+        spec: fizzNode.spec,
+        walletAddress: fizzNode.walletAddress,
+        paymentsAccepted: fizzNode.paymentsAccepted.map((payment: { id: string }) => payment.id),
+        status: getStatusNumberFromFizzStatus(fizzNode.status),
+        joinTimestamp: BigInt(fizzNode.joinTimestamp),
+        rewardWallet: fizzNode.rewardWallet,
+        region: fizzNode.region.id,
       }));
 
       return fizzNodes;
     } catch (error) {
-      const errorMessage = handleContractError(error, FizzRegistryAbi);
-      throw errorMessage;
+      throw error;
     }
   }
 
