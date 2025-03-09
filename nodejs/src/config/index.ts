@@ -122,3 +122,9 @@ export const DEFAULT_PAGE_SIZE = 10;
 export const GSEQ = '1';
 
 export const OSEQ = '1';
+
+export type Paymaster = {
+  type: 'biconomy' | 'coinbase';
+  bundlerUrl: string;
+  paymasterUrl: string;
+}

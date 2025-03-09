@@ -13,6 +13,8 @@ import {
 import { getTokenDetails, initializeSigner } from '@utils/index';
 import { getOrderStateAsString } from '@utils/order';
 import { handleContractError } from '@utils/errors';
+import { BiconomyService } from '@utils/biconomy';
+import type { Paymaster } from '@config/index';
 
 export class OrderModule {
   private provider: ethers.Provider;
@@ -20,17 +22,28 @@ export class OrderModule {
   private createTimeoutId: NodeJS.Timeout | null;
   private updateTimeoutId: NodeJS.Timeout | null;
   private wallet: ethers.Wallet | undefined;
+  private biconomy?: BiconomyService;
+
 
   constructor(
     provider: ethers.Provider,
     websocketProvider?: ethers.WebSocketProvider,
-    wallet?: ethers.Wallet
+    wallet?: ethers.Wallet,
+    paymaster?: Paymaster
   ) {
     this.provider = provider;
     this.websocketProvider = websocketProvider;
     this.createTimeoutId = null;
     this.updateTimeoutId = null;
     this.wallet = wallet;
+
+    switch (paymaster?.type) {
+      case 'biconomy':
+        this.biconomy = new BiconomyService(wallet!.privateKey, paymaster.bundlerUrl, paymaster.paymasterUrl);
+        break;
+      case 'coinbase':
+        break;
+    }
   }
 
   async createOrder(orderDetails: OrderDetails): Promise<ethers.ContractTransactionReceipt | null> {
@@ -45,6 +58,26 @@ export class OrderModule {
     } catch (error) {
       const errorMessage = handleContractError(error, OrderRequestAbi);
       throw errorMessage;
+    }
+  }
+
+  async createOrderWithPaymaster(orderDetails: OrderDetails): Promise<string> {
+    if (this.biconomy) {
+      // Encode vote function call    
+      const encodedData = this.biconomy.encodeFunction({
+        abi: ['function createOrder(OrderDetails memory details) external returns (void)'],
+        functionName: 'createOrder',
+        args: [orderDetails]
+      });
+
+      const txHash = await this.biconomy.sendTransaction({
+        to: OrderRequest,
+        data: encodedData
+      });
+      await this.biconomy.waitForTransaction(txHash);
+      return txHash;
+    } else {
+      throw new Error('Not known paymaster type');
     }
   }
 
@@ -66,6 +99,25 @@ export class OrderModule {
     } catch (error) {
       const errorMessage = handleContractError(error, OrderRequestAbi);
       throw errorMessage;
+    }
+  }
+
+  async updateOrderWithPaymaster(orderId: string, orderDetails: OrderDetails): Promise<string> {
+    if (this.biconomy) {
+      const encodedData = this.biconomy.encodeFunction({
+        abi: ['function updateInitialOrder(uint64 _orderId, OrderDetails memory details) external (void)'],
+        functionName: 'updateInitialOrder',
+        args: [orderId, orderDetails]
+      });
+
+      const txHash = await this.biconomy.sendTransaction({
+        to: OrderRequest,
+        data: encodedData
+      });
+      await this.biconomy.waitForTransaction(txHash);
+      return txHash;
+    } else {
+      throw new Error('Not known paymaster type');
     }
   }
 

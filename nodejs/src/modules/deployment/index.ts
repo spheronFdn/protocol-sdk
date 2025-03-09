@@ -1,4 +1,4 @@
-import { NetworkType, networkType } from '@config/index';
+import { NetworkType, networkType, Paymaster } from '@config/index';
 import { EscrowModule } from '@modules/escrow';
 import { LeaseModule } from '@modules/lease';
 import { OrderModule } from '@modules/order';
@@ -26,12 +26,13 @@ export class DeploymentModule {
   constructor(
     provider: ethers.Provider,
     websocketProvider: ethers.WebSocketProvider,
-    wallet?: ethers.Wallet
+    wallet?: ethers.Wallet,
+    paymaster?: Paymaster
   ) {
     this.wallet = wallet;
     this.escrowModule = new EscrowModule(provider);
-    this.orderModule = new OrderModule(provider, websocketProvider, wallet);
-    this.leaseModule = new LeaseModule(provider, websocketProvider, wallet);
+    this.orderModule = new OrderModule(provider, websocketProvider, wallet, paymaster);
+    this.leaseModule = new LeaseModule(provider, websocketProvider, wallet, paymaster);
     this.providerModule = new ProviderModule(provider);
   }
 

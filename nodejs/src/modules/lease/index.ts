@@ -5,12 +5,13 @@ import { getTokenDetails, initializeSigner } from '@utils/index';
 import { ethers } from 'ethers';
 import { Lease, LeaseState, LeaseWithOrderDetails } from './types';
 import { getLeaseStateAsString } from '@utils/lease';
-import { DEFAULT_PAGE_SIZE } from '@config/index';
+import { DEFAULT_PAGE_SIZE, Paymaster } from '@config/index';
 import { FizzModule } from '@modules/fizz';
 import { ProviderModule } from '@modules/provider';
 import { handleContractError } from '@utils/errors';
 import { FizzDetails } from '@modules/fizz/types';
 import { Provider } from '@modules/provider/types';
+import { BiconomyService } from '@utils/biconomy';
 
 export class LeaseModule {
   private provider: ethers.Provider;
@@ -20,20 +21,29 @@ export class LeaseModule {
   private websocketProvider?: ethers.WebSocketProvider;
   private leaseCloseTimeoutId: NodeJS.Timeout | null;
   private wallet: ethers.Wallet | undefined;
-
+  private biconomy?: BiconomyService;
   constructor(
     provider: ethers.Provider,
     websocketProvider?: ethers.WebSocketProvider,
-    wallet?: ethers.Wallet
+    wallet?: ethers.Wallet,
+    paymaster?: Paymaster
   ) {
     this.provider = provider;
     this.websocketProvider = websocketProvider;
     this.getLeaseDetails = this.getLeaseDetails.bind(this);
-    this.orderModule = new OrderModule(provider);
+    this.orderModule = new OrderModule(provider, undefined, undefined, paymaster);
     this.fizzModule = new FizzModule(provider, websocketProvider);
     this.providerModule = new ProviderModule(provider);
     this.leaseCloseTimeoutId = null;
     this.wallet = wallet;
+
+    switch (paymaster?.type) {
+      case 'biconomy':
+        this.biconomy = new BiconomyService(wallet!.privateKey, paymaster.bundlerUrl, paymaster.paymasterUrl);
+        break;
+      case 'coinbase':
+        break;
+    }
   }
 
   async getLeaseDetails(leaseId: string) {
@@ -152,7 +162,7 @@ export class LeaseModule {
     };
   }
 
-  async closeLease(leaseId: string) {
+  async closeLease(leaseId: string): Promise<ethers.ContractTransactionReceipt | null> {
     const contractAbi = ComputeLeaseAbi;
     const contractAddress = ComputeLease;
     try {
@@ -164,6 +174,25 @@ export class LeaseModule {
     } catch (error) {
       const errorMessage = handleContractError(error, contractAbi);
       throw errorMessage;
+    }
+  }
+
+  async closeLeaseWithPaymaster(leaseId: string): Promise<string> {
+    if (this.biconomy) {
+      const encodedData = this.biconomy.encodeFunction({
+        abi: ['function closeLease(uint256 _leaseId) external nonReentrant (void)'],
+        functionName: 'closeLease',
+        args: [leaseId]
+      });
+
+      const txHash = await this.biconomy.sendTransaction({
+        to: ComputeLease,
+        data: encodedData
+      });
+      await this.biconomy.waitForTransaction(txHash);
+      return txHash;
+    } else {
+      throw new Error('Not known paymaster type');
     }
   }
 
