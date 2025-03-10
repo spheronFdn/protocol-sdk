@@ -17,11 +17,6 @@ export class SpheronSDK {
   public deployment: DeploymentModule;
 
   constructor(networkType: NetworkType, privateKey?: string) {
-    if (networkType !== 'testnet') {
-      throw new Error(
-        "Please use 'testnet' as network type as Spheron Protocol's mainnet is not launched yet."
-      );
-    }
     const provider = new ethers.JsonRpcProvider(rpcUrls[networkType].HTTP_URL);
     const websocketProvider = new ethers.WebSocketProvider(rpcUrls[networkType].WSS_URL);
     const wallet = privateKey ? new ethers.Wallet(privateKey, provider) : undefined;
