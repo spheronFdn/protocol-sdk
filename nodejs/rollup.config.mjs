@@ -47,7 +47,7 @@ export default [
       json(),
       typescript({ tsconfig: './tsconfig.json' }),
     ],
-    external: ['ethers'],
+    external: ['ethers', '@biconomy/abstractjs', 'viem'],
   },
   {
     input: 'dist/esm/index.d.ts',
