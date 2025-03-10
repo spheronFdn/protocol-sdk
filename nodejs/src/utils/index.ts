@@ -101,3 +101,5 @@ export const initializeSigner = async ({ wallet }: { wallet?: ethers.Wallet }) =
 
   return { signer };
 };
+
+export const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));

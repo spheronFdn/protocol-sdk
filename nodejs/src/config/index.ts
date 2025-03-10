@@ -7,6 +7,10 @@ export const SPHERON_TESTNET_WSS_URL =
   'wss://base-sepolia.g.alchemy.com/v2/MYm8w99-g3L5Vbxe-Z3RRcDy7P2BH_0n';
 export const SPHERON_TESTNET_EXPLORER_URL = 'https://sepolia.basescan.org';
 
+export const SPHERON_MAINNET_HTTP_URL = 'https://mainnet.base.org/';
+export const SPHERON_MAINNET_WSS_URL = 'wss://mainnet.base.org/';
+export const SPHERON_MAINNET_EXPLORER_URL = 'https://base.blockscout.com/';
+
 export const rpcUrls = {
   testnet: {
     HTTP_URL: SPHERON_TESTNET_HTTP_URL,
@@ -14,9 +18,9 @@ export const rpcUrls = {
     EXPORER_URL: SPHERON_TESTNET_EXPLORER_URL,
   },
   mainnet: {
-    HTTP_URL: SPHERON_TESTNET_HTTP_URL,
-    WSS_URL: SPHERON_TESTNET_WSS_URL,
-    EXPORER_URL: SPHERON_TESTNET_EXPLORER_URL,
+    HTTP_URL: SPHERON_MAINNET_HTTP_URL,
+    WSS_URL: SPHERON_MAINNET_WSS_URL,
+    EXPORER_URL: SPHERON_MAINNET_EXPLORER_URL,
   },
 };
 
@@ -57,17 +61,19 @@ export const networkMap: Record<NetworkType, INetwork> = {
   },
   // TODO: NEED TO UPDATE WHEN MAINNET RELEASE
   mainnet: {
-    chainId: 421614,
-    chainName: 'Arbitrum Sepolia',
-    rpcUrls: ['https://sepolia-rollup.arbitrum.io/rpc'],
+    chainId: 8453,
+    chainName: 'Base Mainnet',
+    rpcUrls: [SPHERON_MAINNET_HTTP_URL],
     nativeCurrency: {
       name: 'Ethereum',
       symbol: 'ETH',
       decimals: 18,
     },
-    blockExplorerUrls: ['https://sepolia.arbiscan.io/'],
+    blockExplorerUrls: ['https://base.blockscout.com/'],
   },
 };
+
+export const networkType = (process.env.NETWORK_TYPE as NetworkType) || 'testnet';
 
 export const tokenMap: Record<NetworkType, IToken[]> = {
   testnet: [
@@ -112,10 +118,16 @@ export const tokenMap: Record<NetworkType, IToken[]> = {
       // logo: cstIcon,
     },
   ],
-  mainnet: [],
+  mainnet: [
+    {
+      id: 1,
+      name: 'Tether USD Token',
+      symbol: 'USDT',
+      decimal: 6,
+      address: contractAddresses.mainnet.USDT,
+    },
+  ],
 };
-
-export const networkType = (process.env.NETWORK_TYPE as NetworkType) || 'testnet';
 
 export const DEFAULT_PAGE_SIZE = 10;
 
