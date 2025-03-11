@@ -38,7 +38,7 @@ export class FizzModule {
     this.provider = provider;
     this.webSocketProvider = webSocketProvider;
     this.wallet = wallet;
-    this.providerModule = new ProviderModule(provider);
+    this.providerModule = new ProviderModule(provider, networkType);
     this.networkType = networkType;
   }
 

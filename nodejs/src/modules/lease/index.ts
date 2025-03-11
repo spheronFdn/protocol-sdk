@@ -31,9 +31,9 @@ export class LeaseModule {
     this.provider = provider;
     this.websocketProvider = websocketProvider;
     this.getLeaseDetails = this.getLeaseDetails.bind(this);
-    this.orderModule = new OrderModule(provider);
-    this.fizzModule = new FizzModule(provider, websocketProvider);
-    this.providerModule = new ProviderModule(provider);
+    this.orderModule = new OrderModule(provider, websocketProvider, wallet, networkType);
+    this.fizzModule = new FizzModule(provider, websocketProvider, wallet, networkType);
+    this.providerModule = new ProviderModule(provider, networkType);
     this.leaseCloseTimeoutId = null;
     this.wallet = wallet;
     this.networkType = networkType;
@@ -121,7 +121,8 @@ export class LeaseModule {
       filteredLeases.map(async (lease, index) => {
         const order = orderDetails[index];
         let tokenDetails;
-        if (order.token?.address) tokenDetails = getTokenDetails(order.token.address, 'testnet');
+        if (order.token?.address)
+          tokenDetails = getTokenDetails(order.token.address, this.networkType as NetworkType);
 
         let region;
         if (lease.fizzId.toString() !== '0') {

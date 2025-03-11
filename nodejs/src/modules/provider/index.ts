@@ -1,11 +1,6 @@
 import ProviderRegistryAbi from '@contracts/abis/testnet/ProviderRegistry.json';
 import ProviderAttributeRegistryAbi from '@contracts/abis/testnet/ProviderAttributeRegistry.json';
-
-import {
-  ProviderRegistryTestnet as ProviderRegistry,
-  ProviderAttributeRegistryTestnet as ProviderAttributeRegistry,
-  contractAddresses,
-} from '@contracts/addresses';
+import { contractAddresses } from '@contracts/addresses';
 import { ethers } from 'ethers';
 import {
   Attribute,

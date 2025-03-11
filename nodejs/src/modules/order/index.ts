@@ -93,7 +93,7 @@ export class OrderModule {
       tier: response.specs.tier.map((t: bigint) => Number(t)) as Tier[],
     };
 
-    const tokenDetails = getTokenDetails(response.token, 'testnet');
+    const tokenDetails = getTokenDetails(response.token, this.networkType as NetworkType);
     const token = {
       symbol: tokenDetails?.symbol,
       decimal: tokenDetails?.decimal,
