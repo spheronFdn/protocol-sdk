@@ -1,21 +1,23 @@
 import EscrowAbi from '@contracts/abis/devnet/Escrow.json';
 import TokenAbi from '@contracts/abis/devnet/TestToken.json';
-import { EscrowDev as Escrow } from '@contracts/addresses';
+import { contractAddresses, EscrowDev as Escrow } from '@contracts/addresses';
 import { ethers } from 'ethers';
 import { TransactionData } from './types';
-
+import { NetworkType } from '@config/index';
 export class EscrowModule {
   private provider: ethers.Provider;
+  private networkType: NetworkType;
 
-  constructor(provider: ethers.Provider) {
+  constructor(provider: ethers.Provider, networkType: NetworkType = 'testnet') {
     this.provider = provider;
+    this.networkType = networkType;
   }
 
   // read operations
   async getProviderEarnings(providerAddress: string, tokenAddress: string) {
     try {
       const contractAbi = EscrowAbi;
-      const contractAddress = Escrow;
+      const contractAddress = contractAddresses[this.networkType].escrow;
       const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
 
       const response = await contract.getProviderEarnings(providerAddress, tokenAddress);
@@ -36,7 +38,7 @@ export class EscrowModule {
   async getUserBalance(providerAddress: string, tokenAddress: string) {
     try {
       const contractAbi = EscrowAbi;
-      const contractAddress = Escrow;
+      const contractAddress = contractAddresses[this.networkType].escrow;
       const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
 
       const response = await contract.getUserData(providerAddress, tokenAddress, false);
@@ -73,7 +75,7 @@ export class EscrowModule {
       const provider = new ethers.BrowserProvider(window.ethereum);
       const signer = await provider.getSigner();
       const contractABI = EscrowAbi;
-      const contractAddress = Escrow;
+      const contractAddress = contractAddresses[this.networkType].escrow;
 
       const contract = new ethers.Contract(contractAddress, contractABI, signer);
 
@@ -114,7 +116,7 @@ export class EscrowModule {
       const provider = new ethers.BrowserProvider(window.ethereum);
       const signer = await provider.getSigner();
       const contractABI = EscrowAbi;
-      const contractAddress = Escrow;
+      const contractAddress = contractAddresses[this.networkType].escrow;
       const tokenABI = TokenAbi;
 
       const contract = new ethers.Contract(contractAddress, contractABI, signer);
@@ -156,7 +158,7 @@ export class EscrowModule {
       const provider = new ethers.BrowserProvider(window.ethereum);
       const signer = await provider.getSigner();
       const contractABI = EscrowAbi;
-      const contractAddress = Escrow;
+      const contractAddress = contractAddresses[this.networkType].escrow;
 
       const contract = new ethers.Contract(contractAddress, contractABI, signer);
 
