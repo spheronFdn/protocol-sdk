@@ -1,11 +1,11 @@
 import ComputeLeaseAbi from '@contracts/abis/devnet/ComputeLease.json';
-import { ComputeLeaseDev as ComputeLease } from '@contracts/addresses';
+import { ComputeLeaseDev as ComputeLease, contractAddresses } from '@contracts/addresses';
 import { OrderModule } from '@modules/order';
 import { getTokenDetails } from '@utils/index';
 import { ethers } from 'ethers';
 import { Lease, LeaseState, LeaseWithOrderDetails } from './types';
 import { getLeaseStateAsString } from '@utils/lease';
-import { DEFAULT_PAGE_SIZE } from '@config/index';
+import { DEFAULT_PAGE_SIZE, NetworkType } from '@config/index';
 import { FizzModule } from '@modules/fizz';
 import { decompressOrderSpec, decompressProviderSpec } from '@utils/spec';
 
@@ -15,19 +15,25 @@ export class LeaseModule {
   private fizzModule: FizzModule;
   private websocketProvider?: ethers.WebSocketProvider;
   private leaseCloseTimeoutId: NodeJS.Timeout | null;
+  private networkType: NetworkType;
 
-  constructor(provider: ethers.Provider, websocketProvider?: ethers.WebSocketProvider) {
+  constructor(
+    provider: ethers.Provider,
+    websocketProvider?: ethers.WebSocketProvider,
+    networkType: NetworkType = 'testnet'
+  ) {
+    this.networkType = networkType;
     this.provider = provider;
     this.websocketProvider = websocketProvider;
     this.getLeaseDetails = this.getLeaseDetails.bind(this);
-    this.orderModule = new OrderModule(provider);
-    this.fizzModule = new FizzModule(provider, websocketProvider);
+    this.orderModule = new OrderModule(provider, websocketProvider, networkType);
+    this.fizzModule = new FizzModule(provider, websocketProvider, networkType);
     this.leaseCloseTimeoutId = null;
   }
 
   async getLeaseDetails(leaseId: string) {
     const contractAbi = ComputeLeaseAbi;
-    const contractAddress = ComputeLease;
+    const contractAddress = contractAddresses[this.networkType].computeLease;
 
     const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
     const response = await contract.leases(leaseId);
@@ -62,7 +68,7 @@ export class LeaseModule {
 
   async getLeaseIds(address: string) {
     const contractAbi = ComputeLeaseAbi;
-    const contractAddress = ComputeLease;
+    const contractAddress = contractAddresses[this.networkType].computeLease;
 
     const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
     const response = await contract.getTenantLeases(address);
@@ -119,7 +125,8 @@ export class LeaseModule {
       filteredLeases.map(async (lease, index) => {
         const order = orderDetails[index];
         let tokenDetails;
-        if (order.token?.address) tokenDetails = getTokenDetails(order.token.address, 'testnet');
+        if (order.token?.address)
+          tokenDetails = getTokenDetails(order.token.address, this.networkType);
 
         let region;
         if (lease.fizzId.toString() !== '0') {
@@ -157,7 +164,7 @@ export class LeaseModule {
 
   async closeLease(leaseId: string) {
     const contractAbi = ComputeLeaseAbi;
-    const contractAddress = ComputeLease;
+    const contractAddress = contractAddresses[this.networkType].computeLease;
     try {
       const provider = new ethers.BrowserProvider(window.ethereum);
       const signer = await provider.getSigner();
@@ -190,7 +197,7 @@ export class LeaseModule {
     }
     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
     const contractAbi = ComputeLeaseAbi;
-    const contractAddress = ComputeLease;
+    const contractAddress = contractAddresses[this.networkType].computeLease;
 
     const contract = new ethers.Contract(contractAddress, contractAbi, this.websocketProvider);
 

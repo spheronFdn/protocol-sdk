@@ -1,14 +1,17 @@
 import ProviderRegistryAbi from '@contracts/abis/devnet/ProviderRegistry.json';
-import { ProviderRegistryDev as ProviderRegistry } from '@contracts/addresses';
+import { contractAddresses } from '@contracts/addresses';
 import { ethers } from 'ethers';
 import { Category, IProvider } from './types';
 import { isValidEthereumAddress } from '@utils/index';
+import { NetworkType } from '@config/index';
 
 export class ProviderModule {
   private provider: ethers.Provider;
+  private networkType: NetworkType;
 
-  constructor(provider: ethers.Provider) {
+  constructor(provider: ethers.Provider, networkType: NetworkType = 'testnet') {
     this.provider = provider;
+    this.networkType = networkType;
   }
 
   async getProviderDetails(providerAddress: string) {
@@ -23,7 +26,7 @@ export class ProviderModule {
     }
     try {
       const contractAbi = ProviderRegistryAbi;
-      const contractAddress = ProviderRegistry;
+      const contractAddress = contractAddresses[this.networkType].providerRegistry;
 
       const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
       const response = await contract.getProviderByAddress(providerAddress);
@@ -62,7 +65,7 @@ export class ProviderModule {
     }
     try {
       const contractAbi = ProviderRegistryAbi;
-      const contractAddress = ProviderRegistry;
+      const contractAddress = contractAddresses[this.networkType].providerRegistry;
 
       const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
       const response = await contract.getProviderPendingAttributes(providerAddress, category);
@@ -91,7 +94,7 @@ export class ProviderModule {
     }
     try {
       const contractAbi = ProviderRegistryAbi;
-      const contractAddress = ProviderRegistry;
+      const contractAddress = contractAddresses[this.networkType].providerRegistry;
 
       const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
       const response = await contract.getProviderAttributes(providerAddress, category);

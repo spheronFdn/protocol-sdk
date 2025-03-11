@@ -1,18 +1,29 @@
-import { OrderRequestDev as OrderRequest, BidDev as Bid } from '@contracts/addresses';
+import {
+  OrderRequestDev as OrderRequest,
+  BidDev as Bid,
+  contractAddresses,
+} from '@contracts/addresses';
 import OrderRequestAbi from '@contracts/abis/devnet/OrderRequest.json';
 import BidAbi from '@contracts/abis/devnet/Bid.json';
 import { ethers } from 'ethers';
 import { InitialOrder, OrderDetails, Tier } from './types';
 import { getTokenDetails } from '@utils/index';
 import { getOrderStateAsString } from '@utils/order';
+import { NetworkType } from '@config/index';
 
 export class OrderModule {
   private provider: ethers.Provider;
   private websocketProvider?: ethers.WebSocketProvider;
   private createTimeoutId: NodeJS.Timeout | null;
   private updateTimeoutId: NodeJS.Timeout | null;
+  private networkType: NetworkType;
 
-  constructor(provider: ethers.Provider, websocketProvider?: ethers.WebSocketProvider) {
+  constructor(
+    provider: ethers.Provider,
+    websocketProvider?: ethers.WebSocketProvider,
+    networkType: NetworkType = 'testnet'
+  ) {
+    this.networkType = networkType;
     this.provider = provider;
     this.websocketProvider = websocketProvider;
     this.createTimeoutId = null;
@@ -31,7 +42,11 @@ export class OrderModule {
       const provider = new ethers.BrowserProvider(window.ethereum);
       const signer = await provider.getSigner();
 
-      const contract = new ethers.Contract(OrderRequest, OrderRequestAbi, signer);
+      const contract = new ethers.Contract(
+        contractAddresses[this.networkType].orderRequest,
+        OrderRequestAbi,
+        signer
+      );
 
       const tx = await contract.createOrder(orderDetails);
       const receipt = await tx.wait();
@@ -55,7 +70,11 @@ export class OrderModule {
       const provider = new ethers.BrowserProvider(window.ethereum);
       const signer = await provider.getSigner();
 
-      const contract = new ethers.Contract(OrderRequest, OrderRequestAbi, signer);
+      const contract = new ethers.Contract(
+        contractAddresses[this.networkType].orderRequest,
+        OrderRequestAbi,
+        signer
+      );
 
       const tx = await contract.updateInitialOrder(orderId, orderDetails);
 
@@ -71,7 +90,7 @@ export class OrderModule {
 
   async getOrderDetails(leaseId: string) {
     const contractAbi = OrderRequestAbi;
-    const contractAddress = OrderRequest;
+    const contractAddress = contractAddresses[this.networkType].orderRequest;
 
     const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
     const response = await contract.getOrderById(leaseId);
@@ -83,7 +102,7 @@ export class OrderModule {
       tier: response.specs.tier.map((t: bigint) => Number(t)) as Tier[],
     };
 
-    const tokenDetails = getTokenDetails(response.token, 'testnet');
+    const tokenDetails = getTokenDetails(response.token, this.networkType);
     const token = {
       symbol: tokenDetails?.symbol,
       decimal: tokenDetails?.decimal,
@@ -118,7 +137,7 @@ export class OrderModule {
     }
     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
     const contractAbi = BidAbi;
-    const contractAddress = Bid;
+    const contractAddress = contractAddresses[this.networkType].bid;
 
     const contract = new ethers.Contract(contractAddress, contractAbi, this.websocketProvider);
 
@@ -167,7 +186,7 @@ export class OrderModule {
 
     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
     const contractAbi = BidAbi;
-    const contractAddress = Bid;
+    const contractAddress = contractAddresses[this.networkType].bid;
 
     const contract = new ethers.Contract(contractAddress, contractAbi, this.websocketProvider);
 
@@ -202,7 +221,7 @@ export class OrderModule {
 
     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
     const contractAbi = BidAbi;
-    const contractAddress = Bid;
+    const contractAddress = contractAddresses[this.networkType].bid;
 
     const contract = new ethers.Contract(contractAddress, contractAbi, this.websocketProvider);
 

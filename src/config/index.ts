@@ -3,6 +3,7 @@ import {
   USDCDev as USDC,
   USDTDev as USDT,
   WETHDev as WETH,
+  USDTMainnet,
 } from '@contracts/addresses';
 
 // Testnet URLs
@@ -18,6 +19,30 @@ export const SPHERON_DEVNET_RPC_URL =
 export const SPHERON_DEVNET_WSS_URL =
   'wss://base-sepolia.g.alchemy.com/v2/MYm8w99-g3L5Vbxe-Z3RRcDy7P2BH_0n';
 export const SPHERON_DEVNET_EXPLORER_URL = 'https://sepolia.basescan.org/';
+
+export const SPHERON_MAINNET_RPC_URL =
+  'https://base-mainnet.g.alchemy.com/v2/-lNWgmawEUixMe7EKIzZOCpQFpdeVRjD';
+export const SPHERON_MAINNET_WSS_URL =
+  'wss://base-mainnet.g.alchemy.com/v2/-lNWgmawEUixMe7EKIzZOCpQFpdeVRjD';
+export const SPHERON_MAINNET_EXPLORER_URL = 'https://base.blockscout.com/';
+
+export const SPHERON_RPC_MAP = {
+  testnet: {
+    rpc: SPHERON_TESTNET_RPC_URL,
+    wss: SPHERON_TESTNET_WSS_URL,
+    explorer: SPHERON_TESTNET_EXPLORER_URL,
+  },
+  devnet: {
+    rpc: SPHERON_DEVNET_RPC_URL,
+    wss: SPHERON_DEVNET_WSS_URL,
+    explorer: SPHERON_DEVNET_EXPLORER_URL,
+  },
+  mainnet: {
+    rpc: SPHERON_MAINNET_RPC_URL,
+    wss: SPHERON_MAINNET_WSS_URL,
+    explorer: SPHERON_MAINNET_EXPLORER_URL,
+  },
+};
 
 export interface IToken {
   id: number;
@@ -56,15 +81,15 @@ export const networkMap: Record<NetworkType, INetwork> = {
   },
   // TODO: NEED TO UPDATE WHEN MAINNET RELEASE
   mainnet: {
-    chainId: 421614,
-    chainName: 'Arbitrum Sepolia',
-    rpcUrls: ['https://sepolia-rollup.arbitrum.io/rpc'],
+    chainId: 8453,
+    chainName: 'Base Mainnet',
+    rpcUrls: [SPHERON_MAINNET_RPC_URL],
     nativeCurrency: {
       name: 'Ethereum',
       symbol: 'ETH',
       decimals: 18,
     },
-    blockExplorerUrls: ['https://sepolia.arbiscan.io/'],
+    blockExplorerUrls: [SPHERON_MAINNET_EXPLORER_URL],
   },
 };
 
@@ -103,7 +128,15 @@ export const tokenMap: Record<NetworkType, IToken[]> = {
       // logo: WethIcon,
     },
   ],
-  mainnet: [],
+  mainnet: [
+    {
+      id: 1,
+      name: 'Tether USD Token',
+      symbol: 'USDT',
+      decimal: 6,
+      address: USDTMainnet,
+    },
+  ],
 };
 
 export const networkType = (process.env.NEXT_PUBLIC_NETWORK_TYPE as string) || 'testnet';
