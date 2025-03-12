@@ -2,6 +2,7 @@ import { createSmartAccountClient, toNexusAccount, createBicoPaymasterClient, Ne
 import { baseSepolia } from "viem/chains";
 import { encodeFunctionData, parseAbi, http } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
+import { WaitForUserOperationReceiptReturnType } from "viem/_types/account-abstraction";
 
 export class BiconomyService {
     private nexusClient!: NexusClient;
@@ -73,7 +74,7 @@ export class BiconomyService {
         }
     }
 
-    async waitForTransaction(hash: string) {
+    async waitForTransaction(hash: string): Promise<WaitForUserOperationReceiptReturnType> {
         try {
             const receipt = await this.nexusClient.waitForUserOperationReceipt({
                 hash: hash as `0x${string}`

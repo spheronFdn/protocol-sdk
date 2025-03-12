@@ -14,78 +14,68 @@ import { getTokenDetails, initializeSigner } from '@utils/index';
 import { getOrderStateAsString } from '@utils/order';
 import { handleContractError } from '@utils/errors';
 import { BiconomyService } from '@utils/biconomy';
-import type { Paymaster } from '@config/index';
+import { WaitForUserOperationReceiptReturnType } from 'viem/_types/account-abstraction';
 
 export class OrderModule {
-  private provider: ethers.Provider;
-  private websocketProvider?: ethers.WebSocketProvider;
   private createTimeoutId: NodeJS.Timeout | null;
   private updateTimeoutId: NodeJS.Timeout | null;
-  private wallet: ethers.Wallet | undefined;
-  private biconomy?: BiconomyService;
 
 
   constructor(
-    provider: ethers.Provider,
-    websocketProvider?: ethers.WebSocketProvider,
-    wallet?: ethers.Wallet,
-    paymaster?: Paymaster
+    private provider: ethers.Provider,
+    private websocketProvider?: ethers.WebSocketProvider,
+    private wallet?: ethers.Wallet,
+    private paymaster?: BiconomyService
   ) {
-    this.provider = provider;
-    this.websocketProvider = websocketProvider;
     this.createTimeoutId = null;
     this.updateTimeoutId = null;
-    this.wallet = wallet;
-
-    switch (paymaster?.type) {
-      case 'biconomy':
-        this.biconomy = new BiconomyService(wallet!.privateKey, paymaster.bundlerUrl, paymaster.paymasterUrl);
-        break;
-      case 'coinbase':
-        break;
-    }
   }
 
-  async createOrder(orderDetails: OrderDetails): Promise<ethers.ContractTransactionReceipt | null> {
+  async createOrder(orderDetails: OrderDetails): Promise<string | null> {
     try {
+      if (this.paymaster) {
+        return await this.createOrderWithPaymaster(orderDetails);
+      }
+
       const { signer } = await initializeSigner({ wallet: this.wallet });
 
       const contract = new ethers.Contract(OrderRequest, OrderRequestAbi, signer);
 
       const tx: ethers.ContractTransactionResponse = await contract.createOrder(orderDetails);
       const receipt: ethers.ContractTransactionReceipt | null = await tx.wait();
-      return receipt;
+      return receipt?.hash || null;
     } catch (error) {
       const errorMessage = handleContractError(error, OrderRequestAbi);
       throw errorMessage;
     }
   }
 
-  async createOrderWithPaymaster(orderDetails: OrderDetails): Promise<string> {
-    if (this.biconomy) {
-      // Encode vote function call    
-      const encodedData = this.biconomy.encodeFunction({
-        abi: ['function createOrder(OrderDetails memory details) external returns (void)'],
-        functionName: 'createOrder',
-        args: [orderDetails]
-      });
+  async createOrderWithPaymaster(orderDetails: OrderDetails): Promise<string | null> {
+    // Encode vote function call    
+    const encodedData = this.paymaster?.encodeFunction({
+      abi: ['function createOrder(OrderDetails memory details) external returns (void)'],
+      functionName: 'createOrder',
+      args: [orderDetails]
+    });
 
-      const txHash = await this.biconomy.sendTransaction({
-        to: OrderRequest,
-        data: encodedData
-      });
-      await this.biconomy.waitForTransaction(txHash);
-      return txHash;
-    } else {
-      throw new Error('Not known paymaster type');
-    }
+    const txHash = await this.paymaster?.sendTransaction({
+      to: OrderRequest,
+      data: encodedData!
+    });
+    const txReceipt = await this.paymaster?.waitForTransaction(txHash!);
+    return txReceipt?.receipt.transactionHash || null;
+
   }
 
   async updateOrder(
     orderId: string,
     orderDetails: OrderDetails
-  ): Promise<ethers.ContractTransactionReceipt | null> {
+  ): Promise<string | null> {
     try {
+      if (this.paymaster) {
+        return await this.updateOrderWithPaymaster(orderId, orderDetails);
+      }
+
       const { signer } = await initializeSigner({ wallet: this.wallet });
 
       const contract = new ethers.Contract(OrderRequest, OrderRequestAbi, signer);
@@ -95,30 +85,27 @@ export class OrderModule {
         orderDetails
       );
       const receipt: ethers.ContractTransactionReceipt | null = await tx.wait();
-      return receipt;
+      return receipt?.hash || null;
     } catch (error) {
       const errorMessage = handleContractError(error, OrderRequestAbi);
       throw errorMessage;
     }
   }
 
-  async updateOrderWithPaymaster(orderId: string, orderDetails: OrderDetails): Promise<string> {
-    if (this.biconomy) {
-      const encodedData = this.biconomy.encodeFunction({
-        abi: ['function updateInitialOrder(uint64 _orderId, OrderDetails memory details) external (void)'],
-        functionName: 'updateInitialOrder',
-        args: [orderId, orderDetails]
-      });
+  async updateOrderWithPaymaster(orderId: string, orderDetails: OrderDetails): Promise<string | null> {
+    const encodedData = this.paymaster?.encodeFunction({
+      abi: ['function updateInitialOrder(uint64 _orderId, OrderDetails memory details) external (void)'],
+      functionName: 'updateInitialOrder',
+      args: [orderId, orderDetails]
+    });
 
-      const txHash = await this.biconomy.sendTransaction({
-        to: OrderRequest,
-        data: encodedData
-      });
-      await this.biconomy.waitForTransaction(txHash);
-      return txHash;
-    } else {
-      throw new Error('Not known paymaster type');
-    }
+    const txHash = await this.paymaster?.sendTransaction({
+      to: OrderRequest,
+      data: encodedData!
+    });
+    const txReceipt = await this.paymaster?.waitForTransaction(txHash!);
+    return txReceipt?.receipt.transactionHash || null;
+
   }
 
   async getOrderDetails(leaseId: string): Promise<InitialOrder> {
