@@ -181,6 +181,7 @@ interface Placement {
   pricing: Record<string, Pricing>;
   attributes?: {
     region?: string;
+    region_exclude?: string;
     desired_fizz?: string;
     desired_provider?: string;
   };
@@ -320,6 +321,13 @@ export const yamlToOrderDetails = (
       attributes.push({
         Key: 'region',
         Value: firstPlacement.attributes.region,
+      });
+    }
+
+    if (firstPlacement?.attributes?.region_exclude) {
+      attributes.push({
+        Key: 'region_exclude',
+        Value: firstPlacement.attributes.region_exclude,
       });
     }
 
