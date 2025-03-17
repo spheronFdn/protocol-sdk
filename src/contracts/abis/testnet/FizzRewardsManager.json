@@ -1,0 +1,1112 @@
+[
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_fizzAttributeRegistry",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "_rewardToken",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "_access",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "inputs": [],
+      "name": "AlreadyPaused",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "AlreadySlashed",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "ArrayMismatch",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "EnforcedPause",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "ExpectedPause",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "FizzCantClaimRewards",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "InvalidAddress",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "InvalidAmount",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "NoReward",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "NoSlashedEras",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "NotFound",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "NotPaused",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "UnAuthorized",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "ZeroEra",
+      "type": "error"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "fizzAttributeRegistry",
+          "type": "address"
+        }
+      ],
+      "name": "FizzAttributeRegistryUpdated",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "name",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "registry",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "baseReward",
+          "type": "uint256"
+        }
+      ],
+      "name": "FizzCategoryAdded",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "name",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "registry",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "baseReward",
+          "type": "uint256"
+        }
+      ],
+      "name": "FizzCategoryRemoved",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "fizz",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "bool",
+          "name": "status",
+          "type": "bool"
+        }
+      ],
+      "name": "FizzDenialStatusUpdated",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "pausedEra",
+          "type": "uint256"
+        }
+      ],
+      "name": "FizzEraCountPaused",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "resumedEra",
+          "type": "uint256"
+        }
+      ],
+      "name": "FizzEraCountUnpaused",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "fizz",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "era",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "accumulatedRewards",
+          "type": "uint256"
+        }
+      ],
+      "name": "FizzPaused",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "fizz",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "FizzPendingRewardsAdded",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "fizz",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "FizzPendingRewardsUpdated",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "fizz",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "rewardAmount",
+          "type": "uint256"
+        }
+      ],
+      "name": "FizzRewardClaimed",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "rewardToken",
+          "type": "address"
+        }
+      ],
+      "name": "FizzRewardTokenUpdated",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "fizz",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "era",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "slashedAmount",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint8",
+          "name": "percentage",
+          "type": "uint8"
+        }
+      ],
+      "name": "FizzSlashed",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "fizz",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "era",
+          "type": "uint256"
+        }
+      ],
+      "name": "FizzUnpaused",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "fizz",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "era",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "FizzUnslashed",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        }
+      ],
+      "name": "Paused",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        }
+      ],
+      "name": "Unpaused",
+      "type": "event"
+    },
+    {
+      "inputs": [],
+      "name": "SLASHER_ROLE",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "accessControl",
+      "outputs": [
+        {
+          "internalType": "contract IAccessControlManager",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "_name",
+          "type": "string"
+        },
+        {
+          "internalType": "address",
+          "name": "_registry",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_baseReward",
+          "type": "uint256"
+        }
+      ],
+      "name": "addCategory",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address[]",
+          "name": "_fizz",
+          "type": "address[]"
+        },
+        {
+          "internalType": "uint256[]",
+          "name": "_amount",
+          "type": "uint256[]"
+        }
+      ],
+      "name": "addFizzPendingRewards",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "categories",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "name",
+          "type": "string"
+        },
+        {
+          "internalType": "address",
+          "name": "registry",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "baseReward",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_fizz",
+          "type": "address"
+        }
+      ],
+      "name": "claimRewards",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "deploymentTimestamp",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "fizzAttributeRegistry",
+      "outputs": [
+        {
+          "internalType": "contract IFizzAttributeRegistry",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "name": "fizzSlashedAmount",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "fizzSlashedEras",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "era",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "slashedAmount",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "name": "fizzez",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "fizz",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "lastClaimedEra",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bool",
+          "name": "denied",
+          "type": "bool"
+        },
+        {
+          "internalType": "uint256",
+          "name": "slashedEras",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bool",
+          "name": "isPaused",
+          "type": "bool"
+        },
+        {
+          "internalType": "uint256",
+          "name": "pausedEra",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "accumulatedRewardsBeforePause",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_fizz",
+          "type": "address"
+        }
+      ],
+      "name": "getAccRewardsForFizz",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getCurrentEra",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_fizz",
+          "type": "address"
+        }
+      ],
+      "name": "getFizz",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "address",
+              "name": "fizz",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "lastClaimedEra",
+              "type": "uint256"
+            },
+            {
+              "internalType": "bool",
+              "name": "denied",
+              "type": "bool"
+            },
+            {
+              "internalType": "uint256",
+              "name": "slashedEras",
+              "type": "uint256"
+            },
+            {
+              "internalType": "bool",
+              "name": "isPaused",
+              "type": "bool"
+            },
+            {
+              "internalType": "uint256",
+              "name": "pausedEra",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "accumulatedRewardsBeforePause",
+              "type": "uint256"
+            }
+          ],
+          "internalType": "struct FizzRewardsManager.Fizz",
+          "name": "",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_fizz",
+          "type": "address"
+        }
+      ],
+      "name": "getFizzRewardsPerEra",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_fizz",
+          "type": "address"
+        }
+      ],
+      "name": "getFizzSlashedEras",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "uint256",
+              "name": "era",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "slashedAmount",
+              "type": "uint256"
+            }
+          ],
+          "internalType": "struct FizzRewardsManager.SlashedEra[]",
+          "name": "",
+          "type": "tuple[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_fizz",
+          "type": "address"
+        }
+      ],
+      "name": "isDenied",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "isEraPaused",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "isEraSlashed",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "name": "isPausedFizz",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "pause",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "pauseEraCount",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address[]",
+          "name": "_fizzez",
+          "type": "address[]"
+        }
+      ],
+      "name": "pauseRewardsForFizzNodes",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "paused",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "pausedEra",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "pausedPeriods",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "startEra",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "endEra",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "accumulatedRewardsBeforePause",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "pausedTimestamp",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "name": "pendingRewards",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "_name",
+          "type": "string"
+        }
+      ],
+      "name": "removeCategory",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address[]",
+          "name": "_fizzez",
+          "type": "address[]"
+        },
+        {
+          "internalType": "uint256[]",
+          "name": "_eras",
+          "type": "uint256[]"
+        }
+      ],
+      "name": "removeSlashErasForFizzes",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "rewardToken",
+      "outputs": [
+        {
+          "internalType": "contract IRewardToken",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address[]",
+          "name": "_fizzez",
+          "type": "address[]"
+        },
+        {
+          "internalType": "bool[]",
+          "name": "_deny",
+          "type": "bool[]"
+        }
+      ],
+      "name": "setDenied",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address[]",
+          "name": "_fizzez",
+          "type": "address[]"
+        },
+        {
+          "internalType": "uint256[]",
+          "name": "_eras",
+          "type": "uint256[]"
+        },
+        {
+          "internalType": "uint8[]",
+          "name": "_slashedPercentage",
+          "type": "uint8[]"
+        }
+      ],
+      "name": "setSlashErasForFizzNodes",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "unpause",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "unpauseEraCount",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address[]",
+          "name": "_fizzez",
+          "type": "address[]"
+        }
+      ],
+      "name": "unpauseRewardsForFizzNodes",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_fizzAttributes",
+          "type": "address"
+        }
+      ],
+      "name": "updateFizzAttrRegistry",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_fizz",
+          "type": "address"
+        }
+      ],
+      "name": "updatePendingRewards",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_rewardToken",
+          "type": "address"
+        }
+      ],
+      "name": "updateRewardToken",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ]

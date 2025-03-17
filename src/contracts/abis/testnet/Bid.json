@@ -196,6 +196,12 @@
       {
         "indexed": false,
         "internalType": "uint256",
+        "name": "fizzId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
         "name": "providerId",
         "type": "uint256"
       },
