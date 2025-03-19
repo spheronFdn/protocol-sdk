@@ -7,6 +7,12 @@ export const SPHERON_TESTNET_WSS_URL =
   'wss://base-sepolia.g.alchemy.com/v2/MYm8w99-g3L5Vbxe-Z3RRcDy7P2BH_0n';
 export const SPHERON_TESTNET_EXPLORER_URL = 'https://sepolia.basescan.org';
 
+export const SPHERON_MAINNET_HTTP_URL =
+  'https://base-mainnet.g.alchemy.com/v2/-lNWgmawEUixMe7EKIzZOCpQFpdeVRjD';
+export const SPHERON_MAINNET_WSS_URL =
+  'wss://base-mainnet.g.alchemy.com/v2/-lNWgmawEUixMe7EKIzZOCpQFpdeVRjD';
+export const SPHERON_MAINNET_EXPLORER_URL = 'https://base.blockscout.com/';
+
 export const rpcUrls = {
   testnet: {
     HTTP_URL: SPHERON_TESTNET_HTTP_URL,

@@ -1,16 +1,16 @@
-import ComputeLeaseAbi from '@contracts/abis/testnet/ComputeLease.json';
-import { ComputeLeaseTestnet as ComputeLease } from '@contracts/addresses';
+import { contractAddresses } from '@contracts/addresses';
 import { OrderModule } from '@modules/order';
 import { getTokenDetails, initializeSigner } from '@utils/index';
 import { ethers } from 'ethers';
 import { Lease, LeaseState, LeaseWithOrderDetails } from './types';
 import { getLeaseStateAsString } from '@utils/lease';
-import { DEFAULT_PAGE_SIZE } from '@config/index';
+import { DEFAULT_PAGE_SIZE, NetworkType } from '@config/index';
 import { FizzModule } from '@modules/fizz';
 import { ProviderModule } from '@modules/provider';
 import { handleContractError } from '@utils/errors';
 import { FizzDetails } from '@modules/fizz/types';
 import { Provider } from '@modules/provider/types';
+import { abiMap } from '@contracts/abi-map';
 
 export class LeaseModule {
   private provider: ethers.Provider;
@@ -20,25 +20,28 @@ export class LeaseModule {
   private websocketProvider?: ethers.WebSocketProvider;
   private leaseCloseTimeoutId: NodeJS.Timeout | null;
   private wallet: ethers.Wallet | undefined;
+  private networkType: NetworkType | undefined;
 
   constructor(
     provider: ethers.Provider,
     websocketProvider?: ethers.WebSocketProvider,
-    wallet?: ethers.Wallet
+    wallet?: ethers.Wallet,
+    networkType?: NetworkType
   ) {
     this.provider = provider;
     this.websocketProvider = websocketProvider;
     this.getLeaseDetails = this.getLeaseDetails.bind(this);
-    this.orderModule = new OrderModule(provider);
-    this.fizzModule = new FizzModule(provider, websocketProvider);
-    this.providerModule = new ProviderModule(provider);
+    this.orderModule = new OrderModule(provider, websocketProvider, wallet, networkType);
+    this.fizzModule = new FizzModule(provider, websocketProvider, wallet, networkType);
+    this.providerModule = new ProviderModule(provider, networkType);
     this.leaseCloseTimeoutId = null;
     this.wallet = wallet;
+    this.networkType = networkType;
   }
 
   async getLeaseDetails(leaseId: string) {
-    const contractAbi = ComputeLeaseAbi;
-    const contractAddress = ComputeLease;
+    const contractAbi = abiMap[this.networkType as NetworkType].computeLease;
+    const contractAddress = contractAddresses[this.networkType as NetworkType].computeLease;
 
     const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
     const response = await contract.leases(leaseId);
@@ -60,8 +63,8 @@ export class LeaseModule {
   }
 
   async getLeaseIds(address: string) {
-    const contractAbi = ComputeLeaseAbi;
-    const contractAddress = ComputeLease;
+    const contractAbi = abiMap[this.networkType as NetworkType].computeLease;
+    const contractAddress = contractAddresses[this.networkType as NetworkType].computeLease;
 
     const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
     const response = await contract.getTenantLeases(address);
@@ -118,7 +121,8 @@ export class LeaseModule {
       filteredLeases.map(async (lease, index) => {
         const order = orderDetails[index];
         let tokenDetails;
-        if (order.token?.address) tokenDetails = getTokenDetails(order.token.address, 'testnet');
+        if (order.token?.address)
+          tokenDetails = getTokenDetails(order.token.address, this.networkType as NetworkType);
 
         let region;
         if (lease.fizzId.toString() !== '0') {
@@ -153,8 +157,8 @@ export class LeaseModule {
   }
 
   async closeLease(leaseId: string) {
-    const contractAbi = ComputeLeaseAbi;
-    const contractAddress = ComputeLease;
+    const contractAbi = abiMap[this.networkType as NetworkType].computeLease;
+    const contractAddress = contractAddresses[this.networkType as NetworkType].computeLease;
     try {
       const { signer } = await initializeSigner({ wallet: this.wallet });
       const contract = new ethers.Contract(contractAddress, contractAbi, signer);
@@ -185,8 +189,8 @@ export class LeaseModule {
     }
     const { signer } = await initializeSigner({ wallet: this.wallet });
     const account = await signer.getAddress();
-    const contractAbi = ComputeLeaseAbi;
-    const contractAddress = ComputeLease;
+    const contractAbi = abiMap[this.networkType as NetworkType].computeLease;
+    const contractAddress = contractAddresses[this.networkType as NetworkType].computeLease;
 
     const contract = new ethers.Contract(contractAddress, contractAbi, this.websocketProvider);
 
