@@ -6,7 +6,7 @@ import { DeploymentModule } from '@modules/deployment';
 import { ProviderModule } from '@modules/provider';
 import { FizzModule } from '@modules/fizz';
 import { rpcUrls } from '@config/index';
-import type { NetworkType } from '@config/index';
+import type { NetworkType, RpcProvider } from '@config/index';
 
 export class SpheronSDK {
   public leases: LeaseModule;
@@ -16,9 +16,16 @@ export class SpheronSDK {
   public fizz: FizzModule;
   public deployment: DeploymentModule;
 
-  constructor(networkType: NetworkType, privateKey?: string) {
-    const provider = new ethers.JsonRpcProvider(rpcUrls[networkType].HTTP_URL);
-    const websocketProvider = new ethers.WebSocketProvider(rpcUrls[networkType].WSS_URL);
+  constructor(
+    networkType: NetworkType,
+    privateKey?: string,
+    rpcProvider: RpcProvider = {
+      HTTP_URL: rpcUrls[networkType].HTTP_URL,
+      WSS_URL: rpcUrls[networkType].WSS_URL,
+    }
+  ) {
+    const provider = new ethers.JsonRpcProvider(rpcProvider.HTTP_URL);
+    const websocketProvider = new ethers.WebSocketProvider(rpcProvider.WSS_URL);
     const wallet = privateKey ? new ethers.Wallet(privateKey, provider) : undefined;
 
     this.leases = new LeaseModule(provider, websocketProvider, wallet, networkType);
