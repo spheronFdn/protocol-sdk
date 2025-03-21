@@ -1,4 +1,4 @@
-import ComputeLeaseAbi from '@contracts/abis/devnet/ComputeLease.json';
+import ComputeLeaseAbi from '@contracts/abis/testnet/ComputeLease.json';
 import { ComputeLeaseDev as ComputeLease, contractAddresses } from '@contracts/addresses';
 import { OrderModule } from '@modules/order';
 import { getTokenDetails } from '@utils/index';

@@ -8,7 +8,12 @@
       },
       {
         "internalType": "address",
-        "name": "_escrow",
+        "name": "_escrowUser",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_escrowProtocol",
         "type": "address"
       },
       {
@@ -24,6 +29,43 @@
     ],
     "stateMutability": "nonpayable",
     "type": "constructor"
+  },
+  {
+    "inputs": [],
+    "name": "ECDSAInvalidSignature",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "length",
+        "type": "uint256"
+      }
+    ],
+    "name": "ECDSAInvalidSignatureLength",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "s",
+        "type": "bytes32"
+      }
+    ],
+    "name": "ECDSAInvalidSignatureS",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "InvalidNonce",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "InvalidSignature",
+    "type": "error"
   },
   {
     "inputs": [],
@@ -46,7 +88,13 @@
       {
         "indexed": false,
         "internalType": "address",
-        "name": "escrow",
+        "name": "escrowUser",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "escrowProtocol",
         "type": "address"
       }
     ],
@@ -228,6 +276,32 @@
   },
   {
     "inputs": [],
+    "name": "CLOSE_LEASE_TYPEHASH",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "DOMAIN_SEPARATOR",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "accessControl",
     "outputs": [
       {
@@ -278,6 +352,34 @@
   {
     "inputs": [
       {
+        "internalType": "uint256",
+        "name": "_leaseId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "claimedSigner",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "nonce",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bytes",
+        "name": "signature",
+        "type": "bytes"
+      }
+    ],
+    "name": "closeLeaseWithSignature",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "uint64",
         "name": "_orderId",
         "type": "uint64"
@@ -311,10 +413,23 @@
   },
   {
     "inputs": [],
-    "name": "escrow",
+    "name": "escrowProtocol",
     "outputs": [
       {
-        "internalType": "contract IEscrow",
+        "internalType": "contract IEscrowProtocol",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "escrowUser",
+    "outputs": [
+      {
+        "internalType": "contract IEscrowUser",
         "name": "",
         "type": "address"
       }
@@ -464,6 +579,25 @@
     "type": "function"
   },
   {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "nonces",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [],
     "name": "orderRequest",
     "outputs": [
@@ -541,7 +675,12 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "_escrow",
+        "name": "_escrowUser",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_escrowProtocol",
         "type": "address"
       }
     ],

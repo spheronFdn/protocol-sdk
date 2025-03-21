@@ -3,8 +3,8 @@ import {
   BidDev as Bid,
   contractAddresses,
 } from '@contracts/addresses';
-import OrderRequestAbi from '@contracts/abis/devnet/OrderRequest.json';
-import BidAbi from '@contracts/abis/devnet/Bid.json';
+import OrderRequestAbi from '@contracts/abis/testnet/OrderRequest.json';
+import BidAbi from '@contracts/abis/testnet/Bid.json';
 import { ethers } from 'ethers';
 import { InitialOrder, OrderDetails, Tier } from './types';
 import { getTokenDetails } from '@utils/index';

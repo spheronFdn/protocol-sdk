@@ -1,5 +1,5 @@
-import EscrowAbi from '@contracts/abis/devnet/Escrow.json';
-import TokenAbi from '@contracts/abis/devnet/TestToken.json';
+import EscrowAbi from '@contracts/abis/testnet/EscrowUser.json';
+import TokenAbi from '@contracts/abis/testnet/TestToken.json';
 import { contractAddresses, EscrowDev as Escrow } from '@contracts/addresses';
 import { ethers } from 'ethers';
 import { TransactionData } from './types';

@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import EscrowAbi from '@contracts/abis/devnet/Escrow.json';
-import FizzRegistryAbi from '@contracts/abis/devnet/FizzRegistry.json';
-import ProviderRegistryAbi from '@contracts/abis/devnet/ProviderRegistry.json';
-import FizzAttributeRegistryAbi from '@contracts/abis/devnet/FizzAttributeRegistry.json';
-import ResourceRegistryAbi from '@contracts/abis/devnet/ResourceRegistry.json';
-import ComputeLeaseAbi from '@contracts/abis/devnet/ComputeLease.json';
+import EscrowAbi from '@contracts/abis/testnet/EscrowUser.json';
+import FizzRegistryAbi from '@contracts/abis/testnet/FizzRegistry.json';
+import ProviderRegistryAbi from '@contracts/abis/testnet/ProviderRegistry.json';
+import FizzAttributeRegistryAbi from '@contracts/abis/testnet/FizzAttributeRegistry.json';
+import ResourceRegistryAbi from '@contracts/abis/testnet/ResourceRegistry.json';
+import ComputeLeaseAbi from '@contracts/abis/testnet/ComputeLease.json';
 import {
   EscrowDev,
   FizzRegistryDev,

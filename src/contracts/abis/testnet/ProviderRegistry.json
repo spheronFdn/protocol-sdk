@@ -3,17 +3,7 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "_providerRegistryAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
         "name": "_tokenRegistryAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_treasury",
         "type": "address"
       },
       {
@@ -27,37 +17,17 @@
   },
   {
     "inputs": [],
-    "name": "AlreadySet",
-    "type": "error"
-  },
-  {
-    "inputs": [],
-    "name": "FizzAlreadyRegistered",
-    "type": "error"
-  },
-  {
-    "inputs": [],
-    "name": "FizzNodeNotFound",
-    "type": "error"
-  },
-  {
-    "inputs": [],
-    "name": "InactiveFizzNode",
-    "type": "error"
-  },
-  {
-    "inputs": [],
     "name": "InvalidAddress",
     "type": "error"
   },
   {
     "inputs": [],
-    "name": "NotWhitelisted",
+    "name": "ProviderAlreadyRegistered",
     "type": "error"
   },
   {
     "inputs": [],
-    "name": "RegistrationFeeNotPaid",
+    "name": "ProviderNotFound",
     "type": "error"
   },
   {
@@ -77,6 +47,11 @@
   },
   {
     "inputs": [],
+    "name": "UnauthorizedRegistration",
+    "type": "error"
+  },
+  {
+    "inputs": [],
     "name": "UnregisteredToken",
     "type": "error"
   },
@@ -84,67 +59,9 @@
     "anonymous": false,
     "inputs": [
       {
-        "indexed": false,
-        "internalType": "bool",
-        "name": "autoRegister",
-        "type": "bool"
-      }
-    ],
-    "name": "AutoRegisterStatedUpdated",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "treasury",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      }
-    ],
-    "name": "FeesWithdrawn",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "address[]",
-        "name": "fizzes",
-        "type": "address[]"
-      }
-    ],
-    "name": "FizzAddressRemovedFromWhitelist",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "address[]",
-        "name": "fizzes",
-        "type": "address[]"
-      }
-    ],
-    "name": "FizzAddressWhitelisted",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
         "indexed": true,
         "internalType": "uint256",
-        "name": "fizzId",
+        "name": "providerId",
         "type": "uint256"
       },
       {
@@ -155,14 +72,20 @@
       },
       {
         "indexed": false,
-        "internalType": "uint256",
-        "name": "providerId",
-        "type": "uint256"
+        "internalType": "string",
+        "name": "spec",
+        "type": "string"
       },
       {
         "indexed": false,
         "internalType": "string",
-        "name": "spec",
+        "name": "hostUri",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "certificate",
         "type": "string"
       },
       {
@@ -173,8 +96,14 @@
       },
       {
         "indexed": false,
-        "internalType": "enum FizzRegistry.FizzStatus",
+        "internalType": "enum ProviderRegistry.ProviderStatus",
         "name": "status",
+        "type": "uint8"
+      },
+      {
+        "indexed": false,
+        "internalType": "enum ProviderRegistry.TrustTier",
+        "name": "tier",
         "type": "uint8"
       },
       {
@@ -190,7 +119,7 @@
         "type": "address"
       }
     ],
-    "name": "FizzNodeAdded",
+    "name": "ProviderAdded",
     "type": "event"
   },
   {
@@ -199,55 +128,87 @@
       {
         "indexed": true,
         "internalType": "uint256",
-        "name": "fizzId",
-        "type": "uint256"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "tokenAddress",
-        "type": "address"
-      }
-    ],
-    "name": "FizzNodePaymentAdded",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "uint256",
-        "name": "fizzId",
-        "type": "uint256"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "tokenAddress",
-        "type": "address"
-      }
-    ],
-    "name": "FizzNodePaymentRemoved",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "uint256",
-        "name": "fizzId",
+        "name": "providerId",
         "type": "uint256"
       },
       {
         "indexed": false,
+        "internalType": "string",
+        "name": "certificate",
+        "type": "string"
+      }
+    ],
+    "name": "ProviderCertificateUpdated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "providerId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "hostUri",
+        "type": "string"
+      }
+    ],
+    "name": "ProviderHostUriUpdated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "providerId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "tokenAddress",
+        "type": "address"
+      }
+    ],
+    "name": "ProviderPaymentAdded",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "providerId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "tokenAddress",
+        "type": "address"
+      }
+    ],
+    "name": "ProviderPaymentRemoved",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
         "internalType": "uint256",
         "name": "providerId",
         "type": "uint256"
       }
     ],
-    "name": "FizzNodeProviderIdUpdated",
+    "name": "ProviderRemoved",
     "type": "event"
   },
   {
@@ -256,11 +217,17 @@
       {
         "indexed": true,
         "internalType": "uint256",
-        "name": "fizzId",
+        "name": "providerId",
         "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "rewardWallet",
+        "type": "address"
       }
     ],
-    "name": "FizzNodeRemoved",
+    "name": "ProviderRewardWalletUpdated",
     "type": "event"
   },
   {
@@ -269,7 +236,7 @@
       {
         "indexed": true,
         "internalType": "uint256",
-        "name": "fizzId",
+        "name": "providerId",
         "type": "uint256"
       },
       {
@@ -279,7 +246,7 @@
         "type": "string"
       }
     ],
-    "name": "FizzNodeSpecUpdated",
+    "name": "ProviderSpecUpdated",
     "type": "event"
   },
   {
@@ -288,36 +255,17 @@
       {
         "indexed": true,
         "internalType": "uint256",
-        "name": "FizzId",
+        "name": "providerId",
         "type": "uint256"
       },
       {
         "indexed": false,
-        "internalType": "enum FizzRegistry.FizzStatus",
+        "internalType": "enum ProviderRegistry.ProviderStatus",
         "name": "status",
         "type": "uint8"
       }
     ],
-    "name": "FizzStatusUpdated",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "uint256",
-        "name": "fizzId",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "enum FizzRegistry.FizzStatus",
-        "name": "status",
-        "type": "uint8"
-      }
-    ],
-    "name": "FizzUpdated",
+    "name": "ProviderStatusUpdated",
     "type": "event"
   },
   {
@@ -326,11 +274,30 @@
       {
         "indexed": false,
         "internalType": "address",
-        "name": "providerRegistry",
+        "name": "provider",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "enum ProviderRegistry.TrustTier",
+        "name": "tier",
+        "type": "uint8"
+      }
+    ],
+    "name": "ProviderTierUpdated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "reward",
         "type": "address"
       }
     ],
-    "name": "ProviderRegistryUpdated",
+    "name": "RewardManagerAddressUpdated",
     "type": "event"
   },
   {
@@ -345,6 +312,19 @@
     ],
     "name": "TokenRegistryContactUpdated",
     "type": "event"
+  },
+  {
+    "inputs": [],
+    "name": "VERIFIER_ROLE",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
   },
   {
     "inputs": [],
@@ -375,30 +355,7 @@
   {
     "inputs": [
       {
-        "internalType": "address[]",
-        "name": "_fizzes",
-        "type": "address[]"
-      }
-    ],
-    "name": "addAddressesToWhitelist",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "components": [
-          {
-            "internalType": "uint256",
-            "name": "providerId",
-            "type": "uint256"
-          },
-          {
-            "internalType": "string",
-            "name": "spec",
-            "type": "string"
-          },
           {
             "internalType": "address",
             "name": "walletAddress",
@@ -410,17 +367,32 @@
             "type": "address[]"
           },
           {
+            "internalType": "string",
+            "name": "spec",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "hostUri",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "certificate",
+            "type": "string"
+          },
+          {
             "internalType": "address",
             "name": "rewardWallet",
             "type": "address"
           }
         ],
-        "internalType": "struct FizzRegistry.FizzParams",
+        "internalType": "struct ProviderRegistry.ProviderParams",
         "name": "params",
         "type": "tuple"
       }
     ],
-    "name": "addFizzNode",
+    "name": "addProvider",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -433,7 +405,7 @@
         "type": "address"
       }
     ],
-    "name": "addressToFizzId",
+    "name": "addressToProviderId",
     "outputs": [
       {
         "internalType": "uint256",
@@ -450,18 +422,8 @@
         "components": [
           {
             "internalType": "uint256",
-            "name": "fizzId",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
             "name": "providerId",
             "type": "uint256"
-          },
-          {
-            "internalType": "string",
-            "name": "spec",
-            "type": "string"
           },
           {
             "internalType": "address",
@@ -474,8 +436,28 @@
             "type": "address[]"
           },
           {
-            "internalType": "enum FizzRegistry.FizzStatus",
+            "internalType": "string",
+            "name": "spec",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "hostUri",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "certificate",
+            "type": "string"
+          },
+          {
+            "internalType": "enum ProviderRegistry.ProviderStatus",
             "name": "status",
+            "type": "uint8"
+          },
+          {
+            "internalType": "enum ProviderRegistry.TrustTier",
+            "name": "tier",
             "type": "uint8"
           },
           {
@@ -489,138 +471,104 @@
             "type": "address"
           }
         ],
-        "internalType": "struct FizzRegistry.Fizz[]",
-        "name": "fizzInfos",
+        "internalType": "struct ProviderRegistry.Provider[]",
+        "name": "providerInfos",
         "type": "tuple[]"
       }
     ],
-    "name": "adminAddFizzes",
+    "name": "adminAddProviders",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getAllProviders",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "providerId",
+            "type": "uint256"
+          },
+          {
+            "internalType": "address",
+            "name": "walletAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "address[]",
+            "name": "paymentsAccepted",
+            "type": "address[]"
+          },
+          {
+            "internalType": "string",
+            "name": "spec",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "hostUri",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "certificate",
+            "type": "string"
+          },
+          {
+            "internalType": "enum ProviderRegistry.ProviderStatus",
+            "name": "status",
+            "type": "uint8"
+          },
+          {
+            "internalType": "enum ProviderRegistry.TrustTier",
+            "name": "tier",
+            "type": "uint8"
+          },
+          {
+            "internalType": "uint256",
+            "name": "joinTimestamp",
+            "type": "uint256"
+          },
+          {
+            "internalType": "address",
+            "name": "rewardWallet",
+            "type": "address"
+          }
+        ],
+        "internalType": "struct ProviderRegistry.Provider[]",
+        "name": "",
+        "type": "tuple[]"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "",
+        "name": "_providerId",
         "type": "uint256"
       }
     ],
-    "name": "fizzes",
+    "name": "getProvider",
     "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "fizzId",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "providerId",
-        "type": "uint256"
-      },
       {
         "internalType": "string",
         "name": "spec",
         "type": "string"
       },
       {
-        "internalType": "address",
-        "name": "walletAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "enum FizzRegistry.FizzStatus",
-        "name": "status",
-        "type": "uint8"
-      },
-      {
-        "internalType": "uint256",
-        "name": "joinTimestamp",
-        "type": "uint256"
-      },
-      {
-        "internalType": "address",
-        "name": "rewardWallet",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "getAllFizzNodes",
-    "outputs": [
-      {
-        "components": [
-          {
-            "internalType": "uint256",
-            "name": "fizzId",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "providerId",
-            "type": "uint256"
-          },
-          {
-            "internalType": "string",
-            "name": "spec",
-            "type": "string"
-          },
-          {
-            "internalType": "address",
-            "name": "walletAddress",
-            "type": "address"
-          },
-          {
-            "internalType": "address[]",
-            "name": "paymentsAccepted",
-            "type": "address[]"
-          },
-          {
-            "internalType": "enum FizzRegistry.FizzStatus",
-            "name": "status",
-            "type": "uint8"
-          },
-          {
-            "internalType": "uint256",
-            "name": "joinTimestamp",
-            "type": "uint256"
-          },
-          {
-            "internalType": "address",
-            "name": "rewardWallet",
-            "type": "address"
-          }
-        ],
-        "internalType": "struct FizzRegistry.Fizz[]",
-        "name": "",
-        "type": "tuple[]"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "_fizzId",
-        "type": "uint256"
-      }
-    ],
-    "name": "getFizz",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "providerId",
-        "type": "uint256"
+        "internalType": "string",
+        "name": "hostUri",
+        "type": "string"
       },
       {
         "internalType": "string",
-        "name": "spec",
+        "name": "certificate",
         "type": "string"
       },
       {
@@ -629,8 +577,13 @@
         "type": "address[]"
       },
       {
-        "internalType": "enum FizzRegistry.FizzStatus",
+        "internalType": "enum ProviderRegistry.ProviderStatus",
         "name": "status",
+        "type": "uint8"
+      },
+      {
+        "internalType": "enum ProviderRegistry.TrustTier",
+        "name": "tier",
         "type": "uint8"
       },
       {
@@ -660,7 +613,7 @@
         "type": "address"
       }
     ],
-    "name": "getFizzAddressByRewardAddress",
+    "name": "getProviderAddressByRewardAddress",
     "outputs": [
       {
         "internalType": "address",
@@ -679,35 +632,21 @@
         "type": "address"
       }
     ],
-    "name": "getFizzId",
+    "name": "getProviderByAddress",
     "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_walletAddress",
-        "type": "address"
-      }
-    ],
-    "name": "getFizzNodeByAddress",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "providerId",
-        "type": "uint256"
-      },
       {
         "internalType": "string",
         "name": "spec",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "hostUri",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "certificate",
         "type": "string"
       },
       {
@@ -716,8 +655,13 @@
         "type": "address[]"
       },
       {
-        "internalType": "enum FizzRegistry.FizzStatus",
+        "internalType": "enum ProviderRegistry.ProviderStatus",
         "name": "status",
+        "type": "uint8"
+      },
+      {
+        "internalType": "enum ProviderRegistry.TrustTier",
+        "name": "tier",
         "type": "uint8"
       },
       {
@@ -738,16 +682,16 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "_fizz",
+        "name": "_walletAddress",
         "type": "address"
       }
     ],
-    "name": "getFizzNodeRewardWalletByAddress",
+    "name": "getProviderId",
     "outputs": [
       {
-        "internalType": "address",
+        "internalType": "uint256",
         "name": "",
-        "type": "address"
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -756,12 +700,12 @@
   {
     "inputs": [
       {
-        "internalType": "uint256",
-        "name": "_fizzId",
-        "type": "uint256"
+        "internalType": "address",
+        "name": "_walletAddress",
+        "type": "address"
       }
     ],
-    "name": "getFizzNodeRewardWalletById",
+    "name": "getProviderRewardWallet",
     "outputs": [
       {
         "internalType": "address",
@@ -780,10 +724,29 @@
         "type": "address"
       }
     ],
-    "name": "getFizzNodeStatus",
+    "name": "getProviderStatus",
     "outputs": [
       {
-        "internalType": "enum FizzRegistry.FizzStatus",
+        "internalType": "enum ProviderRegistry.ProviderStatus",
+        "name": "",
+        "type": "uint8"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_walletAddress",
+        "type": "address"
+      }
+    ],
+    "name": "getProviderTrustTier",
+    "outputs": [
+      {
+        "internalType": "enum ProviderRegistry.TrustTier",
         "name": "",
         "type": "uint8"
       }
@@ -795,11 +758,30 @@
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "_fizzId",
+        "name": "_providerId",
         "type": "uint256"
       }
     ],
-    "name": "isActiveFizzNode",
+    "name": "getProviderWallet",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_walletAddress",
+        "type": "address"
+      }
+    ],
+    "name": "isActiveProvider",
     "outputs": [
       {
         "internalType": "bool",
@@ -818,26 +800,7 @@
         "type": "address"
       }
     ],
-    "name": "isRegisteredFizzNode",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_fizz",
-        "type": "address"
-      }
-    ],
-    "name": "isWhitelisted",
+    "name": "isRegisteredProvider",
     "outputs": [
       {
         "internalType": "bool",
@@ -850,7 +813,7 @@
   },
   {
     "inputs": [],
-    "name": "nextFizzId",
+    "name": "nextProviderId",
     "outputs": [
       {
         "internalType": "uint256",
@@ -863,11 +826,70 @@
   },
   {
     "inputs": [],
-    "name": "providerRegistry",
+    "name": "providerRewardManager",
     "outputs": [
       {
-        "internalType": "contract IProviderRegistry",
+        "internalType": "contract IProviderRewardsManager",
         "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "providers",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "providerId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "walletAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "string",
+        "name": "spec",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "hostUri",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "certificate",
+        "type": "string"
+      },
+      {
+        "internalType": "enum ProviderRegistry.ProviderStatus",
+        "name": "status",
+        "type": "uint8"
+      },
+      {
+        "internalType": "enum ProviderRegistry.TrustTier",
+        "name": "tier",
+        "type": "uint8"
+      },
+      {
+        "internalType": "uint256",
+        "name": "joinTimestamp",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "rewardWallet",
         "type": "address"
       }
     ],
@@ -890,25 +912,12 @@
   {
     "inputs": [
       {
-        "internalType": "address[]",
-        "name": "_fizzes",
-        "type": "address[]"
-      }
-    ],
-    "name": "removeAddressesFromWhitelist",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "uint256",
-        "name": "_fizzId",
+        "name": "_providerId",
         "type": "uint256"
       }
     ],
-    "name": "removeFizzNode",
+    "name": "removeProvider",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -921,7 +930,7 @@
         "type": "address"
       }
     ],
-    "name": "rewardAddressToFizzId",
+    "name": "rewardAddressToProviderId",
     "outputs": [
       {
         "internalType": "uint256",
@@ -936,16 +945,16 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "_fizzAddress",
+        "name": "_providerAddress",
         "type": "address"
       },
       {
-        "internalType": "enum FizzRegistry.FizzStatus",
+        "internalType": "enum ProviderRegistry.ProviderStatus",
         "name": "_status",
         "type": "uint8"
       }
     ],
-    "name": "setFizzStatus",
+    "name": "setProviderStatus",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -964,27 +973,14 @@
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "treasury",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
     "inputs": [
       {
-        "internalType": "bool",
-        "name": "_autoRegister",
-        "type": "bool"
+        "internalType": "string",
+        "name": "_certificate",
+        "type": "string"
       }
     ],
-    "name": "updateAutoRegisterState",
+    "name": "updateProviderCertificate",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -992,12 +988,25 @@
   {
     "inputs": [
       {
-        "internalType": "uint256",
-        "name": "_providerId",
-        "type": "uint256"
+        "internalType": "string",
+        "name": "_hostUri",
+        "type": "string"
       }
     ],
-    "name": "updateFizzProviderId",
+    "name": "updateProviderHostUri",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_rewardWallet",
+        "type": "address"
+      }
+    ],
+    "name": "updateProviderRewardAddress",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -1010,7 +1019,7 @@
         "type": "string"
       }
     ],
-    "name": "updateFizzSpec",
+    "name": "updateProviderSpec",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -1019,11 +1028,29 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "_providerRegistry",
+        "name": "_provider",
+        "type": "address"
+      },
+      {
+        "internalType": "enum ProviderRegistry.TrustTier",
+        "name": "_tier",
+        "type": "uint8"
+      }
+    ],
+    "name": "updateProviderTier",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_rewardManager",
         "type": "address"
       }
     ],
-    "name": "updateProviderRegistryAddress",
+    "name": "updateRewardAdress",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -1037,13 +1064,6 @@
       }
     ],
     "name": "updateTokenRegistryContract",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "withdrawFees",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

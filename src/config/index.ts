@@ -7,18 +7,11 @@ import {
 } from '@contracts/addresses';
 
 // Testnet URLs
-// export const SPHERON_TESTNET_RPC_URL = 'https://sepolia-rollup.arbitrum.io/rpc';
 export const SPHERON_TESTNET_RPC_URL =
-  'https://arbitrum-sepolia.core.chainstack.com/f89a40155b4b82dc5c601286fcac4ffb';
-export const SPHERON_TESTNET_WSS_URL =
-  'wss://arbitrum-sepolia.core.chainstack.com/f89a40155b4b82dc5c601286fcac4ffb';
-export const SPHERON_TESTNET_EXPLORER_URL = 'https://sepolia.arbiscan.io/';
-
-export const SPHERON_DEVNET_RPC_URL =
   'https://base-sepolia.g.alchemy.com/v2/MYm8w99-g3L5Vbxe-Z3RRcDy7P2BH_0n';
-export const SPHERON_DEVNET_WSS_URL =
+export const SPHERON_TESTNET_WSS_URL =
   'wss://base-sepolia.g.alchemy.com/v2/MYm8w99-g3L5Vbxe-Z3RRcDy7P2BH_0n';
-export const SPHERON_DEVNET_EXPLORER_URL = 'https://sepolia.basescan.org/';
+export const SPHERON_TESTNET_EXPLORER_URL = 'https://sepolia.basescan.org/';
 
 export const SPHERON_MAINNET_RPC_URL =
   'https://base-mainnet.g.alchemy.com/v2/-lNWgmawEUixMe7EKIzZOCpQFpdeVRjD';
@@ -31,11 +24,6 @@ export const SPHERON_RPC_MAP = {
     rpc: SPHERON_TESTNET_RPC_URL,
     wss: SPHERON_TESTNET_WSS_URL,
     explorer: SPHERON_TESTNET_EXPLORER_URL,
-  },
-  devnet: {
-    rpc: SPHERON_DEVNET_RPC_URL,
-    wss: SPHERON_DEVNET_WSS_URL,
-    explorer: SPHERON_DEVNET_EXPLORER_URL,
   },
   mainnet: {
     rpc: SPHERON_MAINNET_RPC_URL,

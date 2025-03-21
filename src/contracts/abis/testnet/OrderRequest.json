@@ -3,7 +3,12 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "_escrow",
+        "name": "_escrowUser",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_escrowProtocol",
         "type": "address"
       },
       {
@@ -32,6 +37,33 @@
   },
   {
     "inputs": [],
+    "name": "ECDSAInvalidSignature",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "length",
+        "type": "uint256"
+      }
+    ],
+    "name": "ECDSAInvalidSignatureLength",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "s",
+        "type": "bytes32"
+      }
+    ],
+    "name": "ECDSAInvalidSignatureS",
+    "type": "error"
+  },
+  {
+    "inputs": [],
     "name": "InsufficientBalance",
     "type": "error"
   },
@@ -52,7 +84,17 @@
   },
   {
     "inputs": [],
+    "name": "InvalidNonce",
+    "type": "error"
+  },
+  {
+    "inputs": [],
     "name": "InvalidOrderState",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "InvalidSignature",
     "type": "error"
   },
   {
@@ -101,7 +143,13 @@
       {
         "indexed": false,
         "internalType": "address",
-        "name": "escrow",
+        "name": "escrowUser",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "escrowProtocol",
         "type": "address"
       }
     ],
@@ -310,6 +358,45 @@
   },
   {
     "inputs": [],
+    "name": "CREATE_ORDER_TYPEHASH",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "DOMAIN_SEPARATOR",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "UPDATE_ORDER_TYPEHASH",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "accessControl",
     "outputs": [
       {
@@ -372,29 +459,9 @@
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "escrow",
-    "outputs": [
-      {
-        "internalType": "contract IEscrow",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "getAllOrders",
-    "outputs": [
+    "inputs": [
       {
         "components": [
-          {
-            "internalType": "uint64",
-            "name": "id",
-            "type": "uint64"
-          },
           {
             "internalType": "uint256",
             "name": "maxPrice",
@@ -411,46 +478,72 @@
             "type": "address"
           },
           {
-            "internalType": "address",
-            "name": "creator",
-            "type": "address"
+            "internalType": "string",
+            "name": "spec",
+            "type": "string"
           },
           {
-            "internalType": "enum OrderRequest.State",
-            "name": "state",
+            "internalType": "uint16",
+            "name": "version",
+            "type": "uint16"
+          },
+          {
+            "internalType": "enum OrderRequest.Mode",
+            "name": "mode",
             "type": "uint8"
           },
           {
-            "components": [
-              {
-                "internalType": "string",
-                "name": "specs",
-                "type": "string"
-              },
-              {
-                "internalType": "uint16",
-                "name": "version",
-                "type": "uint16"
-              },
-              {
-                "internalType": "enum OrderRequest.Mode",
-                "name": "mode",
-                "type": "uint8"
-              },
-              {
-                "internalType": "enum OrderRequest.Tier[]",
-                "name": "tier",
-                "type": "uint8[]"
-              }
-            ],
-            "internalType": "struct OrderRequest.OrderSpecs",
-            "name": "specs",
-            "type": "tuple"
+            "internalType": "enum OrderRequest.Tier[]",
+            "name": "tier",
+            "type": "uint8[]"
           }
         ],
-        "internalType": "struct OrderRequest.InitialOrder[]",
+        "internalType": "struct OrderRequest.OrderDetails",
+        "name": "details",
+        "type": "tuple"
+      },
+      {
+        "internalType": "address",
+        "name": "claimedSigner",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "nonce",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bytes",
+        "name": "signature",
+        "type": "bytes"
+      }
+    ],
+    "name": "createOrderWithSignature",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "escrowProtocol",
+    "outputs": [
+      {
+        "internalType": "contract IEscrowProtocol",
         "name": "",
-        "type": "tuple[]"
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "escrowUser",
+    "outputs": [
+      {
+        "internalType": "contract IEscrowUser",
+        "name": "",
+        "type": "address"
       }
     ],
     "stateMutability": "view",
@@ -673,6 +766,25 @@
   {
     "inputs": [
       {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "nonces",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "uint64",
         "name": "",
         "type": "uint64"
@@ -860,7 +972,30 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "_escrow",
+        "name": "_newAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "bool",
+        "name": "_isTokenRegistry",
+        "type": "bool"
+      }
+    ],
+    "name": "updateContractAddress",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_escrowUser",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_escrowProtocol",
         "type": "address"
       }
     ],
@@ -950,12 +1085,69 @@
   {
     "inputs": [
       {
+        "internalType": "uint64",
+        "name": "_orderId",
+        "type": "uint64"
+      },
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "maxPrice",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint64",
+            "name": "numOfBlocks",
+            "type": "uint64"
+          },
+          {
+            "internalType": "address",
+            "name": "token",
+            "type": "address"
+          },
+          {
+            "internalType": "string",
+            "name": "spec",
+            "type": "string"
+          },
+          {
+            "internalType": "uint16",
+            "name": "version",
+            "type": "uint16"
+          },
+          {
+            "internalType": "enum OrderRequest.Mode",
+            "name": "mode",
+            "type": "uint8"
+          },
+          {
+            "internalType": "enum OrderRequest.Tier[]",
+            "name": "tier",
+            "type": "uint8[]"
+          }
+        ],
+        "internalType": "struct OrderRequest.OrderDetails",
+        "name": "details",
+        "type": "tuple"
+      },
+      {
         "internalType": "address",
-        "name": "_lease",
+        "name": "claimedSigner",
         "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "nonce",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bytes",
+        "name": "signature",
+        "type": "bytes"
       }
     ],
-    "name": "updateLeaseAdress",
+    "name": "updateInitialOrderWithSignature",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -987,19 +1179,6 @@
       }
     ],
     "name": "updatePendingOrder",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_tokenRegistry",
-        "type": "address"
-      }
-    ],
-    "name": "updateTokenRegistryContract",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
