@@ -51,11 +51,44 @@ export class OrderModule {
   }
 
   async createOrderWithPaymaster(orderDetails: OrderDetails): Promise<string | null> {
-    // Encode vote function call    
+    const network = await this.provider.getNetwork();
+    const chainId = network.chainId;
+    const { signer } = await initializeSigner({ wallet: this.wallet });
+    const claimedSigner = signer.address;
+
+    const contract = new ethers.Contract(OrderRequest, OrderRequestAbi, signer);
+    const nonce = await contract.nonces(claimedSigner);
+  
+    const domain = {
+      name: "Spheron",
+      version: "1",
+      chainId,
+      verifyingContract: OrderRequest,
+    };
+  
+    const types = {
+      CreateOrder: [
+        { name: "maxPrice", type: "uint256" },
+        { name: "numOfBlocks", type: "uint64" },
+        { name: "token", type: "address" },
+        { name: "nonce", type: "uint256" },
+      ],
+    };
+  
+    const value = {
+      maxPrice: orderDetails.maxPrice,
+      numOfBlocks: orderDetails.numOfBlocks,
+      token: orderDetails.token,
+      nonce,
+    };
+  
+    // Sign the typed data using EIP-712
+    const signature = await signer.signTypedData(domain, types, value);
+
     const encodedData = this.paymaster?.encodeFunction({
-      abi: ['function createOrder(OrderDetails memory details) external returns (void)'],
-      functionName: 'createOrder',
-      args: [orderDetails]
+      abi: OrderRequestAbi,
+      functionName: 'createOrderWithSignature',
+      args: [orderDetails, claimedSigner, nonce, signature]
     });
 
     const txHash = await this.paymaster?.sendTransaction({
@@ -64,7 +97,6 @@ export class OrderModule {
     });
     const txReceipt = await this.paymaster?.waitForTransaction(txHash!);
     return txReceipt?.receipt.transactionHash || null;
-
   }
 
   async updateOrder(
