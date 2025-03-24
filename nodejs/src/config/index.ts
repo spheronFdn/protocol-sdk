@@ -7,7 +7,7 @@ export const SPHERON_TESTNET_EXPLORER_URL = 'https://sepolia.basescan.org';
 
 export const SPHERON_MAINNET_HTTP_URL = 'https://mainnet.base.org';
 export const SPHERON_MAINNET_WSS_URL = 'wss://base-rpc.publicnode.com';
-export const SPHERON_MAINNET_EXPLORER_URL = 'https://base.blockscout.com/';
+export const SPHERON_MAINNET_EXPLORER_URL = 'https://basescan.org/';
 
 export const rpcUrls = {
   testnet: {
