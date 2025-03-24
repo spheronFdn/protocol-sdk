@@ -45,48 +45,6 @@ export class FizzModule {
     this.webSocketProvider = webSocketProvider;
   }
 
-  async withdrawFizzEarnings({
-    rewardWallet,
-    tokenAddress,
-    amount,
-    decimals,
-    onSuccessCallback,
-    onFailureCallback,
-  }: TransactionData) {
-    if (typeof window?.ethereum === 'undefined') {
-      console.log('Please install MetaMask');
-      return;
-    }
-
-    try {
-      await window.ethereum.request({ method: 'eth_requestAccounts' });
-
-      const provider = new ethers.BrowserProvider(window.ethereum);
-      const signer = await provider.getSigner();
-
-      const contractABI = EscrowAbi;
-      const contractAddress = contractAddresses[this.networkType].escrow;
-      const contract = new ethers.Contract(contractAddress, contractABI, signer);
-
-      const finalAmount = (Number(amount.toString()) - 1) / 10 ** decimals;
-      const withdrawAmount = ethers.parseUnits(finalAmount.toFixed(decimals), decimals);
-
-      const result = await contract.withdrawFizzNodeEarnings(
-        rewardWallet,
-        tokenAddress,
-        withdrawAmount
-      );
-      const receipt = await result.wait();
-      console.log('Withdraw earnings successful -> ', receipt);
-      if (onSuccessCallback) onSuccessCallback(receipt);
-      return receipt;
-    } catch (error) {
-      console.error('Error withdrawing fizz earnings -> ', error);
-      if (onFailureCallback) onFailureCallback(error);
-      throw error;
-    }
-  }
-
   async getFizzEarnings(fizzAddress: string, tokenAddress: string) {
     try {
       const contractAbi = EscrowAbi;

@@ -37,6 +37,7 @@ export const ProviderAttributeRegistryMainnet = '0x14761A632E70FBdaB878F48863DAd
 export const FizzRegistryMainnet = '0x24038E735659673B7755f4439B4Cb3f0983189d5';
 export const FizzAttributeRegistryMainnet = '0x2beCA4bBcdB1eb26Ddf4dDE0733EDb263292d439';
 export const EscrowMainnet = '0x2bD631DA00034282Fce418D578bc97d0A2ba26d0';
+export const EscrowProtocolMainnet = '0xbEDE87cE3411F280B3Ed63027B45f73Cbcd1B441'; //TODO: UPDATE THIS
 export const OrderRequestMainnet = '0xCBAF105A0B22E2692E51393bEd694B55B188F4D0';
 export const ResourceManagerMainnet = '0x270d622149F46fFc72A9fD5A8cF92D1FdE5AD5E0';
 export const ComputeLeaseMainnet = '0x6C0aF43bDf89A6B9Dc7D9f545C89651F9e4930F6';
@@ -61,6 +62,7 @@ export const contractAddresses = {
     fizzRegistry: FizzRegistryDev,
     fizzAttributeRegistry: FizzAttributeRegistryDev,
     escrow: EscrowDev,
+    escrowProtocol: EscrowProtocolDev,
     orderRequest: OrderRequestDev,
     resourceManager: ResourceManagerDev,
     computeLease: ComputeLeaseDev,
@@ -86,6 +88,7 @@ export const contractAddresses = {
     fizzRegistry: FizzRegistryMainnet,
     fizzAttributeRegistry: FizzAttributeRegistryMainnet,
     escrow: EscrowMainnet,
+    escrowProtocol: EscrowProtocolMainnet,
     orderRequest: OrderRequestMainnet,
     resourceManager: ResourceManagerMainnet,
     computeLease: ComputeLeaseMainnet,
