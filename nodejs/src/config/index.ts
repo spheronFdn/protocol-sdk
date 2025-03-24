@@ -1,11 +1,13 @@
 import { contractAddresses } from '@contracts/addresses';
 
 // Testnet URLs
-export const SPHERON_TESTNET_HTTP_URL =
-  'https://base-sepolia.g.alchemy.com/v2/MYm8w99-g3L5Vbxe-Z3RRcDy7P2BH_0n';
-export const SPHERON_TESTNET_WSS_URL =
-  'wss://base-sepolia.g.alchemy.com/v2/MYm8w99-g3L5Vbxe-Z3RRcDy7P2BH_0n';
+export const SPHERON_TESTNET_HTTP_URL = 'https://base-sepolia-rpc.publicnode.com';
+export const SPHERON_TESTNET_WSS_URL = 'wss://base-sepolia-rpc.publicnode.com';
 export const SPHERON_TESTNET_EXPLORER_URL = 'https://sepolia.basescan.org';
+
+export const SPHERON_MAINNET_HTTP_URL = 'https://mainnet.base.org';
+export const SPHERON_MAINNET_WSS_URL = 'wss://base-rpc.publicnode.com';
+export const SPHERON_MAINNET_EXPLORER_URL = 'https://base.blockscout.com/';
 
 export const rpcUrls = {
   testnet: {
