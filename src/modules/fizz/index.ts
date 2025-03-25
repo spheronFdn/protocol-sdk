@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import EscrowProtocolAbi from '@contracts/abis/testnet/EscrowProtocol.json';
 import EscrowAbi from '@contracts/abis/testnet/EscrowUser.json';
 import FizzRegistryAbi from '@contracts/abis/testnet/FizzRegistry.json';
 import ProviderRegistryAbi from '@contracts/abis/testnet/ProviderRegistry.json';
@@ -47,8 +48,8 @@ export class FizzModule {
 
   async getFizzEarnings(fizzAddress: string, tokenAddress: string) {
     try {
-      const contractAbi = EscrowAbi;
-      const contractAddress = contractAddresses[this.networkType].escrow;
+      const contractAbi = EscrowProtocolAbi;
+      const contractAddress = contractAddresses[this.networkType].escrowProtocol;
       const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
 
       const response = await contract.getFizzNodeEarnings(fizzAddress, tokenAddress);
