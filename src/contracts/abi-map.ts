@@ -5,6 +5,7 @@ import ProviderAttributeRegistryTestnet from './abis/testnet/ProviderAttributeRe
 import FizzRegistryTestnet from './abis/testnet/FizzRegistry.json';
 import FizzAttributeRegistryTestnet from './abis/testnet/FizzAttributeRegistry.json';
 import EscrowTestnet from './abis/testnet/EscrowUser.json';
+import EscrowProtocolTestnet from './abis/testnet/EscrowProtocol.json';
 import AttributeRegistryTestnet from './abis/testnet/AttributeRegistry.json';
 import BidTestnet from './abis/testnet/Bid.json';
 import ComputeLeaseTestnet from './abis/testnet/ComputeLease.json';
@@ -24,6 +25,7 @@ import ProviderAttributeRegistryMainnet from './abis/mainnet/ProviderAttributeRe
 import FizzRegistryMainnet from './abis/mainnet/FizzRegistry.json';
 import FizzAttributeRegistryMainnet from './abis/mainnet/FizzAttributeRegistry.json';
 import EscrowMainnet from './abis/mainnet/Escrow.json';
+import EscrowProtocolMainnet from './abis/mainnet/EscrowProtocol.json';
 import AttributeRegistryMainnet from './abis/mainnet/AttributeRegistry.json';
 import BidMainnet from './abis/mainnet/Bid.json';
 import ComputeLeaseMainnet from './abis/mainnet/ComputeLease.json';
@@ -57,6 +59,7 @@ export const abiMap: Record<NetworkType, Record<string, any>> = {
     testContract: TestContractTestnet,
     testToken: TestTokenTestnet,
     tokenRegistry: TokenRegistryTestnet,
+    escrowProtocol: EscrowProtocolTestnet,
   },
   mainnet: {
     accessControlManager: AccessControlManagerMainnet,
@@ -77,5 +80,6 @@ export const abiMap: Record<NetworkType, Record<string, any>> = {
     testContract: TestContractMainnet,
     testToken: TestTokenMainnet,
     tokenRegistry: TokenRegistryMainnet,
+    escrowProtocol: EscrowProtocolMainnet,
   },
 };
