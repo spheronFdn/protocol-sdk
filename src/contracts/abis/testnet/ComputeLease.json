@@ -25,6 +25,11 @@
         "internalType": "address",
         "name": "_access",
         "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_whitelistRegistry",
+        "type": "address"
       }
     ],
     "stateMutability": "nonpayable",
@@ -713,6 +718,19 @@
     "name": "updateTokenRegistryContract",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "whitelistRegistry",
+    "outputs": [
+      {
+        "internalType": "contract IWhitelistRegistry",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   }
 ]

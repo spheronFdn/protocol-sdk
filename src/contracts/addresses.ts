@@ -5,8 +5,6 @@ export const ProviderRegistryDev = '0x038Eb8E227B287d7D42Cf404A07ACb5a7Df7645A';
 export const ProviderAttributeRegistryDev = '0x63942fCb221aDF85ebdFc11a061D5eea2384f00A';
 export const FizzRegistryDev = '0xe16c74C9dB46d437527B83F7A55cF65662Ee4CA3';
 export const FizzAttributeRegistryDev = '0x8cA664043Bf767323d331D69841e525C2c878543';
-export const TreasuryDev = '0xA05d173F369263fB697e1a0e214b107b59237400';
-// export const EscrowUserDev = '0x9859D327a776720DA084397693E53C483CCA0d77';
 export const EscrowDev = '0x93233785411874835eC805c391e4C04376f1F255';
 export const EscrowProtocolDev = '0xbEDE87cE3411F280B3Ed63027B45f73Cbcd1B441';
 export const OrderRequestDev = '0x692c4713E92e9f8dAD0b8405093446C53b18EFb6';
@@ -30,27 +28,28 @@ export const CSTDev = '0x8E5996A3963011Ca9dFa04E3CB773147F98C0e17';
 export const SPONDev = '0x76e593392523243ACD38ceD87c2007F14483a86B';
 
 // Mainnet Contract Addresses
-export const AccessControlManagerMainnet = '0x2F6dE416a7AEED365bE49DeB931D263EC742605C';
 export const TokenRegistryMainnet = '0xe023062b4A63Ca8c0c7Ac7d4AB1810bd3132ac4d';
-export const ProviderRegistryMainnet = '0x39170f12357685d6966468Cc5974c7c2eA629747';
-export const ProviderAttributeRegistryMainnet = '0x14761A632E70FBdaB878F48863DAd1CB2024eA6f';
-export const FizzRegistryMainnet = '0x24038E735659673B7755f4439B4Cb3f0983189d5';
-export const FizzAttributeRegistryMainnet = '0x2beCA4bBcdB1eb26Ddf4dDE0733EDb263292d439';
-export const EscrowMainnet = '0x2bD631DA00034282Fce418D578bc97d0A2ba26d0';
-export const EscrowProtocolMainnet = '0xbEDE87cE3411F280B3Ed63027B45f73Cbcd1B441'; //TODO: UPDATE THIS
-export const OrderRequestMainnet = '0xCBAF105A0B22E2692E51393bEd694B55B188F4D0';
-export const ResourceManagerMainnet = '0x270d622149F46fFc72A9fD5A8cF92D1FdE5AD5E0';
-export const ComputeLeaseMainnet = '0x6C0aF43bDf89A6B9Dc7D9f545C89651F9e4930F6';
-export const BidMainnet = '0x4ba1002F71633E991B3974a4Dc9E293df78884b0';
+export const AccessControlMainnet = '0x2F6dE416a7AEED365bE49DeB931D263EC742605C';
+export const ProviderRegistryMainnet = '0x527D92b97200Df5767d299271B9Cd8533DFd8A4d';
+export const ProviderAttributeRegistryMainnet = '0x35b78B015802481B6a2857Dd54ca6bae188C790F';
+export const FizzRegistryMainnet = '0xAeD93F10317a3f198011E81055Fe7Af91027a08B';
+export const FizzAttributeRegistryMainnet = '0xA48B50EfD3895934188A27c01E857B60106c523a';
+export const EscrowUserMainnet = '0x72Fd86A0Ef515296feB8952BC115DceB916198d2';
+export const EscrowProtocolMainnet = '0x849CEe9f192A0A5c1658EcAa5AF7a1DAD2e1E090';
+export const OrderRequestMainnet = '0xfcACdd715403514Cd4c04830419779b48f66017A';
+export const ComputeLeaseMainnet = '0xA9068fEa5e2374Ee99E2fFa8d5e01529dFB0f29f';
+export const BidMainnet = '0xe7363Cb21B226b0452D23587def5284682293568';
 export const ResourceRegistryCPUMainnet = '0x8Ac7BD17fA6E51E9719FaEfD8FD8Cc46ECAa93A9';
 export const ResourceRegistryGPUMainnet = '0x360135261AB6CF9c9bBeF4c5d2B1fB9bb1671C8e';
 export const ResourceRegistryFactoryMainnet = '0xF302Af7f042A6D2e6A4c1fF67e4f69109d8f4Fa0';
-export const ProviderRewardsManagerMainnet = '0xeE381a67aCeAd7f454E73CE3bDDD034A07Bd30Cc';
-export const FizzRewardsManagerMainnet = '0x16E17Ad30D7a66135ba5F1C2C73faabB130D4BA5';
+export const ProviderRewardCalculatorMainnet = '0xa8F2FaECaeCe5654DB1927437b10852dffE659F6';
+export const ProviderRewardManagerMainnet = '0x20f2159b1082529089752Bce0549a649B0f0032C';
+export const FizzRewardCalculatorMainnet = '0x33Bdb47399e6b80a759658F35bcDD5Ce062dC25F';
+export const FizzRewardManagerMainnet = '0x8A01206Fd078Be34b28d689C92C1f2C05B3C641B';
 export const RewardTokenMainnet = '0xA0c5ba7d9eccbE59000e8E67654CA5d867C6b401';
-export const FizzNodeRewardTokenMainnet = '0xA2400EFe3d7a9E2281F32A66Df18CFFE651c69f3';
 
 // Mainnet Token addresses
+export const USDCMainnet = '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913';
 export const USDTMainnet = '0xF981a6AB8D09a636EC78395b02B1aC693a0C8307';
 
 export const contractAddresses = {
@@ -81,24 +80,24 @@ export const contractAddresses = {
     SPON: SPONDev,
   },
   mainnet: {
-    accessControlManager: AccessControlManagerMainnet,
+    accessControlManager: AccessControlMainnet,
     tokenRegistry: TokenRegistryMainnet,
     providerRegistry: ProviderRegistryMainnet,
     providerAttributeRegistry: ProviderAttributeRegistryMainnet,
     fizzRegistry: FizzRegistryMainnet,
     fizzAttributeRegistry: FizzAttributeRegistryMainnet,
-    escrow: EscrowMainnet,
+    escrow: EscrowUserMainnet,
     escrowProtocol: EscrowProtocolMainnet,
     orderRequest: OrderRequestMainnet,
-    resourceManager: ResourceManagerMainnet,
     computeLease: ComputeLeaseMainnet,
     bid: BidMainnet,
     resourceRegistryCPU: ResourceRegistryCPUMainnet,
     resourceRegistryGPU: ResourceRegistryGPUMainnet,
     resourceRegistryFactory: ResourceRegistryFactoryMainnet,
-    providerRewardManager: ProviderRewardsManagerMainnet,
-    fizzRewardManager: FizzRewardsManagerMainnet,
+    providerRewardManager: ProviderRewardManagerMainnet,
+    fizzRewardManager: FizzRewardManagerMainnet,
     rewardToken: RewardTokenMainnet,
+    USDC: USDCMainnet,
     USDT: USDTMainnet,
   },
 };

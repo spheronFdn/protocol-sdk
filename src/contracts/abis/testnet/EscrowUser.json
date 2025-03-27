@@ -5,6 +5,11 @@
         "internalType": "address",
         "name": "_tokenRegistryAddress",
         "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_whitelistRegistry",
+        "type": "address"
       }
     ],
     "stateMutability": "nonpayable",
@@ -332,19 +337,6 @@
   {
     "inputs": [],
     "name": "DEFAULT_ADMIN_ROLE",
-    "outputs": [
-      {
-        "internalType": "bytes32",
-        "name": "",
-        "type": "bytes32"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "DEPOSIT_FOR_OPERATOR_TYPEHASH",
     "outputs": [
       {
         "internalType": "bytes32",
@@ -884,6 +876,19 @@
         "internalType": "uint128",
         "name": "unlockedBalance",
         "type": "uint128"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "whitelistRegistry",
+    "outputs": [
+      {
+        "internalType": "contract IWhitelistRegistry",
+        "name": "",
+        "type": "address"
       }
     ],
     "stateMutability": "view",

@@ -502,6 +502,19 @@
   {
     "inputs": [
       {
+        "internalType": "address[]",
+        "name": "_fizzes",
+        "type": "address[]"
+      }
+    ],
+    "name": "adminRemoveFizzes",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
@@ -813,6 +826,30 @@
   {
     "inputs": [
       {
+        "internalType": "uint256",
+        "name": "_fizzID",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_providerID",
+        "type": "uint256"
+      }
+    ],
+    "name": "isFizzLinked",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "address",
         "name": "_walletAddress",
         "type": "address"
@@ -1039,6 +1076,25 @@
     "name": "updateTokenRegistryContract",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "whitelistedFizzes",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {

@@ -24,7 +24,7 @@ import ProviderRegistryMainnet from './abis/mainnet/ProviderRegistry.json';
 import ProviderAttributeRegistryMainnet from './abis/mainnet/ProviderAttributeRegistry.json';
 import FizzRegistryMainnet from './abis/mainnet/FizzRegistry.json';
 import FizzAttributeRegistryMainnet from './abis/mainnet/FizzAttributeRegistry.json';
-import EscrowMainnet from './abis/mainnet/Escrow.json';
+import EscrowUserMainnet from './abis/mainnet/EscrowUser.json';
 import EscrowProtocolMainnet from './abis/mainnet/EscrowProtocol.json';
 import AttributeRegistryMainnet from './abis/mainnet/AttributeRegistry.json';
 import BidMainnet from './abis/mainnet/Bid.json';
@@ -66,7 +66,7 @@ export const abiMap: Record<NetworkType, Record<string, any>> = {
     attributeRegistry: AttributeRegistryMainnet,
     bid: BidMainnet,
     computeLease: ComputeLeaseMainnet,
-    escrow: EscrowMainnet,
+    escrow: EscrowUserMainnet,
     fizzAttributeRegistry: FizzAttributeRegistryMainnet,
     fizzRegistry: FizzRegistryMainnet,
     fizzRewardsManager: FizzRewardsManagerMainnet,
