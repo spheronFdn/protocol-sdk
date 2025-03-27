@@ -24,3 +24,13 @@ export interface TransactionData {
   onSuccessCallback?: (data: unknown) => void;
   onFailureCallback?: (data: unknown) => void;
 }
+
+export interface WithdrawEarningsData {
+  providerAddress: string;
+  fizzId: string;
+  tokenAddress: string;
+  amount: number;
+  isFizz: boolean;
+  onSuccessCallback?: (data: unknown) => void;
+  onFailureCallback?: (data: unknown) => void;
+}

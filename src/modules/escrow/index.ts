@@ -1,8 +1,9 @@
-import EscrowAbi from '@contracts/abis/devnet/Escrow.json';
-import TokenAbi from '@contracts/abis/devnet/TestToken.json';
+import EscrowAbi from '@contracts/abis/testnet/EscrowUser.json';
+import EscrowProtocolAbi from '@contracts/abis/testnet/EscrowProtocol.json';
+import TokenAbi from '@contracts/abis/testnet/TestToken.json';
 import { contractAddresses, EscrowDev as Escrow } from '@contracts/addresses';
 import { ethers } from 'ethers';
-import { TransactionData } from './types';
+import { TransactionData, WithdrawEarningsData } from './types';
 import { NetworkType } from '@config/index';
 export class EscrowModule {
   private provider: ethers.Provider;
@@ -172,6 +173,50 @@ export class EscrowModule {
       return receipt;
     } catch (error) {
       console.error('Error in balance withdraw-> ', error);
+      if (onFailureCallback) onFailureCallback(error);
+      return error;
+    }
+  }
+
+  async withdrawEarnings({
+    providerAddress,
+    fizzId = '0',
+    tokenAddress,
+    amount,
+    isFizz = false,
+    onSuccessCallback,
+    onFailureCallback,
+  }: WithdrawEarningsData) {
+    if (typeof window?.ethereum === 'undefined') {
+      console.log('Please install MetaMask');
+      return;
+    }
+
+    try {
+      await window.ethereum.request({ method: 'eth_requestAccounts' });
+
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      const signer = await provider.getSigner();
+
+      const contractABI = EscrowProtocolAbi;
+      const contractAddress = contractAddresses[this.networkType].escrowProtocol;
+
+      const contract = new ethers.Contract(contractAddress, contractABI, signer);
+
+      const result = await contract.withdrawEarnings(
+        providerAddress,
+        fizzId,
+        tokenAddress,
+        amount,
+        isFizz
+      );
+
+      const receipt = await result.wait();
+      console.log('Withdraw earnings successfull -> ', receipt);
+      if (onSuccessCallback) onSuccessCallback(receipt);
+      return receipt;
+    } catch (error) {
+      console.error('Error withdrawing earnings-> ', error);
       if (onFailureCallback) onFailureCallback(error);
       return error;
     }

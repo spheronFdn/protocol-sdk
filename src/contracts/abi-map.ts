@@ -1,21 +1,22 @@
-import AccessControlManagerTestnet from './abis/devnet/AccessControlManager.json';
-import TokenRegistryTestnet from './abis/devnet/TokenRegistry.json';
-import ProviderRegistryTestnet from './abis/devnet/ProviderRegistry.json';
-import ProviderAttributeRegistryTestnet from './abis/devnet/ProviderAttributeRegistry.json';
-import FizzRegistryTestnet from './abis/devnet/FizzRegistry.json';
-import FizzAttributeRegistryTestnet from './abis/devnet/FizzAttributeRegistry.json';
-import EscrowTestnet from './abis/devnet/Escrow.json';
-import AttributeRegistryTestnet from './abis/devnet/AttributeRegistry.json';
-import BidTestnet from './abis/devnet/Bid.json';
-import ComputeLeaseTestnet from './abis/devnet/ComputeLease.json';
-import FizzRewardsManagerTestnet from './abis/devnet/FizzRewardsManager.json';
-import OrderRequestTestnet from './abis/devnet/OrderRequest.json';
-import ProviderRewardsManagerTestnet from './abis/devnet/ProviderRewardsManager.json';
-import ResourceRegistryTestnet from './abis/devnet/ResourceRegistry.json';
-import ResourceRegistryFactoryTestnet from './abis/devnet/ResourceRegistryFactory.json';
-import RewardTokenTestnet from './abis/devnet/RewardToken.json';
-import TestContractTestnet from './abis/devnet/TestContract.json';
-import TestTokenTestnet from './abis/devnet/TestToken.json';
+import AccessControlManagerTestnet from './abis/testnet/AccessControlManager.json';
+import TokenRegistryTestnet from './abis/testnet/TokenRegistry.json';
+import ProviderRegistryTestnet from './abis/testnet/ProviderRegistry.json';
+import ProviderAttributeRegistryTestnet from './abis/testnet/ProviderAttributeRegistry.json';
+import FizzRegistryTestnet from './abis/testnet/FizzRegistry.json';
+import FizzAttributeRegistryTestnet from './abis/testnet/FizzAttributeRegistry.json';
+import EscrowTestnet from './abis/testnet/EscrowUser.json';
+import EscrowProtocolTestnet from './abis/testnet/EscrowProtocol.json';
+import AttributeRegistryTestnet from './abis/testnet/AttributeRegistry.json';
+import BidTestnet from './abis/testnet/Bid.json';
+import ComputeLeaseTestnet from './abis/testnet/ComputeLease.json';
+import FizzRewardsManagerTestnet from './abis/testnet/FizzRewardsManager.json';
+import OrderRequestTestnet from './abis/testnet/OrderRequest.json';
+import ProviderRewardsManagerTestnet from './abis/testnet/ProviderRewardsManager.json';
+import ResourceRegistryTestnet from './abis/testnet/ResourceRegistry.json';
+import ResourceRegistryFactoryTestnet from './abis/testnet/ResourceRegistryFactory.json';
+import RewardTokenTestnet from './abis/testnet/RewardToken.json';
+import TestContractTestnet from './abis/testnet/TestContract.json';
+import TestTokenTestnet from './abis/testnet/TestToken.json';
 
 import AccessControlManagerMainnet from './abis/mainnet/AccessControlManager.json';
 import TokenRegistryMainnet from './abis/mainnet/TokenRegistry.json';
@@ -24,6 +25,7 @@ import ProviderAttributeRegistryMainnet from './abis/mainnet/ProviderAttributeRe
 import FizzRegistryMainnet from './abis/mainnet/FizzRegistry.json';
 import FizzAttributeRegistryMainnet from './abis/mainnet/FizzAttributeRegistry.json';
 import EscrowMainnet from './abis/mainnet/Escrow.json';
+import EscrowProtocolMainnet from './abis/mainnet/EscrowProtocol.json';
 import AttributeRegistryMainnet from './abis/mainnet/AttributeRegistry.json';
 import BidMainnet from './abis/mainnet/Bid.json';
 import ComputeLeaseMainnet from './abis/mainnet/ComputeLease.json';
@@ -57,6 +59,7 @@ export const abiMap: Record<NetworkType, Record<string, any>> = {
     testContract: TestContractTestnet,
     testToken: TestTokenTestnet,
     tokenRegistry: TokenRegistryTestnet,
+    escrowProtocol: EscrowProtocolTestnet,
   },
   mainnet: {
     accessControlManager: AccessControlManagerMainnet,
@@ -77,5 +80,6 @@ export const abiMap: Record<NetworkType, Record<string, any>> = {
     testContract: TestContractMainnet,
     testToken: TestTokenMainnet,
     tokenRegistry: TokenRegistryMainnet,
+    escrowProtocol: EscrowProtocolMainnet,
   },
 };

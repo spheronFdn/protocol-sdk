@@ -1,4 +1,4 @@
-import ProviderRegistryAbi from '@contracts/abis/devnet/ProviderRegistry.json';
+import ProviderRegistryAbi from '@contracts/abis/testnet/ProviderRegistry.json';
 import { contractAddresses } from '@contracts/addresses';
 import { ethers } from 'ethers';
 import { Category, IProvider } from './types';
