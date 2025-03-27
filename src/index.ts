@@ -5,9 +5,8 @@ import { EscrowModule } from '@modules/escrow';
 import { SpheronProviderModule } from '@modules/spheron-provider';
 import {
   NetworkType,
+  RpcProvider,
   SPHERON_RPC_MAP,
-  // SPHERON_TESTNET_RPC_URL,
-  // SPHERON_TESTNET_WSS_URL,
 } from '@config/index';
 import { ProviderModule } from '@modules/provider';
 import { FizzModule } from '@modules/fizz';
@@ -21,12 +20,18 @@ export class SpheronSDK {
   public fizz: FizzModule;
   public networkType: NetworkType;
 
-  constructor(providerUrl = '', proxyUrl = '', networkType: NetworkType = 'testnet') {
+  constructor(
+    providerUrl = '',
+    proxyUrl = '',
+    networkType: NetworkType = 'testnet',
+    rpcProvider: RpcProvider = {
+      HTTP_URL: SPHERON_RPC_MAP[networkType].http,
+      WSS_URL: SPHERON_RPC_MAP[networkType].wss,
+    }
+  ) {
     this.networkType = networkType;
-    // const provider = new ethers.JsonRpcProvider(SPHERON_TESTNET_RPC_URL);
-    // const websocketProvider = new ethers.WebSocketProvider(SPHERON_TESTNET_WSS_URL);
-    const provider = new ethers.JsonRpcProvider(SPHERON_RPC_MAP[networkType].rpc);
-    const websocketProvider = new ethers.WebSocketProvider(SPHERON_RPC_MAP[networkType].wss);
+    const provider = new ethers.JsonRpcProvider(rpcProvider.HTTP_URL);
+    const websocketProvider = new ethers.WebSocketProvider(rpcProvider.WSS_URL);
     this.leases = new LeaseModule(provider, websocketProvider, networkType);
     this.orders = new OrderModule(provider, websocketProvider, networkType);
     this.escrow = new EscrowModule(provider, networkType);

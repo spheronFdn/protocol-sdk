@@ -6,31 +6,33 @@ import {
   USDTMainnet,
 } from '@contracts/addresses';
 
-// Testnet URLs
-export const SPHERON_TESTNET_RPC_URL =
-  'https://base-sepolia.g.alchemy.com/v2/MYm8w99-g3L5Vbxe-Z3RRcDy7P2BH_0n';
-export const SPHERON_TESTNET_WSS_URL =
-  'wss://base-sepolia.g.alchemy.com/v2/MYm8w99-g3L5Vbxe-Z3RRcDy7P2BH_0n';
-export const SPHERON_TESTNET_EXPLORER_URL = 'https://sepolia.basescan.org/';
+// Testnet Default RPC URLs
+export const SPHERON_TESTNET_HTTP_URL = 'https://base-sepolia-rpc.publicnode.com';
+export const SPHERON_TESTNET_WSS_URL = 'wss://base-sepolia-rpc.publicnode.com';
+export const SPHERON_TESTNET_EXPLORER_URL = 'https://sepolia.basescan.org';
 
-export const SPHERON_MAINNET_RPC_URL =
-  'https://base-mainnet.g.alchemy.com/v2/-lNWgmawEUixMe7EKIzZOCpQFpdeVRjD';
-export const SPHERON_MAINNET_WSS_URL =
-  'wss://base-mainnet.g.alchemy.com/v2/-lNWgmawEUixMe7EKIzZOCpQFpdeVRjD';
-export const SPHERON_MAINNET_EXPLORER_URL = 'https://base.blockscout.com/';
+// Mainnet Default RPC URLs
+export const SPHERON_MAINNET_HTTP_URL = 'https://mainnet.base.org';
+export const SPHERON_MAINNET_WSS_URL = 'wss://base-rpc.publicnode.com';
+export const SPHERON_MAINNET_EXPLORER_URL = 'https://basescan.org';
 
 export const SPHERON_RPC_MAP = {
   testnet: {
-    rpc: SPHERON_TESTNET_RPC_URL,
+    http: SPHERON_TESTNET_HTTP_URL,
     wss: SPHERON_TESTNET_WSS_URL,
     explorer: SPHERON_TESTNET_EXPLORER_URL,
   },
   mainnet: {
-    rpc: SPHERON_MAINNET_RPC_URL,
+    http: SPHERON_MAINNET_HTTP_URL,
     wss: SPHERON_MAINNET_WSS_URL,
     explorer: SPHERON_MAINNET_EXPLORER_URL,
   },
 };
+
+export interface RpcProvider {
+  HTTP_URL: string;
+  WSS_URL: string;
+}
 
 export interface IToken {
   id: number;
@@ -57,21 +59,20 @@ export type NetworkType = 'testnet' | 'mainnet';
 
 export const networkMap: Record<NetworkType, INetwork> = {
   testnet: {
-    chainId: 421614,
-    chainName: 'Arbitrum Sepolia',
-    rpcUrls: ['https://sepolia-rollup.arbitrum.io/rpc'],
+    chainId: 84532,
+    chainName: 'Base Sepolia',
+    rpcUrls: [SPHERON_TESTNET_HTTP_URL],
     nativeCurrency: {
-      name: 'Ethereum',
+      name: 'Sepolia Ether',
       symbol: 'ETH',
       decimals: 18,
     },
-    blockExplorerUrls: ['https://sepolia.arbiscan.io/'],
+    blockExplorerUrls: [SPHERON_TESTNET_EXPLORER_URL],
   },
-  // TODO: NEED TO UPDATE WHEN MAINNET RELEASE
   mainnet: {
     chainId: 8453,
     chainName: 'Base Mainnet',
-    rpcUrls: [SPHERON_MAINNET_RPC_URL],
+    rpcUrls: [SPHERON_MAINNET_HTTP_URL],
     nativeCurrency: {
       name: 'Ethereum',
       symbol: 'ETH',
