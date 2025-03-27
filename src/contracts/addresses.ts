@@ -1,48 +1,103 @@
-// Contract addresses
-export const TokenRegistry = '0x96Ca5955F25648FB44C5D772BAdB4313000C66Fe';
-export const ProviderRegistry = '0xc51F366131924e477a65b05D9ca97333daa3385D';
-export const Escrow = '0x495d613910FdeB29E83d9fb4B25EbFC3ACc8ddc4';
-export const OrderRequest = '0xB4df88D433Ff0AFe0DF3e2aE39681C28D8F71937';
-export const ResourceManager = '0x217Bf67daee35A2e59334B5209069FED1F10883A';
-export const ComputeLease = '0x5b6bf1923F11E3a6A123ed162E11fbBe39F51161';
-export const Bid = '0xb32026402F12aAE59Ee37E60495A434C1a044E27';
-export const ResourceRegistryCPU = '0xd92F72Ffc27E5949F61d10012760B2A98b508c02';
-export const ResourceRegistryGPU = '0xe479b5DC6D59B37f62b428Aeb84dF84C33Ce356A';
-export const ResourceRegistryFactory = '0xcD488162aB95759c83eEaC26660c2146Aa7B0B6f';
-export const RewardManager = '0x90e83Bf679DdAF16d4C1a1AF38BeD29293BBfCDf';
-export const RewardToken = '0xA0c5ba7d9eccbE59000e8E67654CA5d867C6b401';
-
-// Token addresses
-export const USDT = '0x270d622149F46fFc72A9fD5A8cF92D1FdE5AD5E0';
-export const USDC = '0x809372ebc19017276f1b5AF5678c306513567118';
-export const DAI = '0x014E547FdD3a7625c6BEb5Af92F34F0960D29ad3';
-export const WETH = '0x55B1835d60Bb7CFcfB838E0963E58ad84Fd9694F';
-
-// Devnet Contract Addresses
+// Testnet Contract Addresses
 export const AccessControlManagerDev = '0x87D3440372293aCf9149552546F7141AAe05Be91';
 export const TokenRegistryDev = '0x032666197A5d9329e717800FC90E8C951bA12290';
-export const ProviderRegistryDev = '0x7fDE3748e8AE27CaF506A47601acAf3B6AEaC34f';
-export const ProviderAttributeRegistryDev = '0x87B49A9b928b06AA5782cB7ec495da8c507CaADC';
-export const FizzRegistryDev = '0x6057730B3B355A111061D63d2D7399D8d51aac58';
-export const FizzAttributeRegistryDev = '0x24A05B480235Ccb450bf7Ce7e9F65072Ed732292';
-export const TreasuryDev = '0xA05d173F369263fB697e1a0e214b107b59237400';
-export const EscrowDev = '0x3854Be113E7B1C7fD8CF4805dF6c7f30d1FA1bC6';
-export const OrderRequestDev = '0x1fdf629E5A90eE4FAab1336a23c41A0Cab8CbA9d';
+export const ProviderRegistryDev = '0x038Eb8E227B287d7D42Cf404A07ACb5a7Df7645A';
+export const ProviderAttributeRegistryDev = '0x63942fCb221aDF85ebdFc11a061D5eea2384f00A';
+export const FizzRegistryDev = '0xe16c74C9dB46d437527B83F7A55cF65662Ee4CA3';
+export const FizzAttributeRegistryDev = '0x8cA664043Bf767323d331D69841e525C2c878543';
+export const EscrowDev = '0x93233785411874835eC805c391e4C04376f1F255';
+export const EscrowProtocolDev = '0xbEDE87cE3411F280B3Ed63027B45f73Cbcd1B441';
+export const OrderRequestDev = '0x692c4713E92e9f8dAD0b8405093446C53b18EFb6';
 export const ResourceManagerDev = '0x270d622149F46fFc72A9fD5A8cF92D1FdE5AD5E0';
-export const ComputeLeaseDev = '0x9C0a16a41d2b0fFc14e6f20Da1368b1FD93bD7e5';
-export const BidDev = '0x27930D6ee40E8DB57c713f063f4a97dc37dC3ffb';
+export const ComputeLeaseDev = '0x09B643a462b09E96c88Cb50C92085a060083D62D';
+export const BidDev = '0xe029A4f5e970c389Ca16e48600707496602af5Ed';
 export const ResourceRegistryCPUDev = '0x67B8c2201Eef00d1a8193a2aF301312DD21a286B';
 export const ResourceRegistryGPUDev = '0x2B73F279044347A3B6c9F122Ec6b479b6C2beAc9';
 export const ResourceRegistryFactoryDev = '0xbb132eB1b36D87ef7Ac63c95c05a8a56eCDac3fd';
-export const ProviderRewardsManagerDev = '0x6fdbbD18A7575C0125c56Be4AfDbd1392C2be118';
-export const FizzRewardsManagerDev = '0xa0b6c8A205fe0B6851BA4Cc2f91BBE530A670519';
+export const ProviderRewardsManagerDev = '0xe32279Bf9d47E20AEbb9ec04Ba5FB46536BA2aB5';
+export const FizzRewardsManagerDev = '0xd653644FFD4ec06d173237FbA952C450A4973f5c';
 export const RewardTokenDev = '0xB28aA1E5074AE0222cf764e2934182775Ee7AB42';
 export const FizzNodeRewardTokenDev = '0xA2400EFe3d7a9E2281F32A66Df18CFFE651c69f3';
 
-// Devnet Token addresses
+// Testnet Token addresses
 export const USDTDev = '0x96Ca5955F25648FB44C5D772BAdB4313000C66Fe';
 export const USDCDev = '0x816413630c39780677E1584D4a6DbAFd76b161F7';
 export const DAIDev = '0xcF5F08686dBE94B88b93FB2E8E5482A7f432C892';
 export const WETHDev = '0xd74C08f8ffDF88C807367813Ad64a960618f4dcC';
 export const CSTDev = '0x8E5996A3963011Ca9dFa04E3CB773147F98C0e17';
 export const SPONDev = '0x76e593392523243ACD38ceD87c2007F14483a86B';
+
+// Mainnet Contract Addresses
+export const TokenRegistryMainnet = '0xe023062b4A63Ca8c0c7Ac7d4AB1810bd3132ac4d';
+export const AccessControlMainnet = '0x2F6dE416a7AEED365bE49DeB931D263EC742605C';
+export const ProviderRegistryMainnet = '0x527D92b97200Df5767d299271B9Cd8533DFd8A4d';
+export const ProviderAttributeRegistryMainnet = '0x35b78B015802481B6a2857Dd54ca6bae188C790F';
+export const FizzRegistryMainnet = '0xAeD93F10317a3f198011E81055Fe7Af91027a08B';
+export const FizzAttributeRegistryMainnet = '0xA48B50EfD3895934188A27c01E857B60106c523a';
+export const EscrowUserMainnet = '0x72Fd86A0Ef515296feB8952BC115DceB916198d2';
+export const EscrowProtocolMainnet = '0x849CEe9f192A0A5c1658EcAa5AF7a1DAD2e1E090';
+export const OrderRequestMainnet = '0xfcACdd715403514Cd4c04830419779b48f66017A';
+export const ComputeLeaseMainnet = '0xA9068fEa5e2374Ee99E2fFa8d5e01529dFB0f29f';
+export const BidMainnet = '0xe7363Cb21B226b0452D23587def5284682293568';
+export const ResourceRegistryCPUMainnet = '0x8Ac7BD17fA6E51E9719FaEfD8FD8Cc46ECAa93A9';
+export const ResourceRegistryGPUMainnet = '0x360135261AB6CF9c9bBeF4c5d2B1fB9bb1671C8e';
+export const ResourceRegistryFactoryMainnet = '0xF302Af7f042A6D2e6A4c1fF67e4f69109d8f4Fa0';
+export const ProviderRewardCalculatorMainnet = '0xa8F2FaECaeCe5654DB1927437b10852dffE659F6';
+export const ProviderRewardManagerMainnet = '0x20f2159b1082529089752Bce0549a649B0f0032C';
+export const FizzRewardCalculatorMainnet = '0x33Bdb47399e6b80a759658F35bcDD5Ce062dC25F';
+export const FizzRewardManagerMainnet = '0x8A01206Fd078Be34b28d689C92C1f2C05B3C641B';
+export const RewardTokenMainnet = '0xA0c5ba7d9eccbE59000e8E67654CA5d867C6b401';
+
+// Mainnet Token addresses
+export const USDCMainnet = '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913';
+export const USDTMainnet = '0xF981a6AB8D09a636EC78395b02B1aC693a0C8307';
+
+export const contractAddresses = {
+  testnet: {
+    accessControlManager: AccessControlManagerDev,
+    tokenRegistry: TokenRegistryDev,
+    providerRegistry: ProviderRegistryDev,
+    providerAttributeRegistry: ProviderAttributeRegistryDev,
+    fizzRegistry: FizzRegistryDev,
+    fizzAttributeRegistry: FizzAttributeRegistryDev,
+    escrow: EscrowDev,
+    escrowProtocol: EscrowProtocolDev,
+    orderRequest: OrderRequestDev,
+    resourceManager: ResourceManagerDev,
+    computeLease: ComputeLeaseDev,
+    bid: BidDev,
+    resourceRegistryCPU: ResourceRegistryCPUDev,
+    resourceRegistryGPU: ResourceRegistryGPUDev,
+    resourceRegistryFactory: ResourceRegistryFactoryDev,
+    providerRewardManager: ProviderRewardsManagerDev,
+    fizzRewardManager: FizzRewardsManagerDev,
+    rewardToken: RewardTokenDev,
+    USDT: USDTDev,
+    USDC: USDCDev,
+    DAI: DAIDev,
+    WETH: WETHDev,
+    CST: CSTDev,
+    SPON: SPONDev,
+  },
+  mainnet: {
+    accessControlManager: AccessControlMainnet,
+    tokenRegistry: TokenRegistryMainnet,
+    providerRegistry: ProviderRegistryMainnet,
+    providerAttributeRegistry: ProviderAttributeRegistryMainnet,
+    fizzRegistry: FizzRegistryMainnet,
+    fizzAttributeRegistry: FizzAttributeRegistryMainnet,
+    escrow: EscrowUserMainnet,
+    escrowProtocol: EscrowProtocolMainnet,
+    orderRequest: OrderRequestMainnet,
+    computeLease: ComputeLeaseMainnet,
+    bid: BidMainnet,
+    resourceRegistryCPU: ResourceRegistryCPUMainnet,
+    resourceRegistryGPU: ResourceRegistryGPUMainnet,
+    resourceRegistryFactory: ResourceRegistryFactoryMainnet,
+    providerRewardManager: ProviderRewardManagerMainnet,
+    fizzRewardManager: FizzRewardManagerMainnet,
+    rewardToken: RewardTokenMainnet,
+    USDC: USDCMainnet,
+    USDT: USDTMainnet,
+  },
+};

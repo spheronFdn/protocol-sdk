@@ -17,47 +17,12 @@
   },
   {
     "inputs": [],
-    "name": "ArrayMismatch",
-    "type": "error"
-  },
-  {
-    "inputs": [],
-    "name": "EmptyArray",
-    "type": "error"
-  },
-  {
-    "inputs": [],
-    "name": "IdTaken",
-    "type": "error"
-  },
-  {
-    "inputs": [],
-    "name": "InactiveProvider",
-    "type": "error"
-  },
-  {
-    "inputs": [],
     "name": "InvalidAddress",
     "type": "error"
   },
   {
     "inputs": [],
-    "name": "InvalidAttributes",
-    "type": "error"
-  },
-  {
-    "inputs": [],
-    "name": "NotAuthorized",
-    "type": "error"
-  },
-  {
-    "inputs": [],
     "name": "ProviderAlreadyRegistered",
-    "type": "error"
-  },
-  {
-    "inputs": [],
-    "name": "ProviderNotActive",
     "type": "error"
   },
   {
@@ -78,6 +43,11 @@
   {
     "inputs": [],
     "name": "TokenNotFound",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "UnauthorizedRegistration",
     "type": "error"
   },
   {
