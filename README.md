@@ -53,7 +53,7 @@ These components work hand in hand, allowing you to interact with the Spheron in
 
 1. Run the Provider Proxy Server: This server communicates with the Spheron provider on your behalf.
 2. Pass the Provider Proxy Server URL to the Protocol SDK: This allows the SDK to route requests appropriately.
-3. Use the SDK Functions: Manage deployments and interact with the Spheron infrastructure through the SDK’s API.
+3. Use the SDK Functions: Manage deployments and interact with the Spheron infrastructure through the SDK.
 
 By following the guide below and referring to the [Node.js SDK README](./nodejs/README.md), you'll be able to perform all necessary interactions for deployments on Spheron.
 
