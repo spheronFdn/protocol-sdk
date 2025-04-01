@@ -169,11 +169,11 @@ export class LeaseModule {
 
   async listenToLeaseClosedEvent(
     onSuccessCallback: ({
-      orderId,
+      leaseId,
       providerAddress,
       tenantAddress,
     }: {
-      orderId: string;
+      leaseId: string;
       providerAddress: string;
       tenantAddress: string;
     }) => void,
@@ -204,11 +204,11 @@ export class LeaseModule {
             providerAddress.toString().toLowerCase() === account.toString().toLowerCase() ||
             tenantAddress.toString().toLowerCase() === account.toString().toLowerCase()
           ) {
-            onSuccessCallback({ orderId, providerAddress, tenantAddress });
+            onSuccessCallback({ leaseId: orderId, providerAddress, tenantAddress });
             this.websocketProvider?.destroy();
             contract.off('LeaseClosed');
             clearTimeout(this.leaseCloseTimeoutId as NodeJS.Timeout);
-            resolve({ orderId, providerAddress, tenantAddress });
+            resolve({ leaseId: orderId, providerAddress, tenantAddress });
           }
         }
       );

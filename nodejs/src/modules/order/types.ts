@@ -54,7 +54,7 @@ export interface InitialOrder {
 }
 
 export interface OrderMatchedEvent {
-  orderId: string;
+  leaseId: string;
   providerAddress: string;
   providerId: string | number | bigint;
   acceptedPrice: string | number | bigint;
@@ -62,13 +62,13 @@ export interface OrderMatchedEvent {
 }
 
 export interface OrderUpdatedEvent {
-  orderId: string;
+  leaseId: string;
   providerAddress: string;
   tenantAddress: string;
   acceptedPrice: string | number | bigint;
 }
 
 export interface OrderUpdateAcceptedEvent {
-  orderId: string;
+  leaseId: string;
   providerAddress: string;
 }
