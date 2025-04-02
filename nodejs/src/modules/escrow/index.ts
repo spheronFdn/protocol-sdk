@@ -1,28 +1,29 @@
-import EscrowAbi from '@contracts/abis/testnet/Escrow.json';
-import TokenAbi from '@contracts/abis/testnet/TestToken.json';
-import { EscrowTestnet as Escrow } from '@contracts/addresses';
+import { contractAddresses } from '@contracts/addresses';
 import { ethers } from 'ethers';
 import { DepositData, TransactionData, UserBalance } from './types';
-import { networkType, tokenMap } from '@config/index';
+import { NetworkType, tokenMap } from '@config/index';
 import { initializeSigner } from '@utils/index';
 import { handleContractError } from '@utils/errors';
+import { abiMap } from '@contracts/abi-map';
 
 export class EscrowModule {
   private provider: ethers.Provider;
   private wallet: ethers.Wallet | undefined;
+  private networkType: NetworkType;
 
-  constructor(provider: ethers.Provider, wallet?: ethers.Wallet) {
+  constructor(provider: ethers.Provider, wallet?: ethers.Wallet, networkType?: NetworkType) {
     this.provider = provider;
     this.wallet = wallet;
+    this.networkType = networkType ?? 'testnet';
   }
 
   async getUserBalance(token: string, walletAddress?: string, isOperator: boolean = false) {
+    const contractAbi = abiMap[this.networkType].escrow;
     try {
-      const contractAbi = EscrowAbi;
-      const contractAddress = Escrow;
+      const contractAddress = contractAddresses[this.networkType].escrow;
       const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
 
-      const tokenDetails = tokenMap[networkType].find(
+      const tokenDetails = tokenMap[this.networkType].find(
         (eachToken) => eachToken.symbol.toLowerCase() === token.toLowerCase()
       );
       if (!tokenDetails) {
@@ -56,21 +57,21 @@ export class EscrowModule {
 
       return userData;
     } catch (error) {
-      const errorMessage = handleContractError(error, EscrowAbi);
+      const errorMessage = handleContractError(error, contractAbi);
       throw errorMessage;
     }
   }
 
   // write operations
   async depositBalance({ token, amount, onSuccessCallback, onFailureCallback }: DepositData) {
+    const contractABI = abiMap[this.networkType].escrow;
     try {
       const { signer } = await initializeSigner({ wallet: this.wallet });
 
-      const contractABI = EscrowAbi;
-      const contractAddress = Escrow;
-      const tokenABI = TokenAbi;
+      const contractAddress = contractAddresses[this.networkType].escrow;
+      const tokenABI = abiMap[this.networkType].testToken;
 
-      const tokenDetails = tokenMap[networkType].find(
+      const tokenDetails = tokenMap[this.networkType].find(
         (eachToken) => eachToken.symbol.toLowerCase() === token.toLowerCase()
       );
       if (!tokenDetails) {
@@ -94,18 +95,19 @@ export class EscrowModule {
       return receipt;
     } catch (error) {
       if (onFailureCallback) onFailureCallback(error);
-      const errorMessage = handleContractError(error, EscrowAbi);
+      const errorMessage = handleContractError(error, contractABI);
       throw errorMessage;
     }
   }
 
   async withdrawBalance({ token, amount, onSuccessCallback, onFailureCallback }: DepositData) {
+    const contractABI = abiMap[this.networkType].escrow;
     try {
       const { signer } = await initializeSigner({ wallet: this.wallet });
-      const contractABI = EscrowAbi;
-      const contractAddress = Escrow;
 
-      const tokenDetails = tokenMap[networkType].find(
+      const contractAddress = contractAddresses[this.networkType].escrow;
+
+      const tokenDetails = tokenMap[this.networkType].find(
         (eachToken) => eachToken.symbol.toLowerCase() === token.toLowerCase()
       );
       if (!tokenDetails) {
@@ -125,7 +127,7 @@ export class EscrowModule {
       return receipt;
     } catch (error) {
       if (onFailureCallback) onFailureCallback(error);
-      const errorMessage = handleContractError(error, EscrowAbi);
+      const errorMessage = handleContractError(error, contractABI);
       throw errorMessage;
     }
   }
@@ -138,10 +140,10 @@ export class EscrowModule {
     onSuccessCallback,
     onFailureCallback,
   }: TransactionData) {
+    const contractABI = abiMap[this.networkType].escrow;
     try {
       const { signer } = await initializeSigner({ wallet: this.wallet });
-      const contractABI = EscrowAbi;
-      const contractAddress = Escrow;
+      const contractAddress = contractAddresses[this.networkType].escrow;
 
       const contract = new ethers.Contract(contractAddress, contractABI, signer);
 
@@ -158,7 +160,7 @@ export class EscrowModule {
       return receipt;
     } catch (error) {
       if (onFailureCallback) onFailureCallback(error);
-      const errorMessage = handleContractError(error, EscrowAbi);
+      const errorMessage = handleContractError(error, contractABI);
       throw errorMessage;
     }
   }
@@ -171,11 +173,11 @@ export class EscrowModule {
     onSuccessCallback,
     onFailureCallback,
   }: TransactionData) {
+    const contractABI = abiMap[this.networkType].escrow;
     try {
       const { signer } = await initializeSigner({ wallet: this.wallet });
 
-      const contractABI = EscrowAbi;
-      const contractAddress = Escrow;
+      const contractAddress = contractAddresses[this.networkType].escrow;
       const contract = new ethers.Contract(contractAddress, contractABI, signer);
 
       const finalAmount = (Number(amount.toString()) - 1) / 10 ** decimals;
@@ -191,17 +193,17 @@ export class EscrowModule {
       return receipt;
     } catch (error) {
       if (onFailureCallback) onFailureCallback(error);
-      const errorMessage = handleContractError(error, EscrowAbi);
+      const errorMessage = handleContractError(error, contractABI);
       throw errorMessage;
     }
   }
 
   // read operations
   async getProviderEarnings(providerAddress: string, tokenAddress: string) {
+    const contractABI = abiMap[this.networkType].escrow;
     try {
-      const contractAbi = EscrowAbi;
-      const contractAddress = Escrow;
-      const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
+      const contractAddress = contractAddresses[this.networkType].escrow;
+      const contract = new ethers.Contract(contractAddress, contractABI, this.provider);
 
       const response = await contract.getProviderEarnings(providerAddress, tokenAddress);
 
@@ -213,15 +215,15 @@ export class EscrowModule {
 
       return providerEarnings;
     } catch (error) {
-      const errorMessage = handleContractError(error, EscrowAbi);
+      const errorMessage = handleContractError(error, contractABI);
       throw errorMessage;
     }
   }
   async getFizzEarnings(fizzAddress: string, tokenAddress: string) {
+    const contractABI = abiMap[this.networkType].escrow;
     try {
-      const contractAbi = EscrowAbi;
-      const contractAddress = Escrow;
-      const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
+      const contractAddress = contractAddresses[this.networkType].escrow;
+      const contract = new ethers.Contract(contractAddress, contractABI, this.provider);
 
       const response = await contract.getFizzNodeEarnings(fizzAddress, tokenAddress);
 
@@ -233,7 +235,7 @@ export class EscrowModule {
 
       return fizzEarnings;
     } catch (error) {
-      const errorMessage = handleContractError(error, EscrowAbi);
+      const errorMessage = handleContractError(error, contractABI);
       throw errorMessage;
     }
   }

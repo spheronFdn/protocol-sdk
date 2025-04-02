@@ -22,17 +22,20 @@ export class DeploymentModule {
   private orderModule: OrderModule;
   private leaseModule: LeaseModule;
   private providerModule: ProviderModule;
+  private networkType: NetworkType;
 
   constructor(
     provider: ethers.Provider,
     websocketProvider: ethers.WebSocketProvider,
-    wallet?: ethers.Wallet
+    wallet?: ethers.Wallet,
+    networkType: NetworkType = 'testnet'
   ) {
     this.wallet = wallet;
-    this.escrowModule = new EscrowModule(provider);
-    this.orderModule = new OrderModule(provider, websocketProvider, wallet);
-    this.leaseModule = new LeaseModule(provider, websocketProvider, wallet);
-    this.providerModule = new ProviderModule(provider);
+    this.escrowModule = new EscrowModule(provider, wallet, networkType);
+    this.orderModule = new OrderModule(provider, websocketProvider, wallet, networkType);
+    this.leaseModule = new LeaseModule(provider, websocketProvider, wallet, networkType);
+    this.providerModule = new ProviderModule(provider, networkType);
+    this.networkType = networkType;
   }
 
   async createDeployment(
