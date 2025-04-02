@@ -18,21 +18,26 @@ import { CreateDeploymentResponse, DeploymentResponse } from './types';
 import { BiconomyService } from '@utils/biconomy';
 
 export class DeploymentModule {
+  private wallet: ethers.Wallet | undefined;
   private escrowModule: EscrowModule;
   private orderModule: OrderModule;
   private leaseModule: LeaseModule;
   private providerModule: ProviderModule;
+  private networkType: NetworkType;
 
   constructor(
     provider: ethers.Provider,
     websocketProvider: ethers.WebSocketProvider,
-    private wallet?: ethers.Wallet,
+    wallet?: ethers.Wallet,
+    networkType: NetworkType = 'testnet',
     paymaster?: BiconomyService
   ) {
-    this.escrowModule = new EscrowModule(provider);
-    this.orderModule = new OrderModule(provider, websocketProvider, wallet, paymaster);
-    this.leaseModule = new LeaseModule(provider, websocketProvider, wallet, paymaster);
-    this.providerModule = new ProviderModule(provider);
+    this.wallet = wallet;
+    this.escrowModule = new EscrowModule(provider, wallet, networkType);
+    this.orderModule = new OrderModule(provider, websocketProvider, wallet, networkType, paymaster);
+    this.leaseModule = new LeaseModule(provider, websocketProvider, wallet, networkType, paymaster);
+    this.providerModule = new ProviderModule(provider, networkType);
+    this.networkType = networkType;
   }
 
   async createDeployment(
