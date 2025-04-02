@@ -42,12 +42,14 @@ export default [
     ],
     plugins: [
       aliases,
-      resolve(),
+      resolve({
+        preferBuiltins: true,
+      }),
       commonjs(),
       json(),
       typescript({ tsconfig: './tsconfig.json' }),
     ],
-    external: ['ethers', '@biconomy/abstractjs', 'viem'],
+    external: ['ethers', 'viem', '@biconomy/abstractjs'],
   },
   {
     input: 'dist/esm/index.d.ts',
