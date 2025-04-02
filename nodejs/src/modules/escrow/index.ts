@@ -202,7 +202,7 @@ export class EscrowModule {
     }
   }
 
-  async depositForOperator({ token, amount, operatorAddresses }: DepositForOperatorData) {
+  async depositForOperators({ token, amount, operatorAddresses }: DepositForOperatorData) {
     const contractABI = abiMap[this.networkType].escrow;
     try {
       const contractAddress = contractAddresses[this.networkType].escrow;
