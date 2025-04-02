@@ -15,11 +15,14 @@ import {
   RawFizzAttribute,
   // FizzProviderTrustTier,
 } from './types';
-import { initializeSigner } from '@utils/index';
+import { initializeSigner, requestPipeline } from '@utils/index';
 import { handleContractError } from '@utils/errors';
 import { ProviderModule } from '@modules/provider';
 import { NetworkType } from '@config/index';
 import { abiMap } from '@contracts/abi-map';
+import { createAuthorizationToken } from '@utils/provider-auth';
+import { Provider, ProviderStatus } from '@modules/provider/types';
+import { subgraphGetProviders } from '@utils/subgraph';
 
 export class FizzModule {
   private provider: ethers.Provider;
@@ -33,7 +36,7 @@ export class FizzModule {
     provider: ethers.Provider,
     webSocketProvider?: ethers.WebSocketProvider,
     wallet?: ethers.Wallet,
-    networkType?: NetworkType
+    networkType?: NetworkType,
   ) {
     this.provider = provider;
     this.webSocketProvider = webSocketProvider;
@@ -177,6 +180,71 @@ export class FizzModule {
         joinTimestamp: fizzNode[6],
         rewardWallet: fizzNode[7],
       }));
+
+      return fizzNodes;
+    } catch (error) {
+      const errorMessage = handleContractError(error, FizzRegistryAbi);
+      throw errorMessage;
+    }
+  }
+
+  async getActiveFizzNodes(providerProxyUrl: string): Promise<FizzNode[]> {
+    if (!this.wallet) throw new Error('Wallet not found');
+    try {
+      let providers: Awaited<ReturnType<typeof subgraphGetProviders>> | null | Provider[] = null;
+      if (this.networkType) {
+        providers = await subgraphGetProviders(this.networkType);
+      } else {
+        providers = await this.providerModule.getAllProviders();
+      }
+
+      const authToken = createAuthorizationToken(this.wallet);
+
+      const fizzNodes = (
+        await Promise.allSettled(
+          providers
+            .filter(
+              (p) =>
+                p.hostUri !== 'localhost' &&
+                p.hostUri !== 'provder.m.testnetasphn.xyz' &&
+                (p.status === 'Active' ||
+                  p.status === ProviderStatus.Active) /*  && p.region !== "dev-spheron" */
+            )
+            .map(async (p) => {
+              console.log(p.hostUri);
+              const reqBody = {
+                certificate: p.certificate,
+                authToken,
+                method: 'GET',
+                url: `https://${p.hostUri}:8543/status`,
+              };
+
+              const url = `${providerProxyUrl}`;
+              try {
+                const response = await requestPipeline({
+                  url,
+                  method: 'POST',
+                  body: JSON.stringify(reqBody),
+                });
+                return response;
+              } catch (error) {
+                return { cluster: { inventory: { available: { nodes: [] } } } };
+              }
+            })
+        )
+      )
+        .map((result) => {
+          if (result.status === 'fulfilled') {
+            return result.value.cluster.inventory.available;
+          } else {
+            console.error(`Failed to get fizz nodes for provider: ${result.reason}`);
+            return { nodes: [] };
+          }
+        })
+        .map((i) => i.nodes)
+        .flat();
+
+      console.log({ fizzNodes });
 
       return fizzNodes;
     } catch (error) {

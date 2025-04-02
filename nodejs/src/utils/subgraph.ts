@@ -77,3 +77,48 @@ query ($first: Int!, $gt: BigInt!) {
   }
 }
 `;
+const getProvidersQuery = `
+  query getProviders($first: Int, $skip: Int) {
+    providers(first: $first, skip: $skip, orderBy: providerId, orderDirection: asc) {
+      id
+      providerId
+      walletAddress
+      hostUri
+      status
+      certificate
+      region {
+        id
+      }
+    }
+  }
+`;
+
+export const subgraphGetProviders = async (networkType: NetworkType) => {
+  const batchSize = 100;
+  let skip = 0;
+  const providers: Array<{
+    id: string;
+    providerId: string;
+    walletAddress: string;
+    hostUri: string;
+    status: string;
+    region: string;
+    certificate: string;
+  }> = [];
+
+  while (true) {
+    const variables = { first: batchSize, skip };
+    const { providers: fetchedProviders } = await fetchSubgraphData(
+      getProvidersQuery,
+      variables,
+      networkType
+    );
+
+    if (fetchedProviders.length === 0) break;
+
+    providers.push(...fetchedProviders.map((p: any) => ({ ...p, region: p.region.id })));
+    skip += batchSize;
+  }
+
+  return providers;
+};
