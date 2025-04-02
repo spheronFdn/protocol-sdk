@@ -25,6 +25,18 @@ const aliases = alias({
   ]
 });
 
+const biconomyResolverPlugin = {
+  name: 'biconomy-resolver',
+  async resolveId(source) {
+    if (source === '@biconomy/abstractjs') {
+      // For ESM projects
+      const modulePath = new URL('@biconomy/abstractjs/dist/_esm/index.js', import.meta.url).pathname;
+      return { id: modulePath, external: true };
+    }
+    return null;
+  }
+};
+
 export default [
   {
     input: 'src/index.ts',
@@ -33,23 +45,32 @@ export default [
         file: packageJson.main,
         format: 'cjs',
         sourcemap: true,
+        preserveModules: false,
       },
       {
         file: packageJson.module,
         format: 'esm',
         sourcemap: true,
+        preserveModules: false,
       },
     ],
     plugins: [
+      biconomyResolverPlugin,
       aliases,
       resolve({
         preferBuiltins: true,
+        exportConditions: ['import', 'default'],
+        mainFields: ['module', 'main'],
       }),
       commonjs(),
       json(),
       typescript({ tsconfig: './tsconfig.json' }),
     ],
-    external: ['ethers', 'viem', '@biconomy/abstractjs'],
+    external: [
+      /^ethers(\/.*)?$/,
+      /^@biconomy\/abstractjs(\/.*)?$/,
+      /^viem(\/.*)?$/,
+    ],
   },
   {
     input: 'dist/esm/index.d.ts',

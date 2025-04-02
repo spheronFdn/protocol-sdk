@@ -20,7 +20,6 @@ export class OrderModule {
   private createTimeoutId: NodeJS.Timeout | null;
   private updateTimeoutId: NodeJS.Timeout | null;
 
-
   constructor(
     private provider: ethers.Provider,
     private websocketProvider?: ethers.WebSocketProvider,
@@ -58,51 +57,48 @@ export class OrderModule {
 
     const contract = new ethers.Contract(OrderRequest, OrderRequestAbi, signer);
     const nonce = await contract.nonces(claimedSigner);
-  
+
     const domain = {
-      name: "Spheron",
-      version: "1",
+      name: 'Spheron',
+      version: '1',
       chainId,
       verifyingContract: OrderRequest,
     };
-  
+
     const types = {
       CreateOrder: [
-        { name: "maxPrice", type: "uint256" },
-        { name: "numOfBlocks", type: "uint64" },
-        { name: "token", type: "address" },
-        { name: "nonce", type: "uint256" },
+        { name: 'maxPrice', type: 'uint256' },
+        { name: 'numOfBlocks', type: 'uint64' },
+        { name: 'token', type: 'address' },
+        { name: 'nonce', type: 'uint256' },
       ],
     };
-  
+
     const value = {
       maxPrice: orderDetails.maxPrice,
       numOfBlocks: orderDetails.numOfBlocks,
       token: orderDetails.token,
       nonce,
     };
-  
+
     // Sign the typed data using EIP-712
     const signature = await signer.signTypedData(domain, types, value);
 
     const encodedData = this.paymaster?.encodeFunction({
       abi: OrderRequestAbi,
       functionName: 'createOrderWithSignature',
-      args: [orderDetails, claimedSigner, nonce, signature]
+      args: [orderDetails, claimedSigner, nonce, signature],
     });
 
     const txHash = await this.paymaster?.sendTransaction({
       to: OrderRequest,
-      data: encodedData!
+      data: encodedData!,
     });
     const txReceipt = await this.paymaster?.waitForTransaction(txHash!);
     return txReceipt?.receipt.transactionHash || null;
   }
 
-  async updateOrder(
-    orderId: string,
-    orderDetails: OrderDetails
-  ): Promise<string | null> {
+  async updateOrder(orderId: string, orderDetails: OrderDetails): Promise<string | null> {
     try {
       if (this.paymaster) {
         return await this.updateOrderWithPaymaster(orderId, orderDetails);
@@ -124,20 +120,24 @@ export class OrderModule {
     }
   }
 
-  async updateOrderWithPaymaster(orderId: string, orderDetails: OrderDetails): Promise<string | null> {
+  async updateOrderWithPaymaster(
+    orderId: string,
+    orderDetails: OrderDetails
+  ): Promise<string | null> {
     const encodedData = this.paymaster?.encodeFunction({
-      abi: ['function updateInitialOrder(uint64 _orderId, OrderDetails memory details) external (void)'],
+      abi: [
+        'function updateInitialOrder(uint64 _orderId, OrderDetails memory details) external (void)',
+      ],
       functionName: 'updateInitialOrder',
-      args: [orderId, orderDetails]
+      args: [orderId, orderDetails],
     });
 
     const txHash = await this.paymaster?.sendTransaction({
       to: OrderRequest,
-      data: encodedData!
+      data: encodedData!,
     });
     const txReceipt = await this.paymaster?.waitForTransaction(txHash!);
     return txReceipt?.receipt.transactionHash || null;
-
   }
 
   async getOrderDetails(leaseId: string): Promise<InitialOrder> {

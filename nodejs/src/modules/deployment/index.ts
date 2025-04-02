@@ -118,7 +118,7 @@ export class DeploymentModule {
     updateOrderAcceptedCallback?: (orderId: string) => void,
     updateOrderFailedCallback?: () => void,
     isOperator: boolean = false
-  ): Promise<{ transactionHash: string | null, updateLeaseResponse: OrderUpdatedEvent | null }> {
+  ): Promise<{ transactionHash: string | null; updateLeaseResponse: OrderUpdatedEvent | null }> {
     try {
       const { error, orderDetails: details } = yamlToOrderDetails(iclYaml);
       if (error || typeof details === 'undefined') {
@@ -179,12 +179,7 @@ export class DeploymentModule {
         providerProxyUrl
       );
       const authToken = await createAuthorizationToken(this.wallet);
-      await spheronProvider.submitManfiest(
-        certificate,
-        authToken,
-        orderId as string,
-        sdlManifest
-      );
+      await spheronProvider.submitManfiest(certificate, authToken, orderId as string, sdlManifest);
       const updateOrderLeaseResponse = await updatedOrderLease;
       return { transactionHash, updateLeaseResponse: updateOrderLeaseResponse };
     } catch (error) {

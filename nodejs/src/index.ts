@@ -26,7 +26,11 @@ export class SpheronSDK {
     }
     switch (paymaster?.type) {
       case 'biconomy':
-        this.paymaster = new BiconomyService(privateKey!, paymaster.bundlerUrl, paymaster.paymasterUrl);
+        this.paymaster = new BiconomyService(
+          privateKey!,
+          paymaster.bundlerUrl,
+          paymaster.paymasterUrl
+        );
         break;
       case 'coinbase':
         break;

@@ -171,16 +171,15 @@ export class LeaseModule {
     const encodedData = this.paymaster?.encodeFunction({
       abi: ['function closeLease(uint256 _leaseId) external nonReentrant (void)'],
       functionName: 'closeLease',
-      args: [leaseId]
+      args: [leaseId],
     });
 
     const txHash = await this.paymaster?.sendTransaction({
       to: ComputeLease,
-      data: encodedData!
+      data: encodedData!,
     });
     const txReceipt = await this.paymaster?.waitForTransaction(txHash!);
     return txReceipt?.receipt.transactionHash || null;
-
   }
 
   async listenToLeaseClosedEvent(

@@ -127,4 +127,4 @@ export type Paymaster = {
   type: 'biconomy' | 'coinbase';
   bundlerUrl: string;
   paymasterUrl: string;
-}
+};
