@@ -1,6 +1,6 @@
 import { contractAddresses } from '@contracts/addresses';
 import { ethers } from 'ethers';
-import { DepositData, TransactionData, UserBalance } from './types';
+import { DepositData, UserBalance, WithdrawEarningsData } from './types';
 import { NetworkType, tokenMap } from '@config/index';
 import { initializeSigner } from '@utils/index';
 import { handleContractError } from '@utils/errors';
@@ -132,77 +132,11 @@ export class EscrowModule {
     }
   }
 
-  async withdrawProviderEarnings({
-    rewardWallet,
-    tokenAddress,
-    amount,
-    decimals,
-    onSuccessCallback,
-    onFailureCallback,
-  }: TransactionData) {
-    const contractABI = abiMap[this.networkType].escrow;
-    try {
-      const { signer } = await initializeSigner({ wallet: this.wallet });
-      const contractAddress = contractAddresses[this.networkType].escrow;
-
-      const contract = new ethers.Contract(contractAddress, contractABI, signer);
-
-      const finalAmount = (Number(amount.toString()) - 1) / 10 ** decimals;
-      const withdrawAmount = ethers.parseUnits(finalAmount.toFixed(decimals), decimals);
-
-      const result = await contract.withdrawProviderEarnings(
-        rewardWallet,
-        tokenAddress,
-        withdrawAmount
-      );
-      const receipt = await result.wait();
-      if (onSuccessCallback) onSuccessCallback(receipt);
-      return receipt;
-    } catch (error) {
-      if (onFailureCallback) onFailureCallback(error);
-      const errorMessage = handleContractError(error, contractABI);
-      throw errorMessage;
-    }
-  }
-
-  async withdrawFizzEarnings({
-    rewardWallet,
-    tokenAddress,
-    amount,
-    decimals,
-    onSuccessCallback,
-    onFailureCallback,
-  }: TransactionData) {
-    const contractABI = abiMap[this.networkType].escrow;
-    try {
-      const { signer } = await initializeSigner({ wallet: this.wallet });
-
-      const contractAddress = contractAddresses[this.networkType].escrow;
-      const contract = new ethers.Contract(contractAddress, contractABI, signer);
-
-      const finalAmount = (Number(amount.toString()) - 1) / 10 ** decimals;
-      const withdrawAmount = ethers.parseUnits(finalAmount.toFixed(decimals), decimals);
-
-      const result = await contract.withdrawFizzNodeEarnings(
-        rewardWallet,
-        tokenAddress,
-        withdrawAmount
-      );
-      const receipt = await result.wait();
-      if (onSuccessCallback) onSuccessCallback(receipt);
-      return receipt;
-    } catch (error) {
-      if (onFailureCallback) onFailureCallback(error);
-      const errorMessage = handleContractError(error, contractABI);
-      throw errorMessage;
-    }
-  }
-
   // read operations
   async getProviderEarnings(providerAddress: string, tokenAddress: string) {
-    const contractABI = abiMap[this.networkType].escrow;
+    const contractABI = abiMap[this.networkType].escrowProtocol;
     try {
-      const contractAddress = contractAddresses[this.networkType].escrow;
+      const contractAddress = contractAddresses[this.networkType].escrowProtocol;
       const contract = new ethers.Contract(contractAddress, contractABI, this.provider);
 
       const response = await contract.getProviderEarnings(providerAddress, tokenAddress);
@@ -220,9 +154,9 @@ export class EscrowModule {
     }
   }
   async getFizzEarnings(fizzAddress: string, tokenAddress: string) {
-    const contractABI = abiMap[this.networkType].escrow;
+    const contractABI = abiMap[this.networkType].escrowProtocol;
     try {
-      const contractAddress = contractAddresses[this.networkType].escrow;
+      const contractAddress = contractAddresses[this.networkType].escrowProtocol;
       const contract = new ethers.Contract(contractAddress, contractABI, this.provider);
 
       const response = await contract.getFizzNodeEarnings(fizzAddress, tokenAddress);
@@ -234,6 +168,34 @@ export class EscrowModule {
       };
 
       return fizzEarnings;
+    } catch (error) {
+      const errorMessage = handleContractError(error, contractABI);
+      throw errorMessage;
+    }
+  }
+
+  async withdrawEarnings({
+    providerAddress,
+    fizzId = '0',
+    tokenAddress,
+    amount,
+    isFizz = false,
+  }: WithdrawEarningsData) {
+    const contractABI = abiMap[this.networkType].escrowProtocol;
+    try {
+      const contractAddress = contractAddresses[this.networkType].escrowProtocol;
+
+      const contract = new ethers.Contract(contractAddress, contractABI, this.provider);
+
+      const result = await contract.withdrawEarnings(
+        providerAddress,
+        fizzId,
+        tokenAddress,
+        amount,
+        isFizz
+      );
+      const receipt = await result.wait();
+      return receipt;
     } catch (error) {
       const errorMessage = handleContractError(error, contractABI);
       throw errorMessage;
