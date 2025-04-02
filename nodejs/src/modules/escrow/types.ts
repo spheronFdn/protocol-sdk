@@ -50,3 +50,7 @@ export interface WithdrawEarningsData {
   amount: number;
   isFizz: boolean;
 }
+
+export interface DepositForOperatorData extends DepositData {
+  operatorAddresses: string[];
+}

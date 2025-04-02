@@ -1,6 +1,6 @@
 import { contractAddresses } from '@contracts/addresses';
 import { ethers } from 'ethers';
-import { DepositData, UserBalance, WithdrawEarningsData } from './types';
+import { DepositData, DepositForOperatorData, UserBalance, WithdrawEarningsData } from './types';
 import { NetworkType, tokenMap } from '@config/index';
 import { initializeSigner } from '@utils/index';
 import { handleContractError } from '@utils/errors';
@@ -194,6 +194,21 @@ export class EscrowModule {
         amount,
         isFizz
       );
+      const receipt = await result.wait();
+      return receipt;
+    } catch (error) {
+      const errorMessage = handleContractError(error, contractABI);
+      throw errorMessage;
+    }
+  }
+
+  async depositForOperator({ token, amount, operatorAddresses }: DepositForOperatorData) {
+    const contractABI = abiMap[this.networkType].escrow;
+    try {
+      const contractAddress = contractAddresses[this.networkType].escrow;
+      const contract = new ethers.Contract(contractAddress, contractABI, this.provider);
+
+      const result = await contract.depositForOperators(token, amount, operatorAddresses);
       const receipt = await result.wait();
       return receipt;
     } catch (error) {
