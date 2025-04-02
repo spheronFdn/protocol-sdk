@@ -4,7 +4,8 @@ import ProviderRegistryTestnet from './abis/testnet/ProviderRegistry.json';
 import ProviderAttributeRegistryTestnet from './abis/testnet/ProviderAttributeRegistry.json';
 import FizzRegistryTestnet from './abis/testnet/FizzRegistry.json';
 import FizzAttributeRegistryTestnet from './abis/testnet/FizzAttributeRegistry.json';
-import EscrowTestnet from './abis/testnet/Escrow.json';
+import EscrowTestnet from './abis/testnet/EscrowUser.json';
+import EscrowProtocolTestnet from './abis/testnet/EscrowProtocol.json';
 import AttributeRegistryTestnet from './abis/testnet/AttributeRegistry.json';
 import BidTestnet from './abis/testnet/Bid.json';
 import ComputeLeaseTestnet from './abis/testnet/ComputeLease.json';
@@ -23,7 +24,8 @@ import ProviderRegistryMainnet from './abis/mainnet/ProviderRegistry.json';
 import ProviderAttributeRegistryMainnet from './abis/mainnet/ProviderAttributeRegistry.json';
 import FizzRegistryMainnet from './abis/mainnet/FizzRegistry.json';
 import FizzAttributeRegistryMainnet from './abis/mainnet/FizzAttributeRegistry.json';
-import EscrowMainnet from './abis/mainnet/Escrow.json';
+import EscrowMainnet from './abis/mainnet/EscrowUser.json';
+import EscrowProtocolMainnet from './abis/mainnet/EscrowProtocol.json';
 import AttributeRegistryMainnet from './abis/mainnet/AttributeRegistry.json';
 import BidMainnet from './abis/mainnet/Bid.json';
 import ComputeLeaseMainnet from './abis/mainnet/ComputeLease.json';
@@ -44,6 +46,7 @@ export const abiMap: Record<NetworkType, Record<string, any>> = {
     bid: BidTestnet,
     computeLease: ComputeLeaseTestnet,
     escrow: EscrowTestnet,
+    escrowProtocol: EscrowProtocolTestnet,
     fizzAttributeRegistry: FizzAttributeRegistryTestnet,
     fizzRegistry: FizzRegistryTestnet,
     fizzRewardsManager: FizzRewardsManagerTestnet,
@@ -64,6 +67,7 @@ export const abiMap: Record<NetworkType, Record<string, any>> = {
     bid: BidMainnet,
     computeLease: ComputeLeaseMainnet,
     escrow: EscrowMainnet,
+    escrowProtocol: EscrowProtocolMainnet,
     fizzAttributeRegistry: FizzAttributeRegistryMainnet,
     fizzRegistry: FizzRegistryMainnet,
     fizzRewardsManager: FizzRewardsManagerMainnet,
