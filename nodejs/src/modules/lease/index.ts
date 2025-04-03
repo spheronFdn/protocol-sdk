@@ -11,13 +11,14 @@ import { handleContractError } from '@utils/errors';
 import { FizzDetails } from '@modules/fizz/types';
 import { Provider } from '@modules/provider/types';
 import { abiMap } from '@contracts/abi-map';
+import { type SmartWalletBundlerClient } from '@utils/smart-wallet';
 
 export class LeaseModule {
   private provider: ethers.Provider;
+  private websocketProvider?: ethers.WebSocketProvider;
   private orderModule: OrderModule;
   private fizzModule: FizzModule;
   private providerModule: ProviderModule;
-  private websocketProvider?: ethers.WebSocketProvider;
   private leaseCloseTimeoutId: NodeJS.Timeout | null;
   private wallet: ethers.Wallet | undefined;
   private networkType: NetworkType | undefined;
@@ -26,17 +27,25 @@ export class LeaseModule {
     provider: ethers.Provider,
     websocketProvider?: ethers.WebSocketProvider,
     wallet?: ethers.Wallet,
-    networkType?: NetworkType
+    networkType?: NetworkType,
+    private smartWalletBundlerClientPromise?: Promise<SmartWalletBundlerClient>
   ) {
     this.provider = provider;
     this.websocketProvider = websocketProvider;
     this.getLeaseDetails = this.getLeaseDetails.bind(this);
-    this.orderModule = new OrderModule(provider, websocketProvider, wallet, networkType);
+    this.orderModule = new OrderModule(
+      provider,
+      websocketProvider,
+      wallet,
+      networkType,
+      smartWalletBundlerClientPromise
+    );
     this.fizzModule = new FizzModule(provider, websocketProvider, wallet, networkType);
     this.providerModule = new ProviderModule(provider, networkType);
     this.leaseCloseTimeoutId = null;
     this.wallet = wallet;
     this.networkType = networkType;
+    this.smartWalletBundlerClientPromise = smartWalletBundlerClientPromise;
   }
 
   async getLeaseDetails(leaseId: string) {
@@ -156,7 +165,10 @@ export class LeaseModule {
     };
   }
 
-  async closeLease(leaseId: string) {
+  async closeLease(leaseId: string): Promise<string | null> {
+    if (this.smartWalletBundlerClientPromise) {
+      return await this.closeLeaseWithPaymaster(leaseId);
+    }
     const contractAbi = abiMap[this.networkType as NetworkType].computeLease;
     const contractAddress = contractAddresses[this.networkType as NetworkType].computeLease;
     try {
@@ -164,11 +176,31 @@ export class LeaseModule {
       const contract = new ethers.Contract(contractAddress, contractAbi, signer);
       const tx = await contract.closeLease(leaseId);
       const receipt = await tx.wait();
-      return receipt;
+      return receipt?.hash || null;
     } catch (error) {
       const errorMessage = handleContractError(error, contractAbi);
       throw errorMessage;
     }
+  }
+
+  async closeLeaseWithPaymaster(leaseId: string): Promise<string | null> {
+    const contractAddress = contractAddresses[this.networkType as NetworkType].computeLease;
+    const contractAbi = abiMap[this.networkType as NetworkType].computeLease;
+
+    const bundlerClient = await this.smartWalletBundlerClientPromise;
+
+    const txHash = await bundlerClient?.sendUserOperation({
+      calls: [
+        {
+          abi: contractAbi,
+          functionName: 'closeLease',
+          to: contractAddress as `0x${string}`,
+          args: [leaseId],
+        },
+      ],
+    });
+    const txReceipt = await bundlerClient?.waitForUserOperationReceipt({ hash: txHash! });
+    return txReceipt?.receipt.transactionHash || null;
   }
 
   async listenToLeaseClosedEvent(

@@ -13,10 +13,11 @@ import { getOrderStateAsString } from '@utils/order';
 import { handleContractError } from '@utils/errors';
 import { NetworkType } from '@config/index';
 import { abiMap } from '@contracts/abi-map';
+import { SmartWalletBundlerClient } from '@utils/smart-wallet';
 
 export class OrderModule {
   private provider: ethers.Provider;
-  private websocketProvider?: ethers.WebSocketProvider;
+  private websocketProvider: ethers.WebSocketProvider | undefined;
   private createTimeoutId: NodeJS.Timeout | null;
   private updateTimeoutId: NodeJS.Timeout | null;
   private wallet: ethers.Wallet | undefined;
@@ -26,7 +27,8 @@ export class OrderModule {
     provider: ethers.Provider,
     websocketProvider?: ethers.WebSocketProvider,
     wallet?: ethers.Wallet,
-    networkType?: NetworkType
+    networkType?: NetworkType,
+    private smartWalletBundlerClientPromise?: Promise<SmartWalletBundlerClient>
   ) {
     this.provider = provider;
     this.websocketProvider = websocketProvider;
@@ -34,11 +36,16 @@ export class OrderModule {
     this.updateTimeoutId = null;
     this.wallet = wallet;
     this.networkType = networkType;
+    this.smartWalletBundlerClientPromise = smartWalletBundlerClientPromise;
   }
 
-  async createOrder(orderDetails: OrderDetails): Promise<ethers.ContractTransactionReceipt | null> {
+  async createOrder(orderDetails: OrderDetails): Promise<string | null> {
     const contractAbi = abiMap[this.networkType as NetworkType].orderRequest;
     try {
+      if (this.smartWalletBundlerClientPromise) {
+        return await this.createOrderWithPaymaster(orderDetails);
+      }
+
       const { signer } = await initializeSigner({ wallet: this.wallet });
 
       const contractAddress = contractAddresses[this.networkType as NetworkType].orderRequest;
@@ -48,19 +55,81 @@ export class OrderModule {
 
       const tx: ethers.ContractTransactionResponse = await contract.createOrder(orderDetails);
       const receipt: ethers.ContractTransactionReceipt | null = await tx.wait();
-      return receipt;
+      return receipt?.hash || null;
     } catch (error) {
       const errorMessage = handleContractError(error, contractAbi);
       throw errorMessage;
     }
   }
 
-  async updateOrder(
-    orderId: string,
-    orderDetails: OrderDetails
-  ): Promise<ethers.ContractTransactionReceipt | null> {
+  async createOrderWithPaymaster(orderDetails: OrderDetails): Promise<string | null> {
+    const network = await this.provider.getNetwork();
+    const chainId = network.chainId;
+    const { signer } = await initializeSigner({ wallet: this.wallet });
+    const claimedSigner = signer.address;
+
+    const contractAddress = contractAddresses[this.networkType as NetworkType].orderRequest;
+    const contractAbi = abiMap[this.networkType as NetworkType].orderRequest;
+
+    const contract = new ethers.Contract(contractAddress, contractAbi, signer);
+    const nonce = await contract.nonces(claimedSigner);
+
+    const domain = {
+      name: 'Spheron',
+      version: '1',
+      chainId,
+      verifyingContract: contractAddress,
+    };
+
+    const types = {
+      CreateOrder: [
+        { name: 'maxPrice', type: 'uint256' },
+        { name: 'numOfBlocks', type: 'uint64' },
+        { name: 'token', type: 'address' },
+        { name: 'nonce', type: 'uint256' },
+      ],
+    };
+
+    const value = {
+      maxPrice: orderDetails.maxPrice,
+      numOfBlocks: orderDetails.numOfBlocks,
+      token: orderDetails.token,
+      nonce,
+    };
+
+    // Sign the typed data using EIP-712
+    const signature = await signer.signTypedData(domain, types, value);
+
+    const smartWalletBundlerClient = await this.smartWalletBundlerClientPromise;
+
+    try {
+      const txHash = await smartWalletBundlerClient?.sendUserOperation({
+        calls: [
+          {
+            abi: contractAbi,
+            functionName: 'createOrderWithSignature',
+            to: contractAddress as `0x${string}`,
+            args: [orderDetails, claimedSigner, nonce, signature],
+          },
+        ],
+        paymaster: true,
+      });
+      const txReceipt = await smartWalletBundlerClient?.waitForUserOperationReceipt({
+        hash: txHash!,
+      });
+      return txReceipt?.receipt.transactionHash || null;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async updateOrder(orderId: string, orderDetails: OrderDetails): Promise<string | null> {
     const contractAbi = abiMap[this.networkType as NetworkType].orderRequest;
     try {
+      if (this.smartWalletBundlerClientPromise) {
+        return await this.updateOrderWithPaymaster(orderId, orderDetails);
+      }
+
       const { signer } = await initializeSigner({ wallet: this.wallet });
 
       const contractAddress = contractAddresses[this.networkType as NetworkType].orderRequest;
@@ -72,11 +141,72 @@ export class OrderModule {
         orderDetails
       );
       const receipt: ethers.ContractTransactionReceipt | null = await tx.wait();
-      return receipt;
+      return receipt?.hash || null;
     } catch (error) {
       const errorMessage = handleContractError(error, contractAbi);
       throw errorMessage;
     }
+  }
+
+  async updateOrderWithPaymaster(
+    orderId: string,
+    orderDetails: OrderDetails
+  ): Promise<string | null> {
+    const network = await this.provider.getNetwork();
+    const chainId = network.chainId;
+    const { signer } = await initializeSigner({ wallet: this.wallet });
+    const claimedSigner = signer.address;
+
+    const contractAddress = contractAddresses[this.networkType as NetworkType].orderRequest;
+    const contractAbi = abiMap[this.networkType as NetworkType].orderRequest;
+
+    const contract = new ethers.Contract(contractAddress, contractAbi, signer);
+    const nonce = await contract.nonces(claimedSigner);
+
+    const domain = {
+      name: 'Spheron',
+      version: '1',
+      chainId,
+      verifyingContract: contractAddress,
+    };
+
+    const types = {
+      UpdateInitialOrder: [
+        { name: 'orderId', type: 'uint64' },
+        { name: 'maxPrice', type: 'uint256' },
+        { name: 'numOfBlocks', type: 'uint64' },
+        { name: 'token', type: 'address' },
+        { name: 'nonce', type: 'uint256' },
+      ],
+    };
+
+    const value = {
+      orderId: orderId,
+      maxPrice: orderDetails.maxPrice,
+      numOfBlocks: orderDetails.numOfBlocks,
+      token: orderDetails.token,
+      nonce,
+    };
+
+    // Sign the typed data using EIP-712
+    const signature = await signer.signTypedData(domain, types, value);
+
+    const smartWalletBundlerClient = await this.smartWalletBundlerClientPromise;
+
+    const txHash = await smartWalletBundlerClient?.sendUserOperation({
+      calls: [
+        {
+          abi: contractAbi,
+          functionName: 'updateInitialOrderWithSignature',
+          to: contractAddress as `0x${string}`,
+          args: [orderId, orderDetails, claimedSigner, nonce, signature],
+        },
+      ],
+    });
+    const txReceipt = await smartWalletBundlerClient?.waitForUserOperationReceipt({
+      hash: txHash!,
+    });
+    return txReceipt?.receipt.transactionHash || null;
   }
 
   async getOrderDetails(leaseId: string): Promise<InitialOrder> {
@@ -116,6 +246,7 @@ export class OrderModule {
     onSuccessCallback: (
       orderId: string,
       providerAddress: string,
+      fizzId: string | number | bigint,
       providerId: string | number | bigint,
       acceptedPrice: string | number | bigint,
       creatorAddress: string
@@ -145,16 +276,31 @@ export class OrderModule {
         (
           orderId: string,
           providerAddress: string,
+          fizzId: string | number | bigint,
           providerId: string | number | bigint,
           acceptedPrice: string | number | bigint,
           creatorAddress: string
         ) => {
           if (creatorAddress.toString().toLowerCase() === account.toString().toLowerCase()) {
-            onSuccessCallback(orderId, providerAddress, providerId, acceptedPrice, creatorAddress);
+            onSuccessCallback(
+              orderId,
+              providerAddress,
+              fizzId,
+              providerId,
+              acceptedPrice,
+              creatorAddress
+            );
             this.websocketProvider?.destroy();
             contract.off('OrderMatched');
             clearTimeout(this.createTimeoutId as NodeJS.Timeout);
-            resolve({ orderId, providerAddress, providerId, acceptedPrice, creatorAddress });
+            resolve({
+              orderId,
+              providerAddress,
+              fizzId,
+              providerId,
+              acceptedPrice,
+              creatorAddress,
+            });
           }
         }
       );

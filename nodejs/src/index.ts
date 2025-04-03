@@ -6,7 +6,8 @@ import { DeploymentModule } from '@modules/deployment';
 import { ProviderModule } from '@modules/provider';
 import { FizzModule } from '@modules/fizz';
 import { rpcUrls } from '@config/index';
-import type { NetworkType, RpcProvider } from '@config/index';
+import type { NetworkType, RpcProvider, gaslessOptions } from '@config/index';
+import { initSmartWalletBundlerClient, type SmartWalletBundlerClient } from '@utils/smart-wallet';
 
 export class SpheronSDK {
   public leases: LeaseModule;
@@ -15,25 +16,63 @@ export class SpheronSDK {
   public provider: ProviderModule;
   public fizz: FizzModule;
   public deployment: DeploymentModule;
+  private smartWalletBundlerClientPromise?: Promise<SmartWalletBundlerClient>;
 
-  constructor(
-    networkType: NetworkType,
-    privateKey?: string,
-    rpcProvider: RpcProvider = {
+  constructor({
+    networkType,
+    privateKey,
+    rpcProvider = {
       HTTP_URL: rpcUrls[networkType].HTTP_URL,
       WSS_URL: rpcUrls[networkType].WSS_URL,
-    }
-  ) {
+    },
+    gaslessOptions,
+  }: {
+    networkType: NetworkType;
+    privateKey?: string;
+    rpcProvider: RpcProvider;
+    gaslessOptions?: gaslessOptions;
+  }) {
     const provider = new ethers.JsonRpcProvider(rpcProvider.HTTP_URL);
     const websocketProvider = new ethers.WebSocketProvider(rpcProvider.WSS_URL);
     const wallet = privateKey ? new ethers.Wallet(privateKey, provider) : undefined;
 
-    this.leases = new LeaseModule(provider, websocketProvider, wallet, networkType);
-    this.orders = new OrderModule(provider, websocketProvider, wallet, networkType);
-    this.escrow = new EscrowModule(provider, wallet, networkType);
+    if (privateKey && gaslessOptions) {
+      this.smartWalletBundlerClientPromise = initSmartWalletBundlerClient({
+        networkType,
+        privateKey,
+        gaslessOptions,
+      });
+    }
+
+    this.leases = new LeaseModule(
+      provider,
+      websocketProvider,
+      wallet,
+      networkType,
+      this.smartWalletBundlerClientPromise
+    );
+    this.orders = new OrderModule(
+      provider,
+      websocketProvider,
+      wallet,
+      networkType,
+      this.smartWalletBundlerClientPromise
+    );
+    this.escrow = new EscrowModule(
+      provider,
+      wallet,
+      networkType,
+      this.smartWalletBundlerClientPromise
+    );
     this.provider = new ProviderModule(provider, networkType);
     this.fizz = new FizzModule(provider, websocketProvider, wallet, networkType);
-    this.deployment = new DeploymentModule(provider, websocketProvider, wallet);
+    this.deployment = new DeploymentModule(
+      provider,
+      websocketProvider,
+      wallet,
+      networkType,
+      this.smartWalletBundlerClientPromise
+    );
   }
 }
 

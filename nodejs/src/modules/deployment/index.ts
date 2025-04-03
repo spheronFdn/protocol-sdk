@@ -15,6 +15,7 @@ import { getTokenDetails } from '@utils/index';
 import { createAuthorizationToken } from '@utils/provider-auth';
 import { ethers } from 'ethers';
 import { CreateDeploymentResponse, DeploymentResponse } from './types';
+import { SmartWalletBundlerClient } from '@utils/smart-wallet';
 
 export class DeploymentModule {
   private wallet: ethers.Wallet | undefined;
@@ -28,12 +29,25 @@ export class DeploymentModule {
     provider: ethers.Provider,
     websocketProvider: ethers.WebSocketProvider,
     wallet?: ethers.Wallet,
-    networkType: NetworkType = 'testnet'
+    networkType: NetworkType = 'testnet',
+    private smartWalletBundlerClientPromise?: Promise<SmartWalletBundlerClient>
   ) {
     this.wallet = wallet;
     this.escrowModule = new EscrowModule(provider, wallet, networkType);
-    this.orderModule = new OrderModule(provider, websocketProvider, wallet, networkType);
-    this.leaseModule = new LeaseModule(provider, websocketProvider, wallet, networkType);
+    this.orderModule = new OrderModule(
+      provider,
+      websocketProvider,
+      wallet,
+      networkType,
+      smartWalletBundlerClientPromise
+    );
+    this.leaseModule = new LeaseModule(
+      provider,
+      websocketProvider,
+      wallet,
+      networkType,
+      smartWalletBundlerClientPromise
+    );
     this.providerModule = new ProviderModule(provider, networkType);
     this.networkType = networkType;
   }
@@ -71,14 +85,14 @@ export class DeploymentModule {
         throw new Error('Insufficient Balance');
       }
       try {
-        const transaction = await this.orderModule.createOrder(details);
+        const transactionHash = await this.orderModule.createOrder(details);
         const newOrderEvent: Promise<OrderMatchedEvent> = this.orderModule.listenToOrderCreated(
           60_000,
           () => {
-            createOrderMatchedCallback?.(transaction?.hash || '');
+            createOrderMatchedCallback?.(transactionHash || '');
           },
           () => {
-            createOrderFailedCallback?.(transaction?.hash || '');
+            createOrderFailedCallback?.(transactionHash || '');
           }
         );
         const { orderId, providerAddress } = await newOrderEvent;
@@ -100,7 +114,7 @@ export class DeploymentModule {
             orderId.toString(),
             sdlManifest
           );
-          return { leaseId: orderId, transaction };
+          return { leaseId: orderId, transactionHash };
         } catch (error) {
           throw new Error('Error occured in sending manifest');
         }
@@ -121,7 +135,7 @@ export class DeploymentModule {
     updateOrderAcceptedCallback?: (orderId: string) => void,
     updateOrderFailedCallback?: () => void,
     isOperator: boolean = false
-  ) {
+  ): Promise<{ transactionHash: string | null; updateLeaseResponse: OrderUpdatedEvent | null }> {
     try {
       const { error, orderDetails: details } = yamlToOrderDetails(iclYaml);
       if (error || typeof details === 'undefined') {
@@ -168,7 +182,7 @@ export class DeploymentModule {
           }
         );
 
-      await this.orderModule.updateOrder(leaseId, details);
+      const transactionHash = await this.orderModule.updateOrder(leaseId, details);
       const updateOrderAcceptanceResponse = await updateOrderAcceptance;
 
       const { orderId, providerAddress } = updateOrderAcceptanceResponse;
@@ -182,14 +196,9 @@ export class DeploymentModule {
         providerProxyUrl
       );
       const authToken = await createAuthorizationToken(this.wallet);
-      const updateOrder = await spheronProvider.submitManfiest(
-        certificate,
-        authToken,
-        orderId as string,
-        sdlManifest
-      );
+      await spheronProvider.submitManfiest(certificate, authToken, orderId as string, sdlManifest);
       const updateOrderLeaseResponse = await updatedOrderLease;
-      return { ...updateOrderLeaseResponse };
+      return { transactionHash, updateLeaseResponse: updateOrderLeaseResponse };
     } catch (error) {
       throw error;
     }
@@ -262,7 +271,7 @@ export class DeploymentModule {
     }
   }
 
-  async closeDeployment(leaseId: string) {
+  async closeDeployment(leaseId: string): Promise<{ transactionHash: string | null }> {
     try {
       if (!this.wallet) {
         throw new Error('Unable to access wallet');
@@ -274,7 +283,7 @@ export class DeploymentModule {
 
       const closeLeaseResponse = await this.leaseModule.closeLease(leaseId);
 
-      return closeLeaseResponse;
+      return { transactionHash: closeLeaseResponse };
     } catch (error) {
       throw error;
     }

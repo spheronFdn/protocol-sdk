@@ -5,16 +5,23 @@ import { NetworkType, tokenMap } from '@config/index';
 import { initializeSigner } from '@utils/index';
 import { handleContractError } from '@utils/errors';
 import { abiMap } from '@contracts/abi-map';
+import { SmartWalletBundlerClient } from '@utils/smart-wallet';
 
 export class EscrowModule {
   private provider: ethers.Provider;
   private wallet: ethers.Wallet | undefined;
   private networkType: NetworkType;
 
-  constructor(provider: ethers.Provider, wallet?: ethers.Wallet, networkType?: NetworkType) {
+  constructor(
+    provider: ethers.Provider,
+    wallet?: ethers.Wallet,
+    networkType?: NetworkType,
+    private smartWalletBundlerClientPromise?: Promise<SmartWalletBundlerClient>
+  ) {
     this.provider = provider;
     this.wallet = wallet;
     this.networkType = networkType ?? 'testnet';
+    this.smartWalletBundlerClientPromise = smartWalletBundlerClientPromise;
   }
 
   async getUserBalance(token: string, walletAddress?: string, isOperator: boolean = false) {
@@ -66,6 +73,14 @@ export class EscrowModule {
   async depositBalance({ token, amount, onSuccessCallback, onFailureCallback }: DepositData) {
     const contractABI = abiMap[this.networkType].escrow;
     try {
+      if (this.smartWalletBundlerClientPromise) {
+        return await this.depositBalanceGasless({
+          token,
+          amount,
+          onSuccessCallback,
+          onFailureCallback,
+        });
+      }
       const { signer } = await initializeSigner({ wallet: this.wallet });
 
       const contractAddress = contractAddresses[this.networkType].escrow;
@@ -96,6 +111,103 @@ export class EscrowModule {
     } catch (error) {
       if (onFailureCallback) onFailureCallback(error);
       const errorMessage = handleContractError(error, contractABI);
+      throw errorMessage;
+    }
+  }
+
+  async depositBalanceGasless({
+    token,
+    amount,
+    onSuccessCallback,
+    onFailureCallback,
+  }: DepositData) {
+    const contractAbi = abiMap[this.networkType].escrow;
+    try {
+      const contractAddress = contractAddresses[this.networkType].escrow;
+
+      const network = await this.provider.getNetwork();
+      const chainId = network.chainId;
+      const { signer } = await initializeSigner({ wallet: this.wallet });
+      const signerAddress = signer.address;
+
+      // Get the current nonce for the signer
+      const contract = new ethers.Contract(contractAddress, contractAbi, signer);
+      const nonce = await contract.nonces(signerAddress);
+
+      const tokenDetails = tokenMap[this.networkType].find(
+        (eachToken) => eachToken.symbol.toLowerCase() === token.toLowerCase()
+      );
+      if (!tokenDetails) {
+        throw new Error('Provided token symbol is invalid.');
+      }
+      const decimals = tokenDetails?.decimal ?? 18;
+      const tokenAddress: string = tokenDetails?.address;
+
+      const finalAmount = Number(amount.toString());
+      const depositAmount = ethers.parseUnits(finalAmount.toFixed(decimals), decimals);
+
+      const domain = {
+        name: 'Spheron',
+        version: '1',
+        chainId,
+        verifyingContract: contractAddress,
+      };
+
+      const types = {
+        Deposit: [
+          { name: 'token', type: 'address' },
+          { name: 'amount', type: 'uint256' },
+          { name: 'nonce', type: 'uint256' },
+        ],
+      };
+
+      const value = {
+        token: tokenAddress,
+        amount: depositAmount,
+        nonce,
+      };
+
+      // Sign the typed data using EIP-712
+      const signature = await signer.signTypedData(domain, types, value);
+
+      const smartWalletBundlerClient = await this.smartWalletBundlerClientPromise;
+
+      const tokenABI = abiMap[this.networkType].testToken;
+      const approvetTxnHash = await smartWalletBundlerClient?.sendUserOperation({
+        calls: [
+          {
+            abi: tokenABI,
+            functionName: 'approve',
+            to: tokenAddress as `0x${string}`,
+            args: [contractAddress, depositAmount],
+          },
+        ],
+        paymaster: true,
+      });
+      await smartWalletBundlerClient?.waitForUserOperationReceipt({
+        hash: approvetTxnHash!,
+      });
+
+      const txHash = await smartWalletBundlerClient?.sendUserOperation({
+        calls: [
+          {
+            abi: contractAbi,
+            functionName: 'depositWithSignature',
+            to: tokenAddress as `0x${string}`,
+            args: [tokenAddress, depositAmount, signerAddress, nonce, signature],
+          },
+        ],
+        paymaster: true,
+      });
+      const txReceipt = await smartWalletBundlerClient?.waitForUserOperationReceipt({
+        hash: txHash!,
+      });
+
+      if (onSuccessCallback) onSuccessCallback(txReceipt?.receipt);
+      return txReceipt?.receipt;
+    } catch (error) {
+      if (onFailureCallback) onFailureCallback(error);
+      const errorMessage = handleContractError(error, contractAbi);
       throw errorMessage;
     }
   }

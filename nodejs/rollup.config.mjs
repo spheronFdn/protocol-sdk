@@ -33,21 +33,25 @@ export default [
         file: packageJson.main,
         format: 'cjs',
         sourcemap: true,
+        inlineDynamicImports: true,
       },
       {
         file: packageJson.module,
         format: 'esm',
         sourcemap: true,
+        inlineDynamicImports: true,
       },
     ],
     plugins: [
       aliases,
-      resolve(),
+      resolve({
+        preferBuiltins: true,
+      }),
       commonjs(),
       json(),
       typescript({ tsconfig: './tsconfig.json' }),
     ],
-    external: ['ethers'],
+    external: ['ethers', 'viem', '@biconomy/abstractjs'],
   },
   {
     input: 'dist/esm/index.d.ts',
