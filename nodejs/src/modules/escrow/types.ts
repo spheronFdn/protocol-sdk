@@ -42,3 +42,15 @@ export interface UserBalance {
   unlockedBalance: string;
   token: TokenDetails;
 }
+
+export interface WithdrawEarningsData {
+  providerAddress: string;
+  fizzId: string;
+  token: string;
+  amount: number;
+  isFizz: boolean;
+}
+
+export interface DepositForOperatorData extends DepositData {
+  operatorAddresses: string[];
+}
