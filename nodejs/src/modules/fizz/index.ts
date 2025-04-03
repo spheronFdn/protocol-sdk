@@ -13,6 +13,7 @@ import {
   FizzDetails,
   RawFizzNode,
   RawFizzAttribute,
+  FizzStatusResponse,
   // FizzProviderTrustTier,
 } from './types';
 import { initializeSigner, requestPipeline } from '@utils/index';
@@ -188,7 +189,7 @@ export class FizzModule {
     }
   }
 
-  async getActiveFizzNodes(providerProxyUrl: string): Promise<FizzNode[]> {
+  async getActiveFizzNodes(providerProxyUrl: string): Promise<FizzStatusResponse[]> {
     if (!this.wallet) throw new Error('Wallet not found');
     try {
       let providers: Awaited<ReturnType<typeof subgraphGetProviders>> | null | Provider[] = null;
