@@ -205,8 +205,26 @@ export class EscrowModule {
   async depositForOperators({ token, amount, operatorAddresses }: DepositForOperatorData) {
     const contractABI = abiMap[this.networkType].escrow;
     try {
+      const { signer } = await initializeSigner({ wallet: this.wallet });
       const contractAddress = contractAddresses[this.networkType].escrow;
-      const contract = new ethers.Contract(contractAddress, contractABI, this.provider);
+      const contract = new ethers.Contract(contractAddress, contractABI, signer);
+      const tokenABI = abiMap[this.networkType].testToken;
+
+      const tokenDetails = tokenMap[this.networkType].find(
+        (eachToken) => eachToken.address.toLowerCase() === token.toLowerCase()
+      );
+      if (!tokenDetails) {
+        throw new Error('Provided token Address is invalid.');
+      }
+      const decimals = tokenDetails?.decimal ?? 18;
+
+      const tokenContract = new ethers.Contract(token, tokenABI, signer);
+
+      const finalAmount = Number(amount.toString());
+      const depositAmount = ethers.parseUnits(finalAmount.toFixed(decimals), decimals);
+
+      const approvalTxn = await tokenContract.approve(contractAddress, depositAmount);
+      await approvalTxn.wait();
 
       const result = await contract.depositForOperators(token, amount, operatorAddresses);
       const receipt = await result.wait();
