@@ -426,7 +426,6 @@ export class EscrowModule {
         Deposit: [
           { name: 'token', type: 'address' },
           { name: 'amount', type: 'uint256' },
-          { name: 'operatorAddresses', type: 'address[]' },
           { name: 'nonce', type: 'uint256' },
         ],
       };
@@ -434,7 +433,6 @@ export class EscrowModule {
       const value = {
         token: tokenAddress,
         amount: depositAmount,
-        operatorAddresses,
         nonce,
       };
 
