@@ -46,7 +46,7 @@ export interface UserBalance {
 export interface WithdrawEarningsData {
   providerAddress: string;
   fizzId: string;
-  tokenAddress: string;
+  token: string;
   amount: number;
   isFizz: boolean;
 }

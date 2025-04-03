@@ -177,7 +177,7 @@ export class EscrowModule {
   async withdrawEarnings({
     providerAddress,
     fizzId = '0',
-    tokenAddress,
+    token,
     amount,
     isFizz = false,
   }: WithdrawEarningsData) {
@@ -186,6 +186,16 @@ export class EscrowModule {
       const { signer } = await initializeSigner({ wallet: this.wallet });
 
       const contractAddress = contractAddresses[this.networkType].escrowProtocol;
+
+      const tokenDetails = tokenMap[this.networkType].find(
+        (eachToken) => eachToken.symbol.toLowerCase() === token.toLowerCase()
+      );
+
+      if (!tokenDetails) {
+        throw new Error('Provided token Symbol is invalid.');
+      }
+
+      const tokenAddress: string = tokenDetails?.address;
 
       const contract = new ethers.Contract(contractAddress, contractABI, signer);
 
@@ -206,6 +216,7 @@ export class EscrowModule {
 
   async depositForOperators({ token, amount, operatorAddresses }: DepositForOperatorData) {
     const contractABI = abiMap[this.networkType].escrow;
+
     try {
       const { signer } = await initializeSigner({ wallet: this.wallet });
       const contractAddress = contractAddresses[this.networkType].escrow;
@@ -213,14 +224,17 @@ export class EscrowModule {
       const tokenABI = abiMap[this.networkType].testToken;
 
       const tokenDetails = tokenMap[this.networkType].find(
-        (eachToken) => eachToken.address.toLowerCase() === token.toLowerCase()
+        (eachToken) => eachToken.symbol.toLowerCase() === token.toLowerCase()
       );
+
       if (!tokenDetails) {
-        throw new Error('Provided token Address is invalid.');
+        throw new Error('Provided token Symbol is invalid.');
       }
       const decimals = tokenDetails?.decimal ?? 18;
 
-      const tokenContract = new ethers.Contract(token, tokenABI, signer);
+      const tokenAddress: string = tokenDetails?.address;
+
+      const tokenContract = new ethers.Contract(tokenAddress, tokenABI, signer);
 
       const finalAmount = Number(amount.toString());
       const depositAmount = ethers.parseUnits(finalAmount.toFixed(decimals), decimals);
@@ -228,7 +242,7 @@ export class EscrowModule {
       const approvalTxn = await tokenContract.approve(contractAddress, depositAmount);
       await approvalTxn.wait();
 
-      const result = await contract.depositForOperators(token, amount, operatorAddresses);
+      const result = await contract.depositForOperators(tokenAddress, amount, operatorAddresses);
       const receipt = await result.wait();
       return receipt;
     } catch (error) {
