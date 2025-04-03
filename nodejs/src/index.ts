@@ -58,7 +58,12 @@ export class SpheronSDK {
       networkType,
       this.smartWalletBundlerClientPromise
     );
-    this.escrow = new EscrowModule(provider, wallet, networkType);
+    this.escrow = new EscrowModule(
+      provider,
+      wallet,
+      networkType,
+      this.smartWalletBundlerClientPromise
+    );
     this.provider = new ProviderModule(provider, networkType);
     this.fizz = new FizzModule(provider, websocketProvider, wallet, networkType);
     this.deployment = new DeploymentModule(
