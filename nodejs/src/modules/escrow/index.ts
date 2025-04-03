@@ -480,7 +480,7 @@ export class EscrowModule {
     }
   }
 
-  async depositForOperatorsGasless({
+  private async depositForOperatorsGasless({
     token,
     amount,
     operatorAddresses,
