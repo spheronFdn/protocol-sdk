@@ -56,6 +56,7 @@ export interface InitialOrder {
 export interface OrderMatchedEvent {
   orderId: string;
   providerAddress: string;
+  fizzId: string | number | bigint;
   providerId: string | number | bigint;
   acceptedPrice: string | number | bigint;
   creatorAddress: string;

@@ -11,11 +11,9 @@ import {
 import { getTokenDetails, initializeSigner } from '@utils/index';
 import { getOrderStateAsString } from '@utils/order';
 import { handleContractError } from '@utils/errors';
-import { BiconomyService } from '@utils/biconomy';
-import { WaitForUserOperationReceiptReturnType } from 'viem/_types/account-abstraction';
 import { NetworkType } from '@config/index';
 import { abiMap } from '@contracts/abi-map';
-import { TransactionReceipt } from 'viem';
+import { SmartWalletBundlerClient } from '@utils/smart-wallet';
 
 export class OrderModule {
   private provider: ethers.Provider;
@@ -30,7 +28,7 @@ export class OrderModule {
     websocketProvider?: ethers.WebSocketProvider,
     wallet?: ethers.Wallet,
     networkType?: NetworkType,
-    private paymaster?: BiconomyService
+    private smartWalletBundlerClientPromise?: Promise<SmartWalletBundlerClient>
   ) {
     this.provider = provider;
     this.websocketProvider = websocketProvider;
@@ -38,12 +36,13 @@ export class OrderModule {
     this.updateTimeoutId = null;
     this.wallet = wallet;
     this.networkType = networkType;
+    this.smartWalletBundlerClientPromise = smartWalletBundlerClientPromise;
   }
 
   async createOrder(orderDetails: OrderDetails): Promise<string | null> {
     const contractAbi = abiMap[this.networkType as NetworkType].orderRequest;
     try {
-      if (this.paymaster) {
+      if (this.smartWalletBundlerClientPromise) {
         return await this.createOrderWithPaymaster(orderDetails);
       }
 
@@ -101,27 +100,33 @@ export class OrderModule {
     // Sign the typed data using EIP-712
     const signature = await signer.signTypedData(domain, types, value);
 
-    const encodedData = this.paymaster?.encodeFunction({
-      abi: contractAbi,
-      functionName: 'createOrderWithSignature',
-      args: [orderDetails, claimedSigner, nonce, signature],
-    });
+    const smartWalletBundlerClient = await this.smartWalletBundlerClientPromise;
 
-    const txHash = await this.paymaster?.sendTransaction({
-      to: contractAddress,
-      data: encodedData!,
-    });
-    const txReceipt = await this.paymaster?.waitForTransaction(txHash!);
-    return txReceipt?.receipt.transactionHash || null;
+    try {
+      const txHash = await smartWalletBundlerClient?.sendUserOperation({
+        calls: [
+          {
+            abi: contractAbi,
+            functionName: 'createOrderWithSignature',
+            to: contractAddress as `0x${string}`,
+            args: [orderDetails, claimedSigner, nonce, signature],
+          },
+        ],
+        paymaster: true,
+      });
+      const txReceipt = await smartWalletBundlerClient?.waitForUserOperationReceipt({
+        hash: txHash!,
+      });
+      return txReceipt?.receipt.transactionHash || null;
+    } catch (error) {
+      throw error;
+    }
   }
 
-  async updateOrder(
-    orderId: string,
-    orderDetails: OrderDetails
-  ): Promise<string | null> {
+  async updateOrder(orderId: string, orderDetails: OrderDetails): Promise<string | null> {
     const contractAbi = abiMap[this.networkType as NetworkType].orderRequest;
     try {
-      if (this.paymaster) {
+      if (this.smartWalletBundlerClientPromise) {
         return await this.updateOrderWithPaymaster(orderId, orderDetails);
       }
 
@@ -147,20 +152,60 @@ export class OrderModule {
     orderId: string,
     orderDetails: OrderDetails
   ): Promise<string | null> {
-    const encodedData = this.paymaster?.encodeFunction({
-      abi: [
-        'function updateInitialOrder(uint64 _orderId, OrderDetails memory details) external (void)',
-      ],
-      functionName: 'updateInitialOrder',
-      args: [orderId, orderDetails],
-    });
-    const contractAddress = contractAddresses[this.networkType as NetworkType].orderRequest;
+    const network = await this.provider.getNetwork();
+    const chainId = network.chainId;
+    const { signer } = await initializeSigner({ wallet: this.wallet });
+    const claimedSigner = signer.address;
 
-    const txHash = await this.paymaster?.sendTransaction({
-      to: contractAddress,
-      data: encodedData!,
+    const contractAddress = contractAddresses[this.networkType as NetworkType].orderRequest;
+    const contractAbi = abiMap[this.networkType as NetworkType].orderRequest;
+
+    const contract = new ethers.Contract(contractAddress, contractAbi, signer);
+    const nonce = await contract.nonces(claimedSigner);
+
+    const domain = {
+      name: 'Spheron',
+      version: '1',
+      chainId,
+      verifyingContract: contractAddress,
+    };
+
+    const types = {
+      UpdateInitialOrder: [
+        { name: 'orderId', type: 'uint64' },
+        { name: 'maxPrice', type: 'uint256' },
+        { name: 'numOfBlocks', type: 'uint64' },
+        { name: 'token', type: 'address' },
+        { name: 'nonce', type: 'uint256' },
+      ],
+    };
+
+    const value = {
+      orderId: orderId,
+      maxPrice: orderDetails.maxPrice,
+      numOfBlocks: orderDetails.numOfBlocks,
+      token: orderDetails.token,
+      nonce,
+    };
+
+    // Sign the typed data using EIP-712
+    const signature = await signer.signTypedData(domain, types, value);
+
+    const smartWalletBundlerClient = await this.smartWalletBundlerClientPromise;
+
+    const txHash = await smartWalletBundlerClient?.sendUserOperation({
+      calls: [
+        {
+          abi: contractAbi,
+          functionName: 'updateInitialOrderWithSignature',
+          to: contractAddress as `0x${string}`,
+          args: [orderId, orderDetails, claimedSigner, nonce, signature],
+        },
+      ],
     });
-    const txReceipt = await this.paymaster?.waitForTransaction(txHash!);
+    const txReceipt = await smartWalletBundlerClient?.waitForUserOperationReceipt({
+      hash: txHash!,
+    });
     return txReceipt?.receipt.transactionHash || null;
   }
 
@@ -201,6 +246,7 @@ export class OrderModule {
     onSuccessCallback: (
       orderId: string,
       providerAddress: string,
+      fizzId: string | number | bigint,
       providerId: string | number | bigint,
       acceptedPrice: string | number | bigint,
       creatorAddress: string
@@ -230,16 +276,31 @@ export class OrderModule {
         (
           orderId: string,
           providerAddress: string,
+          fizzId: string | number | bigint,
           providerId: string | number | bigint,
           acceptedPrice: string | number | bigint,
           creatorAddress: string
         ) => {
           if (creatorAddress.toString().toLowerCase() === account.toString().toLowerCase()) {
-            onSuccessCallback(orderId, providerAddress, providerId, acceptedPrice, creatorAddress);
+            onSuccessCallback(
+              orderId,
+              providerAddress,
+              fizzId,
+              providerId,
+              acceptedPrice,
+              creatorAddress
+            );
             this.websocketProvider?.destroy();
             contract.off('OrderMatched');
             clearTimeout(this.createTimeoutId as NodeJS.Timeout);
-            resolve({ orderId, providerAddress, providerId, acceptedPrice, creatorAddress });
+            resolve({
+              orderId,
+              providerAddress,
+              fizzId,
+              providerId,
+              acceptedPrice,
+              creatorAddress,
+            });
           }
         }
       );

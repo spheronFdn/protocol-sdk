@@ -147,7 +147,7 @@ export const GSEQ = '1';
 
 export const OSEQ = '1';
 
-export type Paymaster = {
+export type gaslessOptions = {
   type: 'biconomy' | 'coinbase';
   bundlerUrl: string;
   paymasterUrl: string;

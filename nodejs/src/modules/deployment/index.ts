@@ -1,4 +1,4 @@
-import { NetworkType, networkType, Paymaster } from '@config/index';
+import { NetworkType, networkType } from '@config/index';
 import { EscrowModule } from '@modules/escrow';
 import { LeaseModule } from '@modules/lease';
 import { OrderModule } from '@modules/order';
@@ -15,7 +15,7 @@ import { getTokenDetails } from '@utils/index';
 import { createAuthorizationToken } from '@utils/provider-auth';
 import { ethers } from 'ethers';
 import { CreateDeploymentResponse, DeploymentResponse } from './types';
-import { BiconomyService } from '@utils/biconomy';
+import { SmartWalletBundlerClient } from '@utils/smart-wallet';
 
 export class DeploymentModule {
   private wallet: ethers.Wallet | undefined;
@@ -30,12 +30,24 @@ export class DeploymentModule {
     websocketProvider: ethers.WebSocketProvider,
     wallet?: ethers.Wallet,
     networkType: NetworkType = 'testnet',
-    paymaster?: BiconomyService
+    private smartWalletBundlerClientPromise?: Promise<SmartWalletBundlerClient>
   ) {
     this.wallet = wallet;
     this.escrowModule = new EscrowModule(provider, wallet, networkType);
-    this.orderModule = new OrderModule(provider, websocketProvider, wallet, networkType, paymaster);
-    this.leaseModule = new LeaseModule(provider, websocketProvider, wallet, networkType, paymaster);
+    this.orderModule = new OrderModule(
+      provider,
+      websocketProvider,
+      wallet,
+      networkType,
+      smartWalletBundlerClientPromise
+    );
+    this.leaseModule = new LeaseModule(
+      provider,
+      websocketProvider,
+      wallet,
+      networkType,
+      smartWalletBundlerClientPromise
+    );
     this.providerModule = new ProviderModule(provider, networkType);
     this.networkType = networkType;
   }
