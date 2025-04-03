@@ -1,6 +1,6 @@
 import * as yaml from 'js-yaml';
 import { getTokenDetails } from '@utils/index';
-import { networkType, NetworkType } from '@config/index';
+import { NetworkType } from '@config/index';
 import {
   GPUAttributesManifest,
   ICL,
@@ -212,7 +212,8 @@ interface IclYaml {
 }
 
 export const yamlToOrderDetails = (
-  yamlString: string
+  yamlString: string,
+  networkType: NetworkType
 ): { error: boolean; orderDetails?: OrderDetails; message?: string } => {
   try {
     const icl = yaml.load(yamlString) as IclYaml;

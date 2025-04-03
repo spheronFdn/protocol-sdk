@@ -42,8 +42,7 @@ export class EscrowModule {
       if (!tokenDetails) {
         throw new Error('Provided token symbol is invalid.');
       }
-      const tokenAddress: string =
-        tokenDetails?.address || ethers.ZeroAddress;
+      const tokenAddress: string = tokenDetails?.address || ethers.ZeroAddress;
 
       let userWalletAddress;
       if (walletAddress) {
@@ -288,10 +287,7 @@ export class EscrowModule {
       const tokenAddress: string = tokenDetails?.address;
 
       const finalAmount = Number(amount.toString());
-      const withdrawAmount = ethers.parseUnits(
-        finalAmount.toFixed(decimals),
-        decimals
-      );
+      const withdrawAmount = ethers.parseUnits(finalAmount.toFixed(decimals), decimals);
 
       const contractAddress = contractAddresses[this.networkType].escrow;
       const contract = new ethers.Contract(contractAddress, contractABI, signer);
@@ -300,18 +296,18 @@ export class EscrowModule {
       const nonce = await contract.nonces(signerAddress);
 
       const domain = {
-        name: "Spheron",
-        version: "1",
+        name: 'Spheron',
+        version: '1',
         chainId,
         verifyingContract: contractAddress,
       };
 
       const types = {
         Withdraw: [
-          { name: "token", type: "address" },
-          { name: "amount", type: "uint256" },
-          { name: "operator", type: "address" },
-          { name: "nonce", type: "uint256" },
+          { name: 'token', type: 'address' },
+          { name: 'amount', type: 'uint256' },
+          { name: 'operator', type: 'address' },
+          { name: 'nonce', type: 'uint256' },
         ],
       };
 
@@ -331,24 +327,17 @@ export class EscrowModule {
         calls: [
           {
             abi: contractABI,
-            functionName: "withdrawWithSignature",
+            functionName: 'withdrawWithSignature',
             to: contractAddress as `0x${string}`,
-            args: [
-              tokenAddress,
-              withdrawAmount,
-              operator,
-              signerAddress,
-              nonce,
-              signature,
-            ],
-          }
+            args: [tokenAddress, withdrawAmount, operator, signerAddress, nonce, signature],
+          },
         ],
         paymaster: true,
       });
       const txReceipt = await smartWalletBundlerClient?.waitForUserOperationReceipt({
         hash: txHash!,
       });
-      
+
       if (onSuccessCallback) onSuccessCallback(txReceipt?.receipt);
       return txReceipt?.receipt;
     } catch (error) {

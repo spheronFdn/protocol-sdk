@@ -60,7 +60,7 @@ export class DeploymentModule {
     isOperator: boolean = false
   ): Promise<CreateDeploymentResponse> {
     try {
-      const { error, orderDetails: details } = yamlToOrderDetails(iclYaml);
+      const { error, orderDetails: details } = yamlToOrderDetails(iclYaml, this.networkType);
       if (error || typeof details === 'undefined') {
         throw new Error('Please verify YAML format');
       }
@@ -137,7 +137,7 @@ export class DeploymentModule {
     isOperator: boolean = false
   ): Promise<{ transactionHash: string | null; updateLeaseResponse: OrderUpdatedEvent | null }> {
     try {
-      const { error, orderDetails: details } = yamlToOrderDetails(iclYaml);
+      const { error, orderDetails: details } = yamlToOrderDetails(iclYaml, this.networkType);
       if (error || typeof details === 'undefined') {
         throw new Error('Please verify YAML format');
       }
