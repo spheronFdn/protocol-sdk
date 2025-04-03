@@ -183,9 +183,11 @@ export class EscrowModule {
   }: WithdrawEarningsData) {
     const contractABI = abiMap[this.networkType].escrowProtocol;
     try {
+      const { signer } = await initializeSigner({ wallet: this.wallet });
+
       const contractAddress = contractAddresses[this.networkType].escrowProtocol;
 
-      const contract = new ethers.Contract(contractAddress, contractABI, this.provider);
+      const contract = new ethers.Contract(contractAddress, contractABI, signer);
 
       const result = await contract.withdrawEarnings(
         providerAddress,
