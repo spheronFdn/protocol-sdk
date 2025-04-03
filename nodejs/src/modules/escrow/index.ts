@@ -1,6 +1,12 @@
 import { contractAddresses } from '@contracts/addresses';
 import { ethers } from 'ethers';
-import { DepositData, DepositForOperatorData, UserBalance, WithdrawEarningsData } from './types';
+import {
+  DepositData,
+  DepositForOperatorData,
+  UserBalance,
+  WithdrawData,
+  WithdrawEarningsData,
+} from './types';
 import { NetworkType, tokenMap } from '@config/index';
 import { initializeSigner } from '@utils/index';
 import { handleContractError } from '@utils/errors';
@@ -37,7 +43,7 @@ export class EscrowModule {
         throw new Error('Provided token symbol is invalid.');
       }
       const tokenAddress: string =
-        tokenDetails?.address || '0x0000000000000000000000000000000000000000';
+        tokenDetails?.address || ethers.ZeroAddress;
 
       let userWalletAddress;
       if (walletAddress) {
@@ -69,7 +75,6 @@ export class EscrowModule {
     }
   }
 
-  // write operations
   async depositBalance({ token, amount, onSuccessCallback, onFailureCallback }: DepositData) {
     const contractABI = abiMap[this.networkType].escrow;
     try {
@@ -115,13 +120,13 @@ export class EscrowModule {
     }
   }
 
-  async depositBalanceGasless({
+  private async depositBalanceGasless({
     token,
     amount,
     onSuccessCallback,
     onFailureCallback,
   }: DepositData) {
-    const contractAbi = abiMap[this.networkType].escrow;
+    const contractABI = abiMap[this.networkType].escrow;
     try {
       const contractAddress = contractAddresses[this.networkType].escrow;
 
@@ -131,7 +136,7 @@ export class EscrowModule {
       const signerAddress = signer.address;
 
       // Get the current nonce for the signer
-      const contract = new ethers.Contract(contractAddress, contractAbi, signer);
+      const contract = new ethers.Contract(contractAddress, contractABI, signer);
       const nonce = await contract.nonces(signerAddress);
 
       const tokenDetails = tokenMap[this.networkType].find(
@@ -173,7 +178,7 @@ export class EscrowModule {
       const smartWalletBundlerClient = await this.smartWalletBundlerClientPromise;
 
       const tokenABI = abiMap[this.networkType].testToken;
-      const approvetTxnHash = await smartWalletBundlerClient?.sendUserOperation({
+      const approveTxnHash = await smartWalletBundlerClient?.sendUserOperation({
         calls: [
           {
             abi: tokenABI,
@@ -185,15 +190,15 @@ export class EscrowModule {
         paymaster: true,
       });
       await smartWalletBundlerClient?.waitForUserOperationReceipt({
-        hash: approvetTxnHash!,
+        hash: approveTxnHash!,
       });
 
       const txHash = await smartWalletBundlerClient?.sendUserOperation({
         calls: [
           {
-            abi: contractAbi,
+            abi: contractABI,
             functionName: 'depositWithSignature',
-            to: tokenAddress as `0x${string}`,
+            to: contractAddress as `0x${string}`,
             args: [tokenAddress, depositAmount, signerAddress, nonce, signature],
           },
         ],
@@ -207,14 +212,29 @@ export class EscrowModule {
       return txReceipt?.receipt;
     } catch (error) {
       if (onFailureCallback) onFailureCallback(error);
-      const errorMessage = handleContractError(error, contractAbi);
+      const errorMessage = handleContractError(error, contractABI);
       throw errorMessage;
     }
   }
 
-  async withdrawBalance({ token, amount, onSuccessCallback, onFailureCallback }: DepositData) {
+  async withdrawBalance({
+    token,
+    amount,
+    operator = ethers.ZeroAddress,
+    onSuccessCallback,
+    onFailureCallback,
+  }: WithdrawData) {
     const contractABI = abiMap[this.networkType].escrow;
     try {
+      if (this.smartWalletBundlerClientPromise) {
+        return await this.withdrawBalanceGasless({
+          token,
+          amount,
+          operator,
+          onSuccessCallback,
+          onFailureCallback,
+        });
+      }
       const { signer } = await initializeSigner({ wallet: this.wallet });
 
       const contractAddress = contractAddresses[this.networkType].escrow;
@@ -230,10 +250,10 @@ export class EscrowModule {
 
       const contract = new ethers.Contract(contractAddress, contractABI, signer);
 
-      const finalAmount = (Number(amount.toString()) * 10 ** decimals - 1) / 10 ** decimals;
+      const finalAmount = Number(amount.toString());
       const withdrawAmount = ethers.parseUnits(finalAmount.toFixed(decimals), decimals);
 
-      const result = await contract.withdraw(tokenAddress, withdrawAmount);
+      const result = await contract.withdraw(tokenAddress, withdrawAmount, operator);
       const receipt = await result.wait();
       if (onSuccessCallback) onSuccessCallback(receipt);
       return receipt;
@@ -244,7 +264,100 @@ export class EscrowModule {
     }
   }
 
-  // read operations
+  private async withdrawBalanceGasless({
+    token,
+    amount,
+    operator = ethers.ZeroAddress,
+    onSuccessCallback,
+    onFailureCallback,
+  }: WithdrawData) {
+    const contractABI = abiMap[this.networkType].escrow;
+    try {
+      const network = await this.provider.getNetwork();
+      const chainId = network.chainId;
+      const { signer } = await initializeSigner({ wallet: this.wallet });
+      const signerAddress = signer.address;
+
+      const tokenDetails = tokenMap[this.networkType].find(
+        (eachToken) => eachToken.symbol.toLowerCase() === token.toLowerCase()
+      );
+      if (!tokenDetails) {
+        throw new Error('Provided token symbol is invalid.');
+      }
+      const decimals = tokenDetails?.decimal ?? 18;
+      const tokenAddress: string = tokenDetails?.address;
+
+      const finalAmount = Number(amount.toString());
+      const withdrawAmount = ethers.parseUnits(
+        finalAmount.toFixed(decimals),
+        decimals
+      );
+
+      const contractAddress = contractAddresses[this.networkType].escrow;
+      const contract = new ethers.Contract(contractAddress, contractABI, signer);
+
+      // Get the current nonce for the signer
+      const nonce = await contract.nonces(signerAddress);
+
+      const domain = {
+        name: "Spheron",
+        version: "1",
+        chainId,
+        verifyingContract: contractAddress,
+      };
+
+      const types = {
+        Withdraw: [
+          { name: "token", type: "address" },
+          { name: "amount", type: "uint256" },
+          { name: "operator", type: "address" },
+          { name: "nonce", type: "uint256" },
+        ],
+      };
+
+      const value = {
+        token: tokenAddress,
+        amount: withdrawAmount,
+        operator,
+        nonce,
+      };
+
+      // Sign the typed data using EIP-712
+      const signature = await signer.signTypedData(domain, types, value);
+
+      const smartWalletBundlerClient = await this.smartWalletBundlerClientPromise;
+
+      const txHash = await smartWalletBundlerClient?.sendUserOperation({
+        calls: [
+          {
+            abi: contractABI,
+            functionName: "withdrawWithSignature",
+            to: contractAddress as `0x${string}`,
+            args: [
+              tokenAddress,
+              withdrawAmount,
+              operator,
+              signerAddress,
+              nonce,
+              signature,
+            ],
+          }
+        ],
+        paymaster: true,
+      });
+      const txReceipt = await smartWalletBundlerClient?.waitForUserOperationReceipt({
+        hash: txHash!,
+      });
+      
+      if (onSuccessCallback) onSuccessCallback(txReceipt?.receipt);
+      return txReceipt?.receipt;
+    } catch (error) {
+      if (onFailureCallback) onFailureCallback(error);
+      const errorMessage = handleContractError(error, contractABI);
+      throw errorMessage;
+    }
+  }
+
   async getProviderEarnings(providerAddress: string, tokenAddress: string) {
     const contractABI = abiMap[this.networkType].escrowProtocol;
     try {
@@ -265,6 +378,7 @@ export class EscrowModule {
       throw errorMessage;
     }
   }
+
   async getFizzEarnings(fizzAddress: string, tokenAddress: string) {
     const contractABI = abiMap[this.networkType].escrowProtocol;
     try {

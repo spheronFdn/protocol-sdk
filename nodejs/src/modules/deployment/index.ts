@@ -1,4 +1,3 @@
-import { NetworkType, networkType } from '@config/index';
 import { EscrowModule } from '@modules/escrow';
 import { LeaseModule } from '@modules/lease';
 import { OrderModule } from '@modules/order';
@@ -13,6 +12,7 @@ import { SpheronProviderModule } from '@modules/spheron-provider';
 import { getManifestIcl, yamlToOrderDetails } from '@utils/deployment';
 import { getTokenDetails } from '@utils/index';
 import { createAuthorizationToken } from '@utils/provider-auth';
+import { NetworkType } from '@config/index';
 import { ethers } from 'ethers';
 import { CreateDeploymentResponse, DeploymentResponse } from './types';
 import { SmartWalletBundlerClient } from '@utils/smart-wallet';
@@ -30,7 +30,7 @@ export class DeploymentModule {
     websocketProvider: ethers.WebSocketProvider,
     wallet?: ethers.Wallet,
     networkType: NetworkType = 'testnet',
-    private smartWalletBundlerClientPromise?: Promise<SmartWalletBundlerClient>
+    smartWalletBundlerClientPromise?: Promise<SmartWalletBundlerClient>
   ) {
     this.wallet = wallet;
     this.escrowModule = new EscrowModule(provider, wallet, networkType);
@@ -66,7 +66,7 @@ export class DeploymentModule {
       }
       const sdlManifest = getManifestIcl(iclYaml);
       const { token, maxPrice, numOfBlocks } = details;
-      const tokenDetails = getTokenDetails(token, networkType as NetworkType);
+      const tokenDetails = getTokenDetails(token, this.networkType as NetworkType);
       const decimal = 18;
       const totalCost =
         Number(Number(maxPrice.toString()) / 10 ** (decimal || 0)) * Number(numOfBlocks);
@@ -143,7 +143,7 @@ export class DeploymentModule {
       }
       const sdlManifest = getManifestIcl(iclYaml);
       const { token, maxPrice, numOfBlocks } = details;
-      const tokenDetails = getTokenDetails(token, networkType as NetworkType);
+      const tokenDetails = getTokenDetails(token, this.networkType as NetworkType);
       const decimal = 18;
       const totalCost =
         Number(Number(maxPrice.toString()) / 10 ** (decimal || 0)) * Number(numOfBlocks);

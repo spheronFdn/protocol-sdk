@@ -139,8 +139,6 @@ export const tokenMap: Record<NetworkType, IToken[]> = {
   ],
 };
 
-export const networkType = (process.env.NETWORK_TYPE as NetworkType) || 'mainnet';
-
 export const DEFAULT_PAGE_SIZE = 10;
 
 export const GSEQ = '1';
