@@ -1,6 +1,6 @@
 {
   "name": "@spheron/protocol-sdk",
-  "version": "2.0.0-mainnet.2",
+  "version": "2.0.0-mainnet.3",
   "description": "Spheron Protocol SDK",
   "repository": {
     "type": "git",
@@ -34,7 +34,9 @@
     "format": "prettier --write 'src/**/*.{js,ts}'",
     "dev": "node dist/esm/index.js"
   },
-  "sideEffects": ["*.js"],
+  "sideEffects": [
+    "*.js"
+  ],
   "devDependencies": {
     "@rollup/plugin-alias": "^5.1.0",
     "@rollup/plugin-commonjs": "^26.0.1",

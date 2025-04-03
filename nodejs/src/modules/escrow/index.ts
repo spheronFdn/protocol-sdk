@@ -330,6 +330,9 @@ export class EscrowModule {
     const contractABI = abiMap[this.networkType].escrow;
 
     try {
+      if (this.smartWalletBundlerClientPromise) {
+        return await this.depositForOperatorsGasless({ token, amount, operatorAddresses });
+      }
       const { signer } = await initializeSigner({ wallet: this.wallet });
       const contractAddress = contractAddresses[this.networkType].escrow;
       const contract = new ethers.Contract(contractAddress, contractABI, signer);
@@ -359,6 +362,104 @@ export class EscrowModule {
       return receipt;
     } catch (error) {
       const errorMessage = handleContractError(error, contractABI);
+      throw errorMessage;
+    }
+  }
+
+  async depositForOperatorsGasless({
+    token,
+    amount,
+    operatorAddresses,
+    onFailureCallback,
+    onSuccessCallback,
+  }: DepositForOperatorData) {
+    const contractAbi = abiMap[this.networkType].escrow;
+    try {
+      const contractAddress = contractAddresses[this.networkType].escrow;
+      const network = await this.provider.getNetwork();
+      const chainId = network.chainId;
+      const { signer } = await initializeSigner({ wallet: this.wallet });
+      const signerAddress = signer.address;
+      const tokenABI = abiMap[this.networkType].testToken;
+
+      const contract = new ethers.Contract(contractAddress, contractAbi, signer);
+      const nonce = await contract.nonces(signerAddress);
+
+      const tokenDetails = tokenMap[this.networkType].find(
+        (eachToken) => eachToken.symbol.toLowerCase() === token.toLowerCase()
+      );
+
+      if (!tokenDetails) {
+        throw new Error('Provided token Symbol is invalid.');
+      }
+      const decimals = tokenDetails?.decimal ?? 18;
+      const tokenAddress: string = tokenDetails?.address;
+
+      const finalAmount = Number(amount.toString());
+      const depositAmount = ethers.parseUnits(finalAmount.toFixed(decimals), decimals);
+
+      const smartWalletBundlerClient = await this.smartWalletBundlerClientPromise;
+
+      const approvetTxnHash = await smartWalletBundlerClient?.sendUserOperation({
+        calls: [
+          {
+            abi: tokenABI,
+            functionName: 'approve',
+            to: tokenAddress as `0x${string}`,
+            args: [contractAddress, depositAmount],
+          },
+        ],
+        paymaster: true,
+      });
+      await smartWalletBundlerClient?.waitForUserOperationReceipt({
+        hash: approvetTxnHash!,
+      });
+
+      const domain = {
+        name: 'Spheron',
+        version: '1',
+        chainId,
+        verifyingContract: contractAddress,
+      };
+
+      const types = {
+        Deposit: [
+          { name: 'token', type: 'address' },
+          { name: 'amount', type: 'uint256' },
+          { name: 'operatorAddresses', type: 'address[]' },
+          { name: 'nonce', type: 'uint256' },
+        ],
+      };
+
+      const value = {
+        token: tokenAddress,
+        amount: depositAmount,
+        operatorAddresses,
+        nonce,
+      };
+
+      const signature = await signer.signTypedData(domain, types, value);
+
+      const txHash = await smartWalletBundlerClient?.sendUserOperation({
+        calls: [
+          {
+            abi: contractAbi,
+            functionName: 'depositForOperatorsWithSignature',
+            to: contractAddress as `0x${string}`,
+            args: [tokenAddress, amount, operatorAddresses, signerAddress, nonce, signature],
+          },
+        ],
+        paymaster: true,
+      });
+      const txReceipt = await smartWalletBundlerClient?.waitForUserOperationReceipt({
+        hash: txHash!,
+      });
+
+      if (onSuccessCallback) onSuccessCallback(txReceipt?.receipt);
+      return txReceipt?.receipt;
+    } catch (error) {
+      if (onFailureCallback) onFailureCallback(error);
+      const errorMessage = handleContractError(error, contractAbi);
       throw errorMessage;
     }
   }
