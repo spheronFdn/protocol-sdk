@@ -206,12 +206,10 @@ export class FizzModule {
             .filter(
               (p) =>
                 p.hostUri !== 'localhost' &&
-                p.hostUri !== 'provder.m.testnetasphn.xyz' &&
-                (p.status === 'Active' ||
-                  p.status === ProviderStatus.Active) /*  && p.region !== "dev-spheron" */
+                (p.status === 'Active' || p.status === ProviderStatus.Active) &&
+                p.region !== 'dev-spheron'
             )
             .map(async (p) => {
-              console.log(p.hostUri);
               const reqBody = {
                 certificate: p.certificate,
                 authToken,
@@ -225,6 +223,9 @@ export class FizzModule {
                   url,
                   method: 'POST',
                   body: JSON.stringify(reqBody),
+                  options: {
+                    signal: AbortSignal.timeout(2000),
+                  },
                 });
                 return response;
               } catch (error) {
@@ -243,8 +244,6 @@ export class FizzModule {
         })
         .map((i) => i.nodes)
         .flat();
-
-      console.log({ fizzNodes });
 
       return fizzNodes;
     } catch (error) {
