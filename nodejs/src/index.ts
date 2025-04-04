@@ -5,8 +5,8 @@ import { EscrowModule } from '@modules/escrow';
 import { DeploymentModule } from '@modules/deployment';
 import { ProviderModule } from '@modules/provider';
 import { FizzModule } from '@modules/fizz';
-import { rpcUrls } from '@config/index';
-import type { NetworkType, RpcProvider, gaslessOptions } from '@config/index';
+import { publicRpcUrls } from '@config/index';
+import type { NetworkType, RpcUrls, gaslessOptions } from '@config/index';
 import { initSmartWalletBundlerClient, type SmartWalletBundlerClient } from '@utils/smart-wallet';
 
 export class SpheronSDK {
@@ -21,19 +21,19 @@ export class SpheronSDK {
   constructor({
     networkType,
     privateKey,
-    rpcProvider = {
-      HTTP_URL: rpcUrls[networkType].HTTP_URL,
-      WSS_URL: rpcUrls[networkType].WSS_URL,
+    rpcUrls = {
+      http: publicRpcUrls[networkType].http,
+      websocket: publicRpcUrls[networkType].websocket,
     },
     gaslessOptions,
   }: {
     networkType: NetworkType;
     privateKey?: string;
-    rpcProvider: RpcProvider;
+    rpcUrls?: RpcUrls;
     gaslessOptions?: gaslessOptions;
   }) {
-    const provider = new ethers.JsonRpcProvider(rpcProvider.HTTP_URL);
-    const websocketProvider = new ethers.WebSocketProvider(rpcProvider.WSS_URL);
+    const provider = new ethers.JsonRpcProvider(rpcUrls.http);
+    const websocketProvider = new ethers.WebSocketProvider(rpcUrls.websocket);
     const wallet = privateKey ? new ethers.Wallet(privateKey, provider) : undefined;
 
     if (privateKey && gaslessOptions) {

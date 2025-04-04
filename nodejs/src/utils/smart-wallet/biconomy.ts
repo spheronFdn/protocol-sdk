@@ -4,7 +4,7 @@ import {
   NexusClient,
   toNexusAccount,
 } from '@biconomy/abstractjs';
-import { NetworkType, gaslessOptions, RpcProvider } from '@config/index';
+import { NetworkType, gaslessOptions } from '@config/index';
 import { http } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
 import { base, baseSepolia } from 'viem/chains';

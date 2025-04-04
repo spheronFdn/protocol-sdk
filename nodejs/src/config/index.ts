@@ -10,16 +10,16 @@ export const SPHERON_MAINNET_HTTP_URL = 'https://mainnet.base.org';
 export const SPHERON_MAINNET_WSS_URL = 'wss://base-rpc.publicnode.com';
 export const SPHERON_MAINNET_EXPLORER_URL = 'https://basescan.org/';
 
-export const rpcUrls = {
+export const publicRpcUrls = {
   testnet: {
-    HTTP_URL: SPHERON_TESTNET_HTTP_URL,
-    WSS_URL: SPHERON_TESTNET_WSS_URL,
-    EXPORER_URL: SPHERON_TESTNET_EXPLORER_URL,
+    http: SPHERON_TESTNET_HTTP_URL,
+    websocket: SPHERON_TESTNET_WSS_URL,
+    explorer: SPHERON_TESTNET_EXPLORER_URL,
   },
   mainnet: {
-    HTTP_URL: SPHERON_TESTNET_HTTP_URL,
-    WSS_URL: SPHERON_TESTNET_WSS_URL,
-    EXPORER_URL: SPHERON_TESTNET_EXPLORER_URL,
+    http: SPHERON_TESTNET_HTTP_URL,
+    websocket: SPHERON_TESTNET_WSS_URL,
+    explorer: SPHERON_TESTNET_EXPLORER_URL,
   },
 };
 
@@ -44,9 +44,9 @@ export interface INetwork {
   blockExplorerUrls: string[];
 }
 
-export interface RpcProvider {
-  HTTP_URL: string;
-  WSS_URL: string;
+export interface RpcUrls {
+  http: string;
+  websocket: string;
 }
 
 export type NetworkType = 'testnet' | 'mainnet';
@@ -112,6 +112,13 @@ export const tokenMap: Record<NetworkType, IToken[]> = {
       symbol: 'CST',
       decimal: 6,
       address: contractAddresses.testnet.CST,
+    },
+    {
+      id: 6,
+      name: 'uSPON',
+      symbol: 'uSPON',
+      decimal: 6,
+      address: contractAddresses.testnet.uSPON,
     },
   ],
   mainnet: [
