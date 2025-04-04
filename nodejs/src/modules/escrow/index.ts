@@ -186,7 +186,6 @@ export class EscrowModule {
             args: [contractAddress, depositAmount],
           },
         ],
-        paymaster: true,
       });
       await smartWalletBundlerClient?.waitForUserOperationReceipt({
         hash: approveTxnHash!,
@@ -201,7 +200,6 @@ export class EscrowModule {
             args: [tokenAddress, depositAmount, signerAddress, nonce, signature],
           },
         ],
-        paymaster: true,
       });
       const txReceipt = await smartWalletBundlerClient?.waitForUserOperationReceipt({
         hash: txHash!,
@@ -332,7 +330,6 @@ export class EscrowModule {
             args: [tokenAddress, withdrawAmount, operator, signerAddress, nonce, signature],
           },
         ],
-        paymaster: true,
       });
       const txReceipt = await smartWalletBundlerClient?.waitForUserOperationReceipt({
         hash: txHash!,
@@ -512,7 +509,6 @@ export class EscrowModule {
             args: [contractAddress, depositAmount],
           },
         ],
-        paymaster: true,
       });
       await smartWalletBundlerClient?.waitForUserOperationReceipt({
         hash: approvetTxnHash!,
@@ -550,7 +546,6 @@ export class EscrowModule {
             args: [tokenAddress, amount, operatorAddresses, signerAddress, nonce, signature],
           },
         ],
-        paymaster: true,
       });
       const txReceipt = await smartWalletBundlerClient?.waitForUserOperationReceipt({
         hash: txHash!,

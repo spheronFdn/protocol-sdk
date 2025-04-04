@@ -112,7 +112,6 @@ export class OrderModule {
             args: [orderDetails, claimedSigner, nonce, signature],
           },
         ],
-        paymaster: true,
       });
       const txReceipt = await smartWalletBundlerClient?.waitForUserOperationReceipt({
         hash: txHash!,
