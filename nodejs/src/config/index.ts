@@ -157,3 +157,5 @@ export type gaslessOptions = {
   bundlerUrl: string;
   paymasterUrl: string;
 };
+
+export const SIGNATURE_DEADLINE = Number(process.env.SIGNATURE_DEADLINE) || 86_400;

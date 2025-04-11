@@ -88,6 +88,11 @@
     "type": "error"
   },
   {
+    "inputs": [],
+    "name": "SignatureExpired",
+    "type": "error"
+  },
+  {
     "anonymous": false,
     "inputs": [
       {
@@ -375,6 +380,11 @@
         "internalType": "bytes",
         "name": "signature",
         "type": "bytes"
+      },
+      {
+        "internalType": "uint256",
+        "name": "deadline",
+        "type": "uint256"
       }
     ],
     "name": "closeLeaseWithSignature",

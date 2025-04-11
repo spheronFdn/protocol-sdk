@@ -7,7 +7,7 @@ import {
   WithdrawData,
   WithdrawEarningsData,
 } from './types';
-import { NetworkType, tokenMap } from '@config/index';
+import { NetworkType, tokenMap, SIGNATURE_DEADLINE } from '@config/index';
 import { initializeSigner } from '@utils/index';
 import { handleContractError } from '@utils/errors';
 import { abiMap } from '@contracts/abi-map';
@@ -150,6 +150,8 @@ export class EscrowModule {
       const finalAmount = Number(amount.toString());
       const depositAmount = ethers.parseUnits(finalAmount.toFixed(decimals), decimals);
 
+      const deadline = Date.now() / 1000 + SIGNATURE_DEADLINE;
+
       const domain = {
         name: 'Spheron',
         version: '1',
@@ -162,6 +164,7 @@ export class EscrowModule {
           { name: 'token', type: 'address' },
           { name: 'amount', type: 'uint256' },
           { name: 'nonce', type: 'uint256' },
+          { name: 'deadline', type: 'uint256' },
         ],
       };
 
@@ -169,6 +172,7 @@ export class EscrowModule {
         token: tokenAddress,
         amount: depositAmount,
         nonce,
+        deadline,
       };
 
       // Sign the typed data using EIP-712
@@ -197,7 +201,7 @@ export class EscrowModule {
             abi: contractABI,
             functionName: 'depositWithSignature',
             to: contractAddress as `0x${string}`,
-            args: [tokenAddress, depositAmount, signerAddress, nonce, signature],
+            args: [tokenAddress, depositAmount, signerAddress, nonce, signature, deadline],
           },
         ],
       });
@@ -290,6 +294,8 @@ export class EscrowModule {
       const contractAddress = contractAddresses[this.networkType].escrow;
       const contract = new ethers.Contract(contractAddress, contractABI, signer);
 
+      const deadline = Date.now() / 1000 + SIGNATURE_DEADLINE;
+
       // Get the current nonce for the signer
       const nonce = await contract.nonces(signerAddress);
 
@@ -306,6 +312,7 @@ export class EscrowModule {
           { name: 'amount', type: 'uint256' },
           { name: 'operator', type: 'address' },
           { name: 'nonce', type: 'uint256' },
+          { name: 'deadline', type: 'uint256' },
         ],
       };
 
@@ -314,6 +321,7 @@ export class EscrowModule {
         amount: withdrawAmount,
         operator,
         nonce,
+        deadline,
       };
 
       // Sign the typed data using EIP-712
@@ -327,7 +335,15 @@ export class EscrowModule {
             abi: contractABI,
             functionName: 'withdrawWithSignature',
             to: contractAddress as `0x${string}`,
-            args: [tokenAddress, withdrawAmount, operator, signerAddress, nonce, signature],
+            args: [
+              tokenAddress,
+              withdrawAmount,
+              operator,
+              signerAddress,
+              nonce,
+              signature,
+              deadline,
+            ],
           },
         ],
       });
@@ -498,6 +514,8 @@ export class EscrowModule {
       const finalAmount = Number(amount.toString());
       const depositAmount = ethers.parseUnits(finalAmount.toFixed(decimals), decimals);
 
+      const deadline = Date.now() / 1000 + SIGNATURE_DEADLINE;
+
       const smartWalletBundlerClient = await this.smartWalletBundlerClientPromise;
 
       const approvetTxnHash = await smartWalletBundlerClient?.sendUserOperation({
@@ -526,6 +544,7 @@ export class EscrowModule {
           { name: 'token', type: 'address' },
           { name: 'amount', type: 'uint256' },
           { name: 'nonce', type: 'uint256' },
+          { name: 'deadline', type: 'uint256' },
         ],
       };
 
@@ -533,6 +552,7 @@ export class EscrowModule {
         token: tokenAddress,
         amount: depositAmount,
         nonce,
+        deadline,
       };
 
       const signature = await signer.signTypedData(domain, types, value);
@@ -543,7 +563,15 @@ export class EscrowModule {
             abi: contractAbi,
             functionName: 'depositForOperatorsWithSignature',
             to: contractAddress as `0x${string}`,
-            args: [tokenAddress, amount, operatorAddresses, signerAddress, nonce, signature],
+            args: [
+              tokenAddress,
+              amount,
+              operatorAddresses,
+              signerAddress,
+              nonce,
+              signature,
+              deadline,
+            ],
           },
         ],
       });
