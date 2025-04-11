@@ -1,3 +1,4 @@
+import { NetworkType } from '@config/index';
 import FizzRegistryAbi from '@contracts/abis/testnet/FizzRegistry.json';
 import { FizzModule } from '@modules/fizz';
 import { ProviderModule } from '@modules/provider';
@@ -13,18 +14,18 @@ export class InventoryModule {
   private wallet: ethers.Wallet | undefined;
   private providerModule: ProviderModule;
   private fizzModule: FizzModule;
-  private subgraphUrl?: string;
+  private networkType?: NetworkType;
 
   constructor(
     provider: ethers.Provider,
     webSocketProvider?: ethers.WebSocketProvider,
     wallet?: ethers.Wallet,
-    subgraphUrl?: string
+    networkType?: NetworkType
   ) {
     this.wallet = wallet;
-    this.providerModule = new ProviderModule(provider);
-    this.fizzModule = new FizzModule(provider, webSocketProvider, wallet, subgraphUrl);
-    this.subgraphUrl = subgraphUrl;
+    this.providerModule = new ProviderModule(provider, networkType);
+    this.fizzModule = new FizzModule(provider, webSocketProvider, wallet, networkType);
+    this.networkType = networkType;
   }
 
   async getFizzInventory(providerProxyUrl: string, options?: { groupBy: 'fizzAddress' | 'gpu' }) {
@@ -141,8 +142,8 @@ export class InventoryModule {
     try {
       if (!this.wallet) throw new Error('Wallet is required');
       let providers: Awaited<ReturnType<typeof subgraphGetProviders>> | null | Provider[] = null;
-      if (this.subgraphUrl) {
-        providers = await subgraphGetProviders(this.subgraphUrl);
+      if (this.networkType) {
+        providers = await subgraphGetProviders(this.networkType);
       } else {
         providers = await this.providerModule.getAllProviders();
       }

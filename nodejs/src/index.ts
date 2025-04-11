@@ -75,7 +75,7 @@ export class SpheronSDK {
       networkType,
       this.smartWalletBundlerClientPromise
     );
-    this.inventory = new InventoryModule(provider, websocketProvider, wallet);
+    this.inventory = new InventoryModule(provider, websocketProvider, wallet, networkType);
   }
 }
 
