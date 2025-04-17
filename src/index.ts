@@ -3,11 +3,7 @@ import { LeaseModule } from '@modules/lease';
 import { OrderModule } from '@modules/order';
 import { EscrowModule } from '@modules/escrow';
 import { SpheronProviderModule } from '@modules/spheron-provider';
-import {
-  NetworkType,
-  RpcProvider,
-  SPHERON_RPC_MAP,
-} from '@config/index';
+import { NetworkType, RpcProvider, SPHERON_RPC_MAP } from '@config/index';
 import { ProviderModule } from '@modules/provider';
 import { FizzModule } from '@modules/fizz';
 

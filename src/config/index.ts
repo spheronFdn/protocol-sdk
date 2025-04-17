@@ -1,10 +1,4 @@
-import {
-  DAIDev as DAI,
-  USDCDev as USDC,
-  USDTDev as USDT,
-  WETHDev as WETH,
-  USDTMainnet,
-} from '@contracts/addresses';
+import { contractAddresses } from '@contracts/addresses';
 
 // Testnet Default RPC URLs
 export const SPHERON_TESTNET_HTTP_URL = 'https://base-sepolia-rpc.publicnode.com';
@@ -89,41 +83,58 @@ export const tokenMap: Record<NetworkType, IToken[]> = {
       name: 'Tether USD Test Token',
       symbol: 'USDT',
       decimal: 6,
-      address: USDT,
-      // logo: USDTIcon,
+      address: contractAddresses.testnet.USDT,
     },
     {
       id: 2,
       name: 'DAI Test Token',
       symbol: 'DAI',
       decimal: 18,
-      address: DAI,
-      // logo: DaiIcon,
+      address: contractAddresses.testnet.DAI,
     },
     {
       id: 3,
       name: 'Test Token USD Coin',
       symbol: 'USDC',
       decimal: 6,
-      address: USDC,
-      // logo: USDCIcon,
+      address: contractAddresses.testnet.USDC,
     },
     {
       id: 4,
       name: 'Wrapped ETH Test Token',
       symbol: 'WETH',
       decimal: 18,
-      address: WETH,
-      // logo: WethIcon,
+      address: contractAddresses.testnet.WETH,
+    },
+    {
+      id: 5,
+      name: 'uSPON Test Token',
+      symbol: 'uSPON',
+      decimal: 6,
+      address: contractAddresses.testnet.uSPON,
     },
   ],
   mainnet: [
     {
       id: 1,
-      name: 'Tether USD Token',
+      name: 'USDT',
       symbol: 'USDT',
       decimal: 6,
-      address: USDTMainnet,
+      address: contractAddresses.mainnet.USDT,
+    },
+    {
+      id: 2,
+      name: 'USDC',
+      symbol: 'USDC',
+      decimal: 6,
+      address: contractAddresses.mainnet.USDC,
+    },
+    {
+      id: 3,
+      name: 'uSPON',
+      symbol: 'uSPON',
+      decimal: 6,
+      address: contractAddresses.mainnet.uSPON,
     },
   ],
 };

@@ -139,6 +139,11 @@
   },
   {
     "inputs": [],
+    "name": "SignatureExpired",
+    "type": "error"
+  },
+  {
+    "inputs": [],
     "name": "UnAuthorized",
     "type": "error"
   },
@@ -521,6 +526,11 @@
         "internalType": "bytes",
         "name": "signature",
         "type": "bytes"
+      },
+      {
+        "internalType": "uint256",
+        "name": "deadline",
+        "type": "uint256"
       }
     ],
     "name": "createOrderWithSignature",
@@ -1150,6 +1160,11 @@
         "internalType": "bytes",
         "name": "signature",
         "type": "bytes"
+      },
+      {
+        "internalType": "uint256",
+        "name": "deadline",
+        "type": "uint256"
       }
     ],
     "name": "updateInitialOrderWithSignature",

@@ -1,15 +1,15 @@
 // Testnet Contract Addresses
 export const AccessControlManagerDev = '0x87D3440372293aCf9149552546F7141AAe05Be91';
-export const TokenRegistryDev = '0x032666197A5d9329e717800FC90E8C951bA12290';
+export const TokenRegistryDev = '0x1aD34aF0eac1cb6B60D93594c9d3F6A0a46bd2f9';
 export const ProviderRegistryDev = '0x038Eb8E227B287d7D42Cf404A07ACb5a7Df7645A';
 export const ProviderAttributeRegistryDev = '0x63942fCb221aDF85ebdFc11a061D5eea2384f00A';
 export const FizzRegistryDev = '0xe16c74C9dB46d437527B83F7A55cF65662Ee4CA3';
 export const FizzAttributeRegistryDev = '0x8cA664043Bf767323d331D69841e525C2c878543';
-export const EscrowDev = '0x62BBfe576B4DadD7776b59b7beD8Fc9300FE48C4';
+export const EscrowDev = '0x9e019d0AF8d120b5463D5299b5F0EfB1794068D9';
 export const EscrowProtocolDev = '0xbEDE87cE3411F280B3Ed63027B45f73Cbcd1B441';
-export const OrderRequestDev = '0x692c4713E92e9f8dAD0b8405093446C53b18EFb6';
+export const OrderRequestDev = '0xCe9787883b8f3785CCd8C8c3275B5F41068d670A';
 export const ResourceManagerDev = '0x270d622149F46fFc72A9fD5A8cF92D1FdE5AD5E0';
-export const ComputeLeaseDev = '0x09B643a462b09E96c88Cb50C92085a060083D62D';
+export const ComputeLeaseDev = '0x70008e46550E628D50310330686A0bc692F722Fd';
 export const BidDev = '0xe029A4f5e970c389Ca16e48600707496602af5Ed';
 export const ResourceRegistryCPUDev = '0x67B8c2201Eef00d1a8193a2aF301312DD21a286B';
 export const ResourceRegistryGPUDev = '0x2B73F279044347A3B6c9F122Ec6b479b6C2beAc9';
@@ -26,6 +26,7 @@ export const DAIDev = '0xcF5F08686dBE94B88b93FB2E8E5482A7f432C892';
 export const WETHDev = '0xd74C08f8ffDF88C807367813Ad64a960618f4dcC';
 export const CSTDev = '0x8E5996A3963011Ca9dFa04E3CB773147F98C0e17';
 export const SPONDev = '0x76e593392523243ACD38ceD87c2007F14483a86B';
+export const uSPONDev = '0xeD8F325cDc2BA7567395cb451A2ea8FAf40E23D2';
 
 // Mainnet Contract Addresses
 export const TokenRegistryMainnet = '0xe023062b4A63Ca8c0c7Ac7d4AB1810bd3132ac4d';
@@ -49,8 +50,9 @@ export const FizzRewardManagerMainnet = '0x8A01206Fd078Be34b28d689C92C1f2C05B3C6
 export const RewardTokenMainnet = '0xA0c5ba7d9eccbE59000e8E67654CA5d867C6b401';
 
 // Mainnet Token addresses
-export const USDCMainnet = '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913';
 export const USDTMainnet = '0xF981a6AB8D09a636EC78395b02B1aC693a0C8307';
+export const USDCMainnet = '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913';
+export const uSPONMainnet = '0x1CB4c02e65dF9813F9483A614B8aB46D22616eC7';
 
 export const contractAddresses = {
   testnet: {
@@ -78,6 +80,7 @@ export const contractAddresses = {
     WETH: WETHDev,
     CST: CSTDev,
     SPON: SPONDev,
+    uSPON: uSPONDev,
   },
   mainnet: {
     accessControlManager: AccessControlMainnet,
@@ -99,5 +102,6 @@ export const contractAddresses = {
     rewardToken: RewardTokenMainnet,
     USDC: USDCMainnet,
     USDT: USDTMainnet,
+    uSPON: uSPONMainnet,
   },
 };
