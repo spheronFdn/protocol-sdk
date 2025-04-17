@@ -73,7 +73,7 @@ export class OrderModule {
 
     const contract = new ethers.Contract(contractAddress, contractAbi, signer);
     const nonce = await contract.nonces(claimedSigner);
-    const deadline = Date.now() / 1000 + SIGNATURE_DEADLINE;
+    const deadline = Math.floor(Date.now() / 1000 + SIGNATURE_DEADLINE);
 
     const domain = {
       name: 'Spheron',
@@ -112,7 +112,7 @@ export class OrderModule {
             abi: contractAbi,
             functionName: 'createOrderWithSignature',
             to: contractAddress as `0x${string}`,
-            args: [orderDetails, claimedSigner, nonce, signature, deadline],
+            args: [orderDetails, claimedSigner, signature, nonce, deadline],
           },
         ],
       });
@@ -164,7 +164,7 @@ export class OrderModule {
 
     const contract = new ethers.Contract(contractAddress, contractAbi, signer);
     const nonce = await contract.nonces(claimedSigner);
-    const deadline = Date.now() / 1000 + SIGNATURE_DEADLINE;
+    const deadline = Math.floor(Date.now() / 1000 + SIGNATURE_DEADLINE);
 
     const domain = {
       name: 'Spheron',
@@ -204,7 +204,7 @@ export class OrderModule {
             abi: contractAbi,
             functionName: 'updateInitialOrderWithSignature',
             to: contractAddress as `0x${string}`,
-            args: [orderId, orderDetails, claimedSigner, nonce, signature, deadline],
+            args: [orderId, orderDetails, claimedSigner, signature, nonce, deadline],
           },
         ],
       });
