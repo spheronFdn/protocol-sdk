@@ -6,16 +6,7 @@ import ProviderRegistryAbi from '@contracts/abis/testnet/ProviderRegistry.json';
 import FizzAttributeRegistryAbi from '@contracts/abis/testnet/FizzAttributeRegistry.json';
 import ResourceRegistryAbi from '@contracts/abis/testnet/ResourceRegistry.json';
 import ComputeLeaseAbi from '@contracts/abis/testnet/ComputeLease.json';
-import {
-  EscrowDev,
-  FizzRegistryDev,
-  FizzAttributeRegistryDev,
-  ResourceRegistryCPUDev,
-  ResourceRegistryGPUDev,
-  ProviderRegistryDev,
-  ComputeLeaseDev,
-  contractAddresses,
-} from '@contracts/addresses';
+import { contractAddresses } from '@contracts/addresses';
 import { ethers } from 'ethers';
 import {
   Attribute,

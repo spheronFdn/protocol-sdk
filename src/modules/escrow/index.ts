@@ -1,7 +1,7 @@
 import EscrowAbi from '@contracts/abis/testnet/EscrowUser.json';
 import EscrowProtocolAbi from '@contracts/abis/testnet/EscrowProtocol.json';
 import TokenAbi from '@contracts/abis/testnet/TestToken.json';
-import { contractAddresses, EscrowDev as Escrow } from '@contracts/addresses';
+import { contractAddresses } from '@contracts/addresses';
 import { ethers } from 'ethers';
 import { TransactionData, WithdrawEarningsData } from './types';
 import { NetworkType } from '@config/index';
