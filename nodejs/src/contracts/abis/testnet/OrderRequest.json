@@ -1,63 +1,193 @@
 [
   {
     "inputs": [
-      { "internalType": "address", "name": "_escrowUser", "type": "address" },
-      { "internalType": "address", "name": "_escrowProtocol", "type": "address" },
-      { "internalType": "address", "name": "_tokenRegistryAddress", "type": "address" },
-      { "internalType": "address", "name": "_access", "type": "address" },
-      { "internalType": "address", "name": "_whitelistRegistry", "type": "address" },
-      { "internalType": "uint256", "name": "_maxBlockNumber", "type": "uint256" },
-      { "internalType": "uint256", "name": "_minBlockNumber", "type": "uint256" }
+      {
+        "internalType": "address",
+        "name": "_escrowUser",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_escrowProtocol",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_tokenRegistryAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_access",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_whitelistRegistry",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_maxBlockNumber",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_minBlockNumber",
+        "type": "uint256"
+      }
     ],
     "stateMutability": "nonpayable",
     "type": "constructor"
   },
-  { "inputs": [], "name": "ECDSAInvalidSignature", "type": "error" },
   {
-    "inputs": [{ "internalType": "uint256", "name": "length", "type": "uint256" }],
+    "inputs": [],
+    "name": "ECDSAInvalidSignature",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "length",
+        "type": "uint256"
+      }
+    ],
     "name": "ECDSAInvalidSignatureLength",
     "type": "error"
   },
   {
-    "inputs": [{ "internalType": "bytes32", "name": "s", "type": "bytes32" }],
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "s",
+        "type": "bytes32"
+      }
+    ],
     "name": "ECDSAInvalidSignatureS",
     "type": "error"
   },
-  { "inputs": [], "name": "InsufficientBalance", "type": "error" },
-  { "inputs": [], "name": "InvalidAddress", "type": "error" },
-  { "inputs": [], "name": "InvalidAmount", "type": "error" },
-  { "inputs": [], "name": "InvalidBlockNumber", "type": "error" },
-  { "inputs": [], "name": "InvalidNonce", "type": "error" },
-  { "inputs": [], "name": "InvalidOrderState", "type": "error" },
-  { "inputs": [], "name": "InvalidSignature", "type": "error" },
-  { "inputs": [], "name": "LeaseAlreadyTerminated", "type": "error" },
-  { "inputs": [], "name": "NotAuthorized", "type": "error" },
-  { "inputs": [], "name": "NotBidContract", "type": "error" },
-  { "inputs": [], "name": "OrderNotActive", "type": "error" },
-  { "inputs": [], "name": "OrderNotFound", "type": "error" },
-  { "inputs": [], "name": "OrderNotMatched", "type": "error" },
-  { "inputs": [], "name": "OrderNotOpened", "type": "error" },
-  { "inputs": [], "name": "SignatureExpired", "type": "error" },
-  { "inputs": [], "name": "UnAuthorized", "type": "error" },
+  {
+    "inputs": [],
+    "name": "InsufficientBalance",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "InvalidAddress",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "InvalidAmount",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "InvalidBlockNumber",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "InvalidNonce",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "InvalidOrderState",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "InvalidSignature",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "LeaseAlreadyTerminated",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "NotAuthorized",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "NotBidContract",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "OrderNotActive",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "OrderNotFound",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "OrderNotMatched",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "OrderNotOpened",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "SignatureExpired",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "UnAuthorized",
+    "type": "error"
+  },
   {
     "anonymous": false,
     "inputs": [
-      { "indexed": false, "internalType": "address", "name": "escrowUser", "type": "address" },
-      { "indexed": false, "internalType": "address", "name": "escrowProtocol", "type": "address" }
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "escrowUser",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "escrowProtocol",
+        "type": "address"
+      }
     ],
     "name": "EscrowAddressUpdated",
     "type": "event"
   },
   {
     "anonymous": false,
-    "inputs": [{ "indexed": false, "internalType": "address", "name": "lease", "type": "address" }],
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "lease",
+        "type": "address"
+      }
+    ],
     "name": "LeaseAddressUpdated",
     "type": "event"
   },
   {
     "anonymous": false,
     "inputs": [
-      { "indexed": false, "internalType": "uint256", "name": "maxBlockNumber", "type": "uint256" }
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "maxBlockNumber",
+        "type": "uint256"
+      }
     ],
     "name": "MaxBlockNumberUpdated",
     "type": "event"
@@ -65,7 +195,12 @@
   {
     "anonymous": false,
     "inputs": [
-      { "indexed": false, "internalType": "uint256", "name": "minBlockNumber", "type": "uint256" }
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "minBlockNumber",
+        "type": "uint256"
+      }
     ],
     "name": "MinBlockNumberUpdated",
     "type": "event"
@@ -73,13 +208,48 @@
   {
     "anonymous": false,
     "inputs": [
-      { "indexed": false, "internalType": "uint64", "name": "orderId", "type": "uint64" },
-      { "indexed": false, "internalType": "address", "name": "creator", "type": "address" },
-      { "indexed": false, "internalType": "uint256", "name": "maxPrice", "type": "uint256" },
-      { "indexed": false, "internalType": "uint64", "name": "numOfBlocks", "type": "uint64" },
-      { "indexed": false, "internalType": "address", "name": "token", "type": "address" },
-      { "indexed": false, "internalType": "string", "name": "specs", "type": "string" },
-      { "indexed": false, "internalType": "uint16", "name": "version", "type": "uint16" },
+      {
+        "indexed": false,
+        "internalType": "uint64",
+        "name": "orderId",
+        "type": "uint64"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "creator",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "maxPrice",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint64",
+        "name": "numOfBlocks",
+        "type": "uint64"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "token",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "specs",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint16",
+        "name": "version",
+        "type": "uint16"
+      },
       {
         "indexed": false,
         "internalType": "enum OrderRequest.Mode",
@@ -92,15 +262,32 @@
   },
   {
     "anonymous": false,
-    "inputs": [{ "indexed": true, "internalType": "uint64", "name": "_orderId", "type": "uint64" }],
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint64",
+        "name": "_orderId",
+        "type": "uint64"
+      }
+    ],
     "name": "OrderMarkedAsClosed",
     "type": "event"
   },
   {
     "anonymous": false,
     "inputs": [
-      { "indexed": false, "internalType": "uint64", "name": "orderId", "type": "uint64" },
-      { "indexed": false, "internalType": "uint256", "name": "maxPrice", "type": "uint256" },
+      {
+        "indexed": false,
+        "internalType": "uint64",
+        "name": "orderId",
+        "type": "uint64"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "maxPrice",
+        "type": "uint256"
+      },
       {
         "indexed": false,
         "internalType": "enum OrderRequest.State",
@@ -114,13 +301,48 @@
   {
     "anonymous": false,
     "inputs": [
-      { "indexed": false, "internalType": "uint64", "name": "_orderId", "type": "uint64" },
-      { "indexed": false, "internalType": "address", "name": "user", "type": "address" },
-      { "indexed": false, "internalType": "uint256", "name": "maxPrice", "type": "uint256" },
-      { "indexed": false, "internalType": "uint64", "name": "numOfBlocks", "type": "uint64" },
-      { "indexed": false, "internalType": "address", "name": "token", "type": "address" },
-      { "indexed": false, "internalType": "string", "name": "specs", "type": "string" },
-      { "indexed": false, "internalType": "uint16", "name": "version", "type": "uint16" },
+      {
+        "indexed": false,
+        "internalType": "uint64",
+        "name": "_orderId",
+        "type": "uint64"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "user",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "maxPrice",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint64",
+        "name": "numOfBlocks",
+        "type": "uint64"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "token",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "specs",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint16",
+        "name": "version",
+        "type": "uint16"
+      },
       {
         "indexed": false,
         "internalType": "enum OrderRequest.Mode",
@@ -134,7 +356,12 @@
   {
     "anonymous": false,
     "inputs": [
-      { "indexed": true, "internalType": "address", "name": "_registryContract", "type": "address" }
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "_registryContract",
+        "type": "address"
+      }
     ],
     "name": "TokenRegistryContactUpdated",
     "type": "event"
@@ -142,21 +369,39 @@
   {
     "inputs": [],
     "name": "CREATE_ORDER_TYPEHASH",
-    "outputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [],
     "name": "DOMAIN_SEPARATOR",
-    "outputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [],
     "name": "UPDATE_ORDER_TYPEHASH",
-    "outputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
@@ -164,7 +409,11 @@
     "inputs": [],
     "name": "accessControl",
     "outputs": [
-      { "internalType": "contract IAccessControlManager", "name": "", "type": "address" }
+      {
+        "internalType": "contract IAccessControlManager",
+        "name": "",
+        "type": "address"
+      }
     ],
     "stateMutability": "view",
     "type": "function"
@@ -173,13 +422,41 @@
     "inputs": [
       {
         "components": [
-          { "internalType": "uint256", "name": "maxPrice", "type": "uint256" },
-          { "internalType": "uint64", "name": "numOfBlocks", "type": "uint64" },
-          { "internalType": "address", "name": "token", "type": "address" },
-          { "internalType": "string", "name": "spec", "type": "string" },
-          { "internalType": "uint16", "name": "version", "type": "uint16" },
-          { "internalType": "enum OrderRequest.Mode", "name": "mode", "type": "uint8" },
-          { "internalType": "enum OrderRequest.Tier[]", "name": "tier", "type": "uint8[]" }
+          {
+            "internalType": "uint256",
+            "name": "maxPrice",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint64",
+            "name": "numOfBlocks",
+            "type": "uint64"
+          },
+          {
+            "internalType": "address",
+            "name": "token",
+            "type": "address"
+          },
+          {
+            "internalType": "string",
+            "name": "spec",
+            "type": "string"
+          },
+          {
+            "internalType": "uint16",
+            "name": "version",
+            "type": "uint16"
+          },
+          {
+            "internalType": "enum OrderRequest.Mode",
+            "name": "mode",
+            "type": "uint8"
+          },
+          {
+            "internalType": "enum OrderRequest.Tier[]",
+            "name": "tier",
+            "type": "uint8[]"
+          }
         ],
         "internalType": "struct OrderRequest.OrderDetails",
         "name": "details",
@@ -195,22 +472,66 @@
     "inputs": [
       {
         "components": [
-          { "internalType": "uint256", "name": "maxPrice", "type": "uint256" },
-          { "internalType": "uint64", "name": "numOfBlocks", "type": "uint64" },
-          { "internalType": "address", "name": "token", "type": "address" },
-          { "internalType": "string", "name": "spec", "type": "string" },
-          { "internalType": "uint16", "name": "version", "type": "uint16" },
-          { "internalType": "enum OrderRequest.Mode", "name": "mode", "type": "uint8" },
-          { "internalType": "enum OrderRequest.Tier[]", "name": "tier", "type": "uint8[]" }
+          {
+            "internalType": "uint256",
+            "name": "maxPrice",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint64",
+            "name": "numOfBlocks",
+            "type": "uint64"
+          },
+          {
+            "internalType": "address",
+            "name": "token",
+            "type": "address"
+          },
+          {
+            "internalType": "string",
+            "name": "spec",
+            "type": "string"
+          },
+          {
+            "internalType": "uint16",
+            "name": "version",
+            "type": "uint16"
+          },
+          {
+            "internalType": "enum OrderRequest.Mode",
+            "name": "mode",
+            "type": "uint8"
+          },
+          {
+            "internalType": "enum OrderRequest.Tier[]",
+            "name": "tier",
+            "type": "uint8[]"
+          }
         ],
         "internalType": "struct OrderRequest.OrderDetails",
         "name": "details",
         "type": "tuple"
       },
-      { "internalType": "address", "name": "claimedSigner", "type": "address" },
-      { "internalType": "bytes", "name": "signature", "type": "bytes" },
-      { "internalType": "uint256", "name": "nonce", "type": "uint256" },
-      { "internalType": "uint256", "name": "deadline", "type": "uint256" }
+      {
+        "internalType": "address",
+        "name": "claimedSigner",
+        "type": "address"
+      },
+      {
+        "internalType": "bytes",
+        "name": "signature",
+        "type": "bytes"
+      },
+      {
+        "internalType": "uint256",
+        "name": "nonce",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "deadline",
+        "type": "uint256"
+      }
     ],
     "name": "createOrderWithSignature",
     "outputs": [],
@@ -220,35 +541,93 @@
   {
     "inputs": [],
     "name": "escrowProtocol",
-    "outputs": [{ "internalType": "contract IEscrowProtocol", "name": "", "type": "address" }],
+    "outputs": [
+      {
+        "internalType": "contract IEscrowProtocol",
+        "name": "",
+        "type": "address"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [],
     "name": "escrowUser",
-    "outputs": [{ "internalType": "contract IEscrowUser", "name": "", "type": "address" }],
+    "outputs": [
+      {
+        "internalType": "contract IEscrowUser",
+        "name": "",
+        "type": "address"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
   {
-    "inputs": [{ "internalType": "uint64", "name": "_orderId", "type": "uint64" }],
+    "inputs": [
+      {
+        "internalType": "uint64",
+        "name": "_orderId",
+        "type": "uint64"
+      }
+    ],
     "name": "getOrderById",
     "outputs": [
       {
         "components": [
-          { "internalType": "uint64", "name": "id", "type": "uint64" },
-          { "internalType": "uint256", "name": "maxPrice", "type": "uint256" },
-          { "internalType": "uint64", "name": "numOfBlocks", "type": "uint64" },
-          { "internalType": "address", "name": "token", "type": "address" },
-          { "internalType": "address", "name": "creator", "type": "address" },
-          { "internalType": "enum OrderRequest.State", "name": "state", "type": "uint8" },
+          {
+            "internalType": "uint64",
+            "name": "id",
+            "type": "uint64"
+          },
+          {
+            "internalType": "uint256",
+            "name": "maxPrice",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint64",
+            "name": "numOfBlocks",
+            "type": "uint64"
+          },
+          {
+            "internalType": "address",
+            "name": "token",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "creator",
+            "type": "address"
+          },
+          {
+            "internalType": "enum OrderRequest.State",
+            "name": "state",
+            "type": "uint8"
+          },
           {
             "components": [
-              { "internalType": "string", "name": "specs", "type": "string" },
-              { "internalType": "uint16", "name": "version", "type": "uint16" },
-              { "internalType": "enum OrderRequest.Mode", "name": "mode", "type": "uint8" },
-              { "internalType": "enum OrderRequest.Tier[]", "name": "tier", "type": "uint8[]" }
+              {
+                "internalType": "string",
+                "name": "specs",
+                "type": "string"
+              },
+              {
+                "internalType": "uint16",
+                "name": "version",
+                "type": "uint16"
+              },
+              {
+                "internalType": "enum OrderRequest.Mode",
+                "name": "mode",
+                "type": "uint8"
+              },
+              {
+                "internalType": "enum OrderRequest.Tier[]",
+                "name": "tier",
+                "type": "uint8[]"
+              }
             ],
             "internalType": "struct OrderRequest.OrderSpecs",
             "name": "specs",
@@ -264,30 +643,88 @@
     "type": "function"
   },
   {
-    "inputs": [{ "internalType": "address", "name": "_providerAddress", "type": "address" }],
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_providerAddress",
+        "type": "address"
+      }
+    ],
     "name": "getOrderByProvider",
-    "outputs": [{ "internalType": "uint64[]", "name": "", "type": "uint64[]" }],
+    "outputs": [
+      {
+        "internalType": "uint64[]",
+        "name": "",
+        "type": "uint64[]"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
   {
-    "inputs": [{ "internalType": "uint64", "name": "_orderId", "type": "uint64" }],
+    "inputs": [
+      {
+        "internalType": "uint64",
+        "name": "_orderId",
+        "type": "uint64"
+      }
+    ],
     "name": "getPendingOrderById",
     "outputs": [
       {
         "components": [
-          { "internalType": "uint64", "name": "id", "type": "uint64" },
-          { "internalType": "uint256", "name": "maxPrice", "type": "uint256" },
-          { "internalType": "uint64", "name": "numOfBlocks", "type": "uint64" },
-          { "internalType": "address", "name": "token", "type": "address" },
-          { "internalType": "address", "name": "creator", "type": "address" },
-          { "internalType": "enum OrderRequest.State", "name": "state", "type": "uint8" },
+          {
+            "internalType": "uint64",
+            "name": "id",
+            "type": "uint64"
+          },
+          {
+            "internalType": "uint256",
+            "name": "maxPrice",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint64",
+            "name": "numOfBlocks",
+            "type": "uint64"
+          },
+          {
+            "internalType": "address",
+            "name": "token",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "creator",
+            "type": "address"
+          },
+          {
+            "internalType": "enum OrderRequest.State",
+            "name": "state",
+            "type": "uint8"
+          },
           {
             "components": [
-              { "internalType": "string", "name": "specs", "type": "string" },
-              { "internalType": "uint16", "name": "version", "type": "uint16" },
-              { "internalType": "enum OrderRequest.Mode", "name": "mode", "type": "uint8" },
-              { "internalType": "enum OrderRequest.Tier[]", "name": "tier", "type": "uint8[]" }
+              {
+                "internalType": "string",
+                "name": "specs",
+                "type": "string"
+              },
+              {
+                "internalType": "uint16",
+                "name": "version",
+                "type": "uint16"
+              },
+              {
+                "internalType": "enum OrderRequest.Mode",
+                "name": "mode",
+                "type": "uint8"
+              },
+              {
+                "internalType": "enum OrderRequest.Tier[]",
+                "name": "tier",
+                "type": "uint8[]"
+              }
             ],
             "internalType": "struct OrderRequest.OrderSpecs",
             "name": "specs",
@@ -305,47 +742,123 @@
   {
     "inputs": [],
     "name": "lease",
-    "outputs": [{ "internalType": "contract IComputeLease", "name": "", "type": "address" }],
+    "outputs": [
+      {
+        "internalType": "contract IComputeLease",
+        "name": "",
+        "type": "address"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [],
     "name": "maxBlockNumber",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [],
     "name": "minBlockNumber",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
   {
-    "inputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
     "name": "nonces",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
   {
-    "inputs": [{ "internalType": "uint64", "name": "", "type": "uint64" }],
+    "inputs": [
+      {
+        "internalType": "uint64",
+        "name": "",
+        "type": "uint64"
+      }
+    ],
     "name": "orders",
     "outputs": [
-      { "internalType": "uint64", "name": "id", "type": "uint64" },
-      { "internalType": "uint256", "name": "maxPrice", "type": "uint256" },
-      { "internalType": "uint64", "name": "numOfBlocks", "type": "uint64" },
-      { "internalType": "address", "name": "token", "type": "address" },
-      { "internalType": "address", "name": "creator", "type": "address" },
-      { "internalType": "enum OrderRequest.State", "name": "state", "type": "uint8" },
+      {
+        "internalType": "uint64",
+        "name": "id",
+        "type": "uint64"
+      },
+      {
+        "internalType": "uint256",
+        "name": "maxPrice",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint64",
+        "name": "numOfBlocks",
+        "type": "uint64"
+      },
+      {
+        "internalType": "address",
+        "name": "token",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "creator",
+        "type": "address"
+      },
+      {
+        "internalType": "enum OrderRequest.State",
+        "name": "state",
+        "type": "uint8"
+      },
       {
         "components": [
-          { "internalType": "string", "name": "specs", "type": "string" },
-          { "internalType": "uint16", "name": "version", "type": "uint16" },
-          { "internalType": "enum OrderRequest.Mode", "name": "mode", "type": "uint8" },
-          { "internalType": "enum OrderRequest.Tier[]", "name": "tier", "type": "uint8[]" }
+          {
+            "internalType": "string",
+            "name": "specs",
+            "type": "string"
+          },
+          {
+            "internalType": "uint16",
+            "name": "version",
+            "type": "uint16"
+          },
+          {
+            "internalType": "enum OrderRequest.Mode",
+            "name": "mode",
+            "type": "uint8"
+          },
+          {
+            "internalType": "enum OrderRequest.Tier[]",
+            "name": "tier",
+            "type": "uint8[]"
+          }
         ],
         "internalType": "struct OrderRequest.OrderSpecs",
         "name": "specs",
@@ -357,23 +870,71 @@
   },
   {
     "inputs": [
-      { "internalType": "uint64", "name": "", "type": "uint64" },
-      { "internalType": "uint64", "name": "", "type": "uint64" }
+      {
+        "internalType": "uint64",
+        "name": "",
+        "type": "uint64"
+      },
+      {
+        "internalType": "uint64",
+        "name": "",
+        "type": "uint64"
+      }
     ],
     "name": "pendingOrders",
     "outputs": [
-      { "internalType": "uint64", "name": "id", "type": "uint64" },
-      { "internalType": "uint256", "name": "maxPrice", "type": "uint256" },
-      { "internalType": "uint64", "name": "numOfBlocks", "type": "uint64" },
-      { "internalType": "address", "name": "token", "type": "address" },
-      { "internalType": "address", "name": "creator", "type": "address" },
-      { "internalType": "enum OrderRequest.State", "name": "state", "type": "uint8" },
+      {
+        "internalType": "uint64",
+        "name": "id",
+        "type": "uint64"
+      },
+      {
+        "internalType": "uint256",
+        "name": "maxPrice",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint64",
+        "name": "numOfBlocks",
+        "type": "uint64"
+      },
+      {
+        "internalType": "address",
+        "name": "token",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "creator",
+        "type": "address"
+      },
+      {
+        "internalType": "enum OrderRequest.State",
+        "name": "state",
+        "type": "uint8"
+      },
       {
         "components": [
-          { "internalType": "string", "name": "specs", "type": "string" },
-          { "internalType": "uint16", "name": "version", "type": "uint16" },
-          { "internalType": "enum OrderRequest.Mode", "name": "mode", "type": "uint8" },
-          { "internalType": "enum OrderRequest.Tier[]", "name": "tier", "type": "uint8[]" }
+          {
+            "internalType": "string",
+            "name": "specs",
+            "type": "string"
+          },
+          {
+            "internalType": "uint16",
+            "name": "version",
+            "type": "uint16"
+          },
+          {
+            "internalType": "enum OrderRequest.Mode",
+            "name": "mode",
+            "type": "uint8"
+          },
+          {
+            "internalType": "enum OrderRequest.Tier[]",
+            "name": "tier",
+            "type": "uint8[]"
+          }
         ],
         "internalType": "struct OrderRequest.OrderSpecs",
         "name": "specs",
@@ -384,14 +945,26 @@
     "type": "function"
   },
   {
-    "inputs": [{ "internalType": "uint256", "name": "_maxBlockNumber", "type": "uint256" }],
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_maxBlockNumber",
+        "type": "uint256"
+      }
+    ],
     "name": "setMaxBlockNumber",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },
   {
-    "inputs": [{ "internalType": "uint256", "name": "_minBlockNumber", "type": "uint256" }],
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_minBlockNumber",
+        "type": "uint256"
+      }
+    ],
     "name": "setMinBlockNumber",
     "outputs": [],
     "stateMutability": "nonpayable",
@@ -400,14 +973,28 @@
   {
     "inputs": [],
     "name": "tokenRegistry",
-    "outputs": [{ "internalType": "contract ITokenRegistry", "name": "", "type": "address" }],
+    "outputs": [
+      {
+        "internalType": "contract ITokenRegistry",
+        "name": "",
+        "type": "address"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [
-      { "internalType": "address", "name": "_newAddress", "type": "address" },
-      { "internalType": "bool", "name": "_isTokenRegistry", "type": "bool" }
+      {
+        "internalType": "address",
+        "name": "_newAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "bool",
+        "name": "_isTokenRegistry",
+        "type": "bool"
+      }
     ],
     "name": "updateContractAddress",
     "outputs": [],
@@ -416,8 +1003,16 @@
   },
   {
     "inputs": [
-      { "internalType": "address", "name": "_escrowUser", "type": "address" },
-      { "internalType": "address", "name": "_escrowProtocol", "type": "address" }
+      {
+        "internalType": "address",
+        "name": "_escrowUser",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_escrowProtocol",
+        "type": "address"
+      }
     ],
     "name": "updateEscrowAdress",
     "outputs": [],
@@ -426,16 +1021,48 @@
   },
   {
     "inputs": [
-      { "internalType": "uint64", "name": "_orderId", "type": "uint64" },
+      {
+        "internalType": "uint64",
+        "name": "_orderId",
+        "type": "uint64"
+      },
       {
         "components": [
-          { "internalType": "uint256", "name": "maxPrice", "type": "uint256" },
-          { "internalType": "uint64", "name": "numOfBlocks", "type": "uint64" },
-          { "internalType": "address", "name": "token", "type": "address" },
-          { "internalType": "string", "name": "spec", "type": "string" },
-          { "internalType": "uint16", "name": "version", "type": "uint16" },
-          { "internalType": "enum OrderRequest.Mode", "name": "mode", "type": "uint8" },
-          { "internalType": "enum OrderRequest.Tier[]", "name": "tier", "type": "uint8[]" }
+          {
+            "internalType": "uint256",
+            "name": "maxPrice",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint64",
+            "name": "numOfBlocks",
+            "type": "uint64"
+          },
+          {
+            "internalType": "address",
+            "name": "token",
+            "type": "address"
+          },
+          {
+            "internalType": "string",
+            "name": "spec",
+            "type": "string"
+          },
+          {
+            "internalType": "uint16",
+            "name": "version",
+            "type": "uint16"
+          },
+          {
+            "internalType": "enum OrderRequest.Mode",
+            "name": "mode",
+            "type": "uint8"
+          },
+          {
+            "internalType": "enum OrderRequest.Tier[]",
+            "name": "tier",
+            "type": "uint8[]"
+          }
         ],
         "internalType": "struct OrderRequest.OrderDetails",
         "name": "details",
@@ -449,9 +1076,21 @@
   },
   {
     "inputs": [
-      { "internalType": "uint64", "name": "_orderId", "type": "uint64" },
-      { "internalType": "address", "name": "_providerAddress", "type": "address" },
-      { "internalType": "uint256", "name": "_amount", "type": "uint256" }
+      {
+        "internalType": "uint64",
+        "name": "_orderId",
+        "type": "uint64"
+      },
+      {
+        "internalType": "address",
+        "name": "_providerAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_amount",
+        "type": "uint256"
+      }
     ],
     "name": "updateInitialOrderState",
     "outputs": [],
@@ -460,25 +1099,73 @@
   },
   {
     "inputs": [
-      { "internalType": "uint64", "name": "_orderId", "type": "uint64" },
+      {
+        "internalType": "uint64",
+        "name": "_orderId",
+        "type": "uint64"
+      },
       {
         "components": [
-          { "internalType": "uint256", "name": "maxPrice", "type": "uint256" },
-          { "internalType": "uint64", "name": "numOfBlocks", "type": "uint64" },
-          { "internalType": "address", "name": "token", "type": "address" },
-          { "internalType": "string", "name": "spec", "type": "string" },
-          { "internalType": "uint16", "name": "version", "type": "uint16" },
-          { "internalType": "enum OrderRequest.Mode", "name": "mode", "type": "uint8" },
-          { "internalType": "enum OrderRequest.Tier[]", "name": "tier", "type": "uint8[]" }
+          {
+            "internalType": "uint256",
+            "name": "maxPrice",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint64",
+            "name": "numOfBlocks",
+            "type": "uint64"
+          },
+          {
+            "internalType": "address",
+            "name": "token",
+            "type": "address"
+          },
+          {
+            "internalType": "string",
+            "name": "spec",
+            "type": "string"
+          },
+          {
+            "internalType": "uint16",
+            "name": "version",
+            "type": "uint16"
+          },
+          {
+            "internalType": "enum OrderRequest.Mode",
+            "name": "mode",
+            "type": "uint8"
+          },
+          {
+            "internalType": "enum OrderRequest.Tier[]",
+            "name": "tier",
+            "type": "uint8[]"
+          }
         ],
         "internalType": "struct OrderRequest.OrderDetails",
         "name": "details",
         "type": "tuple"
       },
-      { "internalType": "address", "name": "claimedSigner", "type": "address" },
-      { "internalType": "bytes", "name": "signature", "type": "bytes" },
-      { "internalType": "uint256", "name": "nonce", "type": "uint256" },
-      { "internalType": "uint256", "name": "deadline", "type": "uint256" }
+      {
+        "internalType": "address",
+        "name": "claimedSigner",
+        "type": "address"
+      },
+      {
+        "internalType": "bytes",
+        "name": "signature",
+        "type": "bytes"
+      },
+      {
+        "internalType": "uint256",
+        "name": "nonce",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "deadline",
+        "type": "uint256"
+      }
     ],
     "name": "updateInitialOrderWithSignature",
     "outputs": [],
@@ -486,7 +1173,13 @@
     "type": "function"
   },
   {
-    "inputs": [{ "internalType": "uint64", "name": "_orderId", "type": "uint64" }],
+    "inputs": [
+      {
+        "internalType": "uint64",
+        "name": "_orderId",
+        "type": "uint64"
+      }
+    ],
     "name": "updateOrderStateToClosed",
     "outputs": [],
     "stateMutability": "nonpayable",
@@ -494,8 +1187,16 @@
   },
   {
     "inputs": [
-      { "internalType": "uint64", "name": "_orderId", "type": "uint64" },
-      { "internalType": "uint256", "name": "_acceptedPrice", "type": "uint256" }
+      {
+        "internalType": "uint64",
+        "name": "_orderId",
+        "type": "uint64"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_acceptedPrice",
+        "type": "uint256"
+      }
     ],
     "name": "updatePendingOrder",
     "outputs": [],
@@ -505,7 +1206,13 @@
   {
     "inputs": [],
     "name": "whitelistRegistry",
-    "outputs": [{ "internalType": "contract IWhitelistRegistry", "name": "", "type": "address" }],
+    "outputs": [
+      {
+        "internalType": "contract IWhitelistRegistry",
+        "name": "",
+        "type": "address"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   }

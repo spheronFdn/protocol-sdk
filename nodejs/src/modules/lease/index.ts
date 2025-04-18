@@ -198,7 +198,7 @@ export class LeaseModule {
     const contract = new ethers.Contract(contractAddress, contractAbi, signer);
 
     const nonce = await contract.nonces(claimedSigner);
-    const deadline = Date.now() / 1000 + SIGNATURE_DEADLINE;
+    const deadline = Math.floor(Date.now() / 1000 + SIGNATURE_DEADLINE);
 
     const domain = {
       name: 'Spheron',
