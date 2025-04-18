@@ -68,9 +68,7 @@ export class DeploymentModule {
       const { token, maxPrice, numOfBlocks } = details;
       const tokenDetails = getTokenDetails(token, this.networkType as NetworkType);
       const decimal = 18;
-      const totalCost =
-        Number(Number(maxPrice.toString()) / 10 ** (decimal || 0)) * Number(numOfBlocks);
-
+      const totalCost = (Number(maxPrice.toString()) / 10 ** decimal) * Number(numOfBlocks);
       if (!this.wallet) {
         throw new Error('Unable to access wallet');
       }
