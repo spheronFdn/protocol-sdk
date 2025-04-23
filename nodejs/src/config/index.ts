@@ -17,9 +17,9 @@ export const publicRpcUrls = {
     explorer: SPHERON_TESTNET_EXPLORER_URL,
   },
   mainnet: {
-    http: SPHERON_TESTNET_HTTP_URL,
-    websocket: SPHERON_TESTNET_WSS_URL,
-    explorer: SPHERON_TESTNET_EXPLORER_URL,
+    http: SPHERON_MAINNET_HTTP_URL,
+    websocket: SPHERON_MAINNET_WSS_URL,
+    explorer: SPHERON_MAINNET_EXPLORER_URL,
   },
 };
 
