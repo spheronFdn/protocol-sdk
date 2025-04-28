@@ -1,10 +1,10 @@
 // Testnet Contract Addresses
 export const AccessControlTestnet = '0x87D3440372293aCf9149552546F7141AAe05Be91';
-export const TokenRegistryTestnet = '0x1aD34aF0eac1cb6B60D93594c9d3F6A0a46bd2f9';
+export const TokenRegistryTestnet = '0x032666197A5d9329e717800FC90E8C951bA12290';
 export const ProviderRegistryTestnet = '0x038Eb8E227B287d7D42Cf404A07ACb5a7Df7645A';
 export const ProviderAttributeRegistryTestnet = '0x63942fCb221aDF85ebdFc11a061D5eea2384f00A';
-export const FizzRegistryTestnet = '0x6cB3604EeA7Ba303bB1a020fD8e06f034D5534a3';
-export const FizzAttributeRegistryTestnet = '0xB598170D89046385C62F10670CAe2658f6D8E7D7';
+export const FizzRegistryTestnet = '0xe16c74C9dB46d437527B83F7A55cF65662Ee4CA3';
+export const FizzAttributeRegistryTestnet = '0x8cA664043Bf767323d331D69841e525C2c878543';
 export const EscrowUserTestnet = '0xb8AC4512852409C9b30F10844c3F0a61679fAe66';
 export const EscrowProtocolTestnet = '0xbEDE87cE3411F280B3Ed63027B45f73Cbcd1B441';
 export const OrderRequestTestnet = '0xCe9787883b8f3785CCd8C8c3275B5F41068d670A';

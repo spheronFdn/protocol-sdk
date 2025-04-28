@@ -75,12 +75,6 @@
         "internalType": "uint256",
         "name": "minimumDeposit",
         "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "bool",
-        "name": "isDefault",
-        "type": "bool"
       }
     ],
     "name": "TokenAdded",
@@ -147,11 +141,6 @@
         "internalType": "uint256",
         "name": "minimumDeposit",
         "type": "uint256"
-      },
-      {
-        "internalType": "bool",
-        "name": "isDefault",
-        "type": "bool"
       }
     ],
     "stateMutability": "view",
@@ -191,11 +180,6 @@
         "internalType": "uint256[]",
         "name": "_minimumDeposits",
         "type": "uint256[]"
-      },
-      {
-        "internalType": "bool[]",
-        "name": "_isDefault",
-        "type": "bool[]"
       }
     ],
     "name": "addToken",
@@ -228,35 +212,11 @@
             "internalType": "uint256",
             "name": "minimumDeposit",
             "type": "uint256"
-          },
-          {
-            "internalType": "bool",
-            "name": "isDefault",
-            "type": "bool"
           }
         ],
         "internalType": "struct TokenRegistry.Token[]",
         "name": "",
         "type": "tuple[]"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "string",
-        "name": "symbol",
-        "type": "string"
-      }
-    ],
-    "name": "getTokenAddress",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
       }
     ],
     "stateMutability": "view",
@@ -293,11 +253,6 @@
             "internalType": "uint256",
             "name": "minimumDeposit",
             "type": "uint256"
-          },
-          {
-            "internalType": "bool",
-            "name": "isDefault",
-            "type": "bool"
           }
         ],
         "internalType": "struct TokenRegistry.Token",
@@ -328,25 +283,6 @@
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_token",
-        "type": "address"
-      }
-    ],
-    "name": "isDefaultToken",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
     "inputs": [],
     "name": "owner",
     "outputs": [
@@ -362,19 +298,6 @@
   {
     "inputs": [
       {
-        "internalType": "address",
-        "name": "_token",
-        "type": "address"
-      }
-    ],
-    "name": "removeDefaultToken",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "address[]",
         "name": "_token",
         "type": "address[]"
@@ -383,38 +306,6 @@
     "name": "removeTokens",
     "outputs": [],
     "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_token",
-        "type": "address"
-      }
-    ],
-    "name": "setDefaultToken",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "string",
-        "name": "",
-        "type": "string"
-      }
-    ],
-    "name": "symbolToAddress",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
     "type": "function"
   },
   {
