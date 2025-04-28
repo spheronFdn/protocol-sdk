@@ -401,13 +401,7 @@ export class EscrowModule {
     }
   }
 
-  async withdrawEarnings({
-    providerAddress,
-    fizzId = '0',
-    token,
-    amount,
-    isFizz = false,
-  }: WithdrawEarningsData) {
+  async withdrawEarnings({ providerAddress, fizzId = '0', token, amount }: WithdrawEarningsData) {
     const contractABI = abiMap[this.networkType].escrowProtocol;
     try {
       const { signer } = await initializeSigner({ wallet: this.wallet });
@@ -426,13 +420,7 @@ export class EscrowModule {
 
       const contract = new ethers.Contract(contractAddress, contractABI, signer);
 
-      const result = await contract.withdrawEarnings(
-        providerAddress,
-        fizzId,
-        tokenAddress,
-        amount,
-        isFizz
-      );
+      const result = await contract.withdrawEarnings(providerAddress, fizzId, tokenAddress, amount);
       const receipt = await result.wait();
       return receipt;
     } catch (error) {

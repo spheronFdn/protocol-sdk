@@ -34,7 +34,7 @@ export const ProviderAttributeRegistryMainnet = '0x35b78B015802481B6a2857Dd54ca6
 export const FizzRegistryMainnet = '0x8F3407eD1C6730168CD7411210cDce457c8366E7';
 export const FizzAttributeRegistryMainnet = '0x429f5bb05C31B9C33446Fb557d980CA094545278';
 export const EscrowUserMainnet = '0xa9A220c0665A40f2DaCB1d066d255Abd32b6A486';
-export const EscrowProtocolMainnet = '0x9ec7be523fC75C73120419Eb43e661Bddb835E01';
+export const EscrowProtocolMainnet = '0x7381F084D31EF2F983c95572b7DD6Ee99eE03d8d';
 export const OrderRequestMainnet = '0x7CA6527CFD57eBF5b3789f4aeF647f07dd111c38';
 export const ComputeLeaseMainnet = '0x82E5631862daaA5e0C14EC92f7ed8AB4776d5DB6';
 export const BidMainnet = '0xe7363Cb21B226b0452D23587def5284682293568';
@@ -50,7 +50,7 @@ export const RewardTokenMainnet = '0xA0c5ba7d9eccbE59000e8E67654CA5d867C6b401';
 // Mainnet Token Addresses
 export const USDTMainnet = '0xF981a6AB8D09a636EC78395b02B1aC693a0C8307';
 export const USDCMainnet = '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913';
-export const uSPONMainnet = '0x1CB4c02e65dF9813F9483A614B8aB46D22616eC7';
+export const uSPONMainnet = '0xBf0fA0461331d815A103e59929E5a19A48C30f5e';
 
 export const contractAddresses = {
   testnet: {
