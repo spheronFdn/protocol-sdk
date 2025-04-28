@@ -1,10 +1,10 @@
 // Testnet Contract Addresses
 export const AccessControlTestnet = '0x87D3440372293aCf9149552546F7141AAe05Be91';
-export const TokenRegistryTestnet = '0x032666197A5d9329e717800FC90E8C951bA12290';
+export const TokenRegistryTestnet = '0x1aD34aF0eac1cb6B60D93594c9d3F6A0a46bd2f9';
 export const ProviderRegistryTestnet = '0x038Eb8E227B287d7D42Cf404A07ACb5a7Df7645A';
 export const ProviderAttributeRegistryTestnet = '0x63942fCb221aDF85ebdFc11a061D5eea2384f00A';
-export const FizzRegistryTestnet = '0xe16c74C9dB46d437527B83F7A55cF65662Ee4CA3';
-export const FizzAttributeRegistryTestnet = '0x8cA664043Bf767323d331D69841e525C2c878543';
+export const FizzRegistryTestnet = '0x6cB3604EeA7Ba303bB1a020fD8e06f034D5534a3';
+export const FizzAttributeRegistryTestnet = '0xB598170D89046385C62F10670CAe2658f6D8E7D7';
 export const EscrowUserTestnet = '0xb8AC4512852409C9b30F10844c3F0a61679fAe66';
 export const EscrowProtocolTestnet = '0xbEDE87cE3411F280B3Ed63027B45f73Cbcd1B441';
 export const OrderRequestTestnet = '0xCe9787883b8f3785CCd8C8c3275B5F41068d670A';
@@ -27,17 +27,17 @@ export const SPONTestnet = '0x76e593392523243ACD38ceD87c2007F14483a86B';
 export const uSPONTestnet = '0xeD8F325cDc2BA7567395cb451A2ea8FAf40E23D2';
 
 // Mainnet Contract Addresses
-export const TokenRegistryMainnet = '0xe023062b4A63Ca8c0c7Ac7d4AB1810bd3132ac4d';
+export const TokenRegistryMainnet = '0xDCD3eeE9f5Fb828C4EaE14B8Fe2382c0dDD6de01';
 export const AccessControlMainnet = '0x2F6dE416a7AEED365bE49DeB931D263EC742605C';
-export const ProviderRegistryMainnet = '0x527D92b97200Df5767d299271B9Cd8533DFd8A4d';
-export const ProviderAttributeRegistryMainnet = '0x35b78B015802481B6a2857Dd54ca6bae188C790F';
-export const FizzRegistryMainnet = '0x8F3407eD1C6730168CD7411210cDce457c8366E7';
-export const FizzAttributeRegistryMainnet = '0x429f5bb05C31B9C33446Fb557d980CA094545278';
-export const EscrowUserMainnet = '0xa9A220c0665A40f2DaCB1d066d255Abd32b6A486';
+export const ProviderRegistryMainnet = '0x79c892AE9D910bBeb81705960BA01706Bb2Af02e';
+export const ProviderAttributeRegistryMainnet = '0x4149Ff1496AA74F7A59989eb5332946fEed22705';
+export const FizzRegistryMainnet = '0x1071F508b68E9cf8f338170295C952BDF509AE4D';
+export const FizzAttributeRegistryMainnet = '0xB7AbA489Fe9F0eB930b8d298eD5FE669611cbf79';
+export const EscrowUserMainnet = '0x67Ad502B202Ac602C215B2Ba28689a71d03F9Ba4';
 export const EscrowProtocolMainnet = '0x7381F084D31EF2F983c95572b7DD6Ee99eE03d8d';
-export const OrderRequestMainnet = '0x7CA6527CFD57eBF5b3789f4aeF647f07dd111c38';
-export const ComputeLeaseMainnet = '0x82E5631862daaA5e0C14EC92f7ed8AB4776d5DB6';
-export const BidMainnet = '0xe7363Cb21B226b0452D23587def5284682293568';
+export const OrderRequestMainnet = '0xC1A0AF3224465c2a5099C14c5A1A4f6680C30A86';
+export const ComputeLeaseMainnet = '0x8A9f22D855bBE978C0D47De0963a3B15022E8ce0';
+export const BidMainnet = '0x1582D6f9A7098B112dC76dd55a98d11d95f4702A';
 export const ResourceRegistryCPUMainnet = '0x8Ac7BD17fA6E51E9719FaEfD8FD8Cc46ECAa93A9';
 export const ResourceRegistryGPUMainnet = '0x360135261AB6CF9c9bBeF4c5d2B1fB9bb1671C8e';
 export const ResourceRegistryFactoryMainnet = '0xF302Af7f042A6D2e6A4c1fF67e4f69109d8f4Fa0';

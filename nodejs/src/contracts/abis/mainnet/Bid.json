@@ -8,23 +8,33 @@
       },
       {
         "internalType": "address",
-        "name": "_fizzRegistryAddress",
+        "name": "_fizzRegistry",
         "type": "address"
       },
       {
         "internalType": "address",
-        "name": "_orderRequest",
+        "name": "_escrow",
         "type": "address"
       },
       {
         "internalType": "address",
-        "name": "_lease",
+        "name": "_treasury",
         "type": "address"
       },
       {
-        "internalType": "address",
-        "name": "_access",
-        "type": "address"
+        "internalType": "uint32",
+        "name": "_userFeePercentage",
+        "type": "uint32"
+      },
+      {
+        "internalType": "uint32",
+        "name": "_protocolFeePercentage",
+        "type": "uint32"
+      },
+      {
+        "internalType": "uint32",
+        "name": "_fizzNodePercentage",
+        "type": "uint32"
       }
     ],
     "stateMutability": "nonpayable",
@@ -32,22 +42,39 @@
   },
   {
     "inputs": [],
-    "name": "BidPriceExceedsMaxPrice",
+    "name": "AccessControlBadConfirmation",
     "type": "error"
   },
   {
-    "inputs": [],
-    "name": "BiddingClosed",
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "neededRole",
+        "type": "bytes32"
+      }
+    ],
+    "name": "AccessControlUnauthorizedAccount",
     "type": "error"
   },
   {
-    "inputs": [],
-    "name": "FizzNodeNotActive",
-    "type": "error"
-  },
-  {
-    "inputs": [],
-    "name": "FizzNotLinkedToProvider",
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "available",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "required",
+        "type": "uint256"
+      }
+    ],
+    "name": "InsufficientBalance",
     "type": "error"
   },
   {
@@ -57,240 +84,294 @@
   },
   {
     "inputs": [],
-    "name": "LeaseNotActive",
+    "name": "InvalidAmount",
     "type": "error"
   },
   {
     "inputs": [],
-    "name": "OrderNotActive",
+    "name": "ReentrancyGuardReentrantCall",
     "type": "error"
   },
   {
     "inputs": [],
-    "name": "OrderNotFound",
-    "type": "error"
-  },
-  {
-    "inputs": [],
-    "name": "ProviderHasActiveBid",
-    "type": "error"
-  },
-  {
-    "inputs": [],
-    "name": "ProviderNotActive",
-    "type": "error"
-  },
-  {
-    "inputs": [],
-    "name": "UnAuthourized",
-    "type": "error"
-  },
-  {
-    "inputs": [],
-    "name": "UpdateOrderNotAccepted",
+    "name": "UnauthorizedAccess",
     "type": "error"
   },
   {
     "anonymous": false,
     "inputs": [
       {
-        "indexed": false,
-        "internalType": "uint64",
-        "name": "orderId",
-        "type": "uint64"
+        "indexed": true,
+        "internalType": "enum EscrowProtocol.AddressType",
+        "name": "_type",
+        "type": "uint8"
       },
       {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "bidPrice",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
+        "indexed": true,
         "internalType": "address",
-        "name": "provider",
+        "name": "_newAddress",
         "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "fizz",
-        "type": "uint256"
       }
     ],
-    "name": "BidPlaced",
+    "name": "AddressUpdated",
     "type": "event"
   },
   {
     "anonymous": false,
     "inputs": [
       {
-        "indexed": false,
-        "internalType": "address",
-        "name": "fizzRegistry",
-        "type": "address"
-      }
-    ],
-    "name": "FizzRegistryUpdated",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "lease",
-        "type": "address"
-      }
-    ],
-    "name": "LeaseAddressUpdated",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "uint64",
-        "name": "orderId",
-        "type": "uint64"
-      },
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "providerAddress",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "tenant",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "acceptedPrice",
-        "type": "uint256"
-      }
-    ],
-    "name": "LeaseUpdated",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "uint64",
-        "name": "orderId",
-        "type": "uint64"
-      },
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "providerAddress",
-        "type": "address"
-      },
-      {
-        "indexed": false,
+        "indexed": true,
         "internalType": "uint256",
         "name": "fizzId",
         "type": "uint256"
       },
       {
+        "indexed": true,
+        "internalType": "address",
+        "name": "token",
+        "type": "address"
+      },
+      {
         "indexed": false,
         "internalType": "uint256",
-        "name": "providerId",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "FizzMovement",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "from",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "to",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "token",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "deposit",
+        "type": "uint256"
+      }
+    ],
+    "name": "LockedTokenTransfered",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "from",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "fizzId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "token",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "deposit",
+        "type": "uint256"
+      }
+    ],
+    "name": "LockedTokenTransferedToFizz",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "role",
+        "type": "bytes32"
+      },
+      {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "previousAdminRole",
+        "type": "bytes32"
+      },
+      {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "newAdminRole",
+        "type": "bytes32"
+      }
+    ],
+    "name": "RoleAdminChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "role",
+        "type": "bytes32"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "sender",
+        "type": "address"
+      }
+    ],
+    "name": "RoleGranted",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "role",
+        "type": "bytes32"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "sender",
+        "type": "address"
+      }
+    ],
+    "name": "RoleRevoked",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "from",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "to",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "token",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
         "type": "uint256"
       },
       {
         "indexed": false,
+        "internalType": "uint8",
+        "name": "movementType",
+        "type": "uint8"
+      }
+    ],
+    "name": "TokenMovement",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "treasury",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "token",
+        "type": "address"
+      },
+      {
+        "indexed": false,
         "internalType": "uint256",
-        "name": "acceptedPrice",
+        "name": "amount",
         "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "creator",
-        "type": "address"
       }
     ],
-    "name": "OrderMatched",
+    "name": "TreasuryMovement",
     "type": "event"
   },
   {
-    "anonymous": false,
-    "inputs": [
+    "inputs": [],
+    "name": "DEFAULT_ADMIN_ROLE",
+    "outputs": [
       {
-        "indexed": false,
-        "internalType": "address",
-        "name": "orderRequest",
-        "type": "address"
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
       }
     ],
-    "name": "OrderRequestAddressUpdated",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "providerRegistry",
-        "type": "address"
-      }
-    ],
-    "name": "ProviderRegistryUpdated",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "uint64",
-        "name": "orderId",
-        "type": "uint64"
-      },
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "providerAddress",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "tenant",
-        "type": "address"
-      }
-    ],
-    "name": "UpdateRequestAccepted",
-    "type": "event"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint64",
-        "name": "_orderId",
-        "type": "uint64"
-      }
-    ],
-    "name": "acceptUpdate",
-    "outputs": [],
-    "stateMutability": "nonpayable",
+    "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [],
-    "name": "accessControl",
+    "name": "MAX_PROTOCOL_FEE_PERCENTAGE",
     "outputs": [
       {
-        "internalType": "contract IAccessControlManager",
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "escrow",
+    "outputs": [
+      {
+        "internalType": "contract IEscrowUser",
         "name": "",
         "type": "address"
       }
@@ -301,47 +382,64 @@
   {
     "inputs": [
       {
-        "internalType": "uint64",
+        "internalType": "address",
         "name": "",
-        "type": "uint64"
-      },
+        "type": "address"
+      }
+    ],
+    "name": "fees",
+    "outputs": [
       {
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
       }
     ],
-    "name": "bids",
-    "outputs": [
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
       {
         "internalType": "uint256",
-        "name": "requestId",
+        "name": "",
         "type": "uint256"
       },
       {
         "internalType": "address",
-        "name": "provider",
+        "name": "",
         "type": "address"
+      }
+    ],
+    "name": "fizzNodeEarnings",
+    "outputs": [
+      {
+        "internalType": "uint128",
+        "name": "earned",
+        "type": "uint128"
       },
       {
-        "internalType": "uint256",
-        "name": "bidPrice",
-        "type": "uint256"
+        "internalType": "uint128",
+        "name": "withdrawn",
+        "type": "uint128"
       },
       {
-        "internalType": "uint256",
-        "name": "fizzId",
-        "type": "uint256"
-      },
+        "internalType": "uint128",
+        "name": "balance",
+        "type": "uint128"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "fizzNodePercentage",
+    "outputs": [
       {
-        "internalType": "uint256",
-        "name": "timestamp",
-        "type": "uint256"
-      },
-      {
-        "internalType": "enum Bid.BidState",
-        "name": "state",
-        "type": "uint8"
+        "internalType": "uint32",
+        "name": "",
+        "type": "uint32"
       }
     ],
     "stateMutability": "view",
@@ -361,120 +459,18 @@
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "uint64",
-        "name": "_orderId",
-        "type": "uint64"
-      }
-    ],
-    "name": "getAllBidsForOrder",
-    "outputs": [
-      {
-        "components": [
-          {
-            "internalType": "uint256",
-            "name": "requestId",
-            "type": "uint256"
-          },
-          {
-            "internalType": "address",
-            "name": "provider",
-            "type": "address"
-          },
-          {
-            "internalType": "uint256",
-            "name": "bidPrice",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "fizzId",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "timestamp",
-            "type": "uint256"
-          },
-          {
-            "internalType": "enum Bid.BidState",
-            "name": "state",
-            "type": "uint8"
-          }
-        ],
-        "internalType": "struct Bid.ProviderBid[]",
-        "name": "",
-        "type": "tuple[]"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint64",
-        "name": "_orderId",
-        "type": "uint64"
-      },
-      {
-        "internalType": "address",
-        "name": "_provider",
-        "type": "address"
-      }
-    ],
-    "name": "getProviderOrderBid",
-    "outputs": [
-      {
-        "components": [
-          {
-            "internalType": "uint256",
-            "name": "requestId",
-            "type": "uint256"
-          },
-          {
-            "internalType": "address",
-            "name": "provider",
-            "type": "address"
-          },
-          {
-            "internalType": "uint256",
-            "name": "bidPrice",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "fizzId",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "timestamp",
-            "type": "uint256"
-          },
-          {
-            "internalType": "enum Bid.BidState",
-            "name": "state",
-            "type": "uint8"
-          }
-        ],
-        "internalType": "struct Bid.ProviderBid",
-        "name": "",
-        "type": "tuple"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
     "inputs": [],
-    "name": "lease",
+    "name": "getProtocolFee",
     "outputs": [
       {
-        "internalType": "contract IComputeLease",
+        "internalType": "uint32",
         "name": "",
-        "type": "address"
+        "type": "uint32"
+      },
+      {
+        "internalType": "uint32",
+        "name": "",
+        "type": "uint32"
       }
     ],
     "stateMutability": "view",
@@ -483,59 +479,54 @@
   {
     "inputs": [
       {
-        "internalType": "uint64",
-        "name": "_orderId",
-        "type": "uint64"
+        "internalType": "bytes32",
+        "name": "role",
+        "type": "bytes32"
+      }
+    ],
+    "name": "getRoleAdmin",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "role",
+        "type": "bytes32"
       },
       {
         "internalType": "address",
-        "name": "_providerAddress",
+        "name": "account",
         "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_acceptedPrice",
-        "type": "uint256"
       }
     ],
-    "name": "matchOrder",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
+    "name": "grantRole",
+    "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "orderRequest",
-    "outputs": [
-      {
-        "internalType": "contract IOrderRequest",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
     "inputs": [
       {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
+        "internalType": "bytes32",
+        "name": "role",
+        "type": "bytes32"
       },
       {
-        "internalType": "uint64",
-        "name": "",
-        "type": "uint64"
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
       }
     ],
-    "name": "orderUpdateAcceptance",
+    "name": "hasRole",
     "outputs": [
       {
         "internalType": "bool",
@@ -547,47 +538,13 @@
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "uint64",
-        "name": "_orderId",
-        "type": "uint64"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_bidPrice",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_fizzId",
-        "type": "uint256"
-      }
-    ],
-    "name": "placeBid",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      },
-      {
-        "internalType": "uint64",
-        "name": "",
-        "type": "uint64"
-      }
-    ],
-    "name": "providerActiveBid",
+    "inputs": [],
+    "name": "protocolFeePercentage",
     "outputs": [
       {
-        "internalType": "uint64",
+        "internalType": "uint32",
         "name": "",
-        "type": "uint64"
+        "type": "uint32"
       }
     ],
     "stateMutability": "view",
@@ -601,42 +558,27 @@
         "type": "address"
       },
       {
-        "internalType": "uint64",
+        "internalType": "address",
         "name": "",
-        "type": "uint64"
+        "type": "address"
       }
     ],
-    "name": "providerOrderBid",
+    "name": "providerEarnings",
     "outputs": [
       {
-        "internalType": "uint256",
-        "name": "requestId",
-        "type": "uint256"
+        "internalType": "uint128",
+        "name": "earned",
+        "type": "uint128"
       },
       {
-        "internalType": "address",
-        "name": "provider",
-        "type": "address"
+        "internalType": "uint128",
+        "name": "withdrawn",
+        "type": "uint128"
       },
       {
-        "internalType": "uint256",
-        "name": "bidPrice",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "fizzId",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "timestamp",
-        "type": "uint256"
-      },
-      {
-        "internalType": "enum Bid.BidState",
-        "name": "state",
-        "type": "uint8"
+        "internalType": "uint128",
+        "name": "balance",
+        "type": "uint128"
       }
     ],
     "stateMutability": "view",
@@ -658,12 +600,17 @@
   {
     "inputs": [
       {
+        "internalType": "bytes32",
+        "name": "role",
+        "type": "bytes32"
+      },
+      {
         "internalType": "address",
-        "name": "_fizzRegistry",
+        "name": "callerConfirmation",
         "type": "address"
       }
     ],
-    "name": "updateFizzRegistryAddress",
+    "name": "renounceRole",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -671,12 +618,17 @@
   {
     "inputs": [
       {
+        "internalType": "bytes32",
+        "name": "role",
+        "type": "bytes32"
+      },
+      {
         "internalType": "address",
-        "name": "_lease",
+        "name": "account",
         "type": "address"
       }
     ],
-    "name": "updateLeaseAdress",
+    "name": "revokeRole",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -684,17 +636,194 @@
   {
     "inputs": [
       {
-        "internalType": "uint64",
-        "name": "_orderId",
-        "type": "uint64"
+        "internalType": "uint32",
+        "name": "_protocolFee",
+        "type": "uint32"
+      },
+      {
+        "internalType": "uint32",
+        "name": "_userFee",
+        "type": "uint32"
+      },
+      {
+        "internalType": "uint32",
+        "name": "_fizzNodeFee",
+        "type": "uint32"
+      }
+    ],
+    "name": "setPercentages",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes4",
+        "name": "interfaceId",
+        "type": "bytes4"
+      }
+    ],
+    "name": "supportsInterface",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "from",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "to",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_token",
+        "type": "address"
       },
       {
         "internalType": "uint256",
-        "name": "_acceptedPrice",
+        "name": "amount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_fees",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bool",
+        "name": "_isOperator",
+        "type": "bool"
+      }
+    ],
+    "name": "transferLocked",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "from",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "fizzId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "to",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_token",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_fees",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bool",
+        "name": "_isOperator",
+        "type": "bool"
+      }
+    ],
+    "name": "transferLockedFizz",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "treasury",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_newAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "enum EscrowProtocol.AddressType",
+        "name": "_type",
+        "type": "uint8"
+      }
+    ],
+    "name": "updateAddress",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "userFeePercentage",
+    "outputs": [
+      {
+        "internalType": "uint32",
+        "name": "",
+        "type": "uint32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_provider",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_fizzId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "_token",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_amount",
         "type": "uint256"
       }
     ],
-    "name": "updateOrder",
+    "name": "withdrawEarnings",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -703,24 +832,16 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "_orderRequest",
+        "name": "_token",
         "type": "address"
-      }
-    ],
-    "name": "updateOrderRequestAdress",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
+      },
       {
-        "internalType": "address",
-        "name": "_providerRegistry",
-        "type": "address"
+        "internalType": "uint256",
+        "name": "_amount",
+        "type": "uint256"
       }
     ],
-    "name": "updateProviderAdress",
+    "name": "withdrawFees",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
