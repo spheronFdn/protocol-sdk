@@ -74,6 +74,37 @@ export class EscrowModule {
     }
   }
 
+  async getSmartWalletDetails(): Promise<{ accountAddress: string; balance: string }> {
+    if (this.smartWalletBundlerClientPromise) {
+      const smartWalletBundlerClient = await this.smartWalletBundlerClientPromise;
+      const accountAddress = await smartWalletBundlerClient?.account?.address;
+      if (!accountAddress) {
+        throw new Error('Smart wallet account address not found');
+      }
+
+      const uSponToken = tokenMap[this.networkType].find(
+        (token) => token.symbol.toLowerCase() === 'uspon'
+      );
+      if (!uSponToken) {
+        throw new Error('uSPON token not found');
+      }
+
+      const tokenContract = new ethers.Contract(
+        uSponToken.address,
+        abiMap[this.networkType].testToken,
+        this.provider
+      );
+      const balance = await tokenContract.balanceOf(accountAddress);
+
+      return {
+        accountAddress,
+        balance: balance.toString(),
+      };
+    } else {
+      throw new Error('Gasless options not provided');
+    }
+  }
+
   async depositBalance({ token, amount, onSuccessCallback, onFailureCallback }: DepositData) {
     const contractABI = abiMap[this.networkType].escrow;
     try {
