@@ -18,61 +18,76 @@ if (!PROVIDER_PROXY_URL) {
     throw new Error("PROVIDER_PROXY_URL is not set in the environment variables");
 }
 
-const sdk = new SpheronSDK("testnet", PRIVATE_KEY);
+// Example 1: Basic initialization (minimal configuration)
+const basicSdk = new SpheronSDK({
+    networkType: 'mainnet', // or 'testnet', defaults to 'mainnet'
+    privateKey: PRIVATE_KEY
+});
+
+// Example 2: Full initialization with all options
+const fullSdk = new SpheronSDK({
+    networkType: 'mainnet',
+    privateKey: PRIVATE_KEY,
+    rpcUrls: {
+        http: 'https://base-mainnet.g.alchemy.com/v2/your-api-key',
+        websocket: 'wss://base-mainnet.g.alchemy.com/v2/your-api-key'
+    },
+    gaslessOptions: {
+        type: 'coinbase',
+        bundlerUrl: 'https://api.developer.coinbase.com/rpc/v1/base/your-api-key',
+        paymasterUrl: 'https://api.developer.coinbase.com/rpc/v1/base/your-api-key'
+    }
+});
+
+// Choose which SDK instance to use (using full configuration for this example)
+const sdk = fullSdk;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 async function main() {
     try {
-        // Get wallet address
+        // Get wallet address and smart wallet details
         console.log("Wallet address:", WALLET_ADDRESS);
 
-        // Check current balance
-        const currentBalance = await sdk.escrow.getUserBalance("USDT", WALLET_ADDRESS);
-        console.log("Current USDT balance:", currentBalance);
+        // If using gasless transactions, get smart wallet details first
+        const smartWalletDetails = await sdk.escrow.getSmartWalletDetails();
+        console.log("Smart Wallet Details:", smartWalletDetails);
 
-        const requiredBalance = 100 * 1e6; // Required balance in USDT (100 USDT in smallest units)
-        const depositAmount = requiredBalance - (parseInt(currentBalance.unlockedBalance, 10) || 0);
-
-        if (depositAmount > 0) {
-            console.log(`Depositing ${depositAmount} USDT to reach the required balance...`);
-            await sdk.escrow.depositBalance({
-                token: "USDT",
-                amount: depositAmount,
-                onSuccessCallback: (receipt) => {
-                    console.log("Successfully deposited:", receipt);
-                },
-                onFailureCallback: (error) => {
-                    console.error("Deposit failed:", error);
-                },
-            });
-        } else {
-            console.log("Current balance is sufficient. No deposit needed.");
+        // Check if smart wallet needs funding (for gasless transactions)
+        if (smartWalletDetails && Number(smartWalletDetails.balance) === 0) {
+            console.log("Warning: Smart wallet needs funding for gasless transactions");
         }
+        
+        // Check balances
+        const currentBalance = await sdk.escrow.getUserBalance("uSPON", WALLET_ADDRESS);
+        console.log("Current uSPON balance:", currentBalance);
 
-        // Update the YAML file path
+        // Example deployment
         const yamlPath = join(__dirname, 'utils', 'spheron.yaml');
-        console.log("YAML file path:", yamlPath); // Add this line for debugging
         const iclYaml = fs.readFileSync(yamlPath, 'utf8');
 
+        // Create deployment
         const deploymentTxn = await sdk.deployment.createDeployment(iclYaml, PROVIDER_PROXY_URL);
         console.log("Deployment created:", deploymentTxn);
 
-        // Fetch deployment logs
         if (deploymentTxn.leaseId) {
-            console.log("Fetching deployment details...");
-            const deploymentDetails = await sdk.deployment.getDeployment(deploymentTxn.leaseId, PROVIDER_PROXY_URL);
-            console.log("Deployment details:", deploymentDetails, deploymentDetails.forwarded_ports);
+            // Get deployment details
+            const deploymentDetails = await sdk.deployment.getDeployment(
+                deploymentTxn.leaseId, 
+                PROVIDER_PROXY_URL
+            );
+            console.log("Deployment details:", deploymentDetails);
 
-            console.log("Fetching lease details...");
+            // Get lease details
             const leaseDetails = await sdk.leases.getLeaseDetails(deploymentTxn.leaseId);
             console.log("Lease details:", leaseDetails);
 
-            console.log("Sleeping for 10 seconds...");
+            // Wait for deployment to stabilize
+            console.log("Waiting for deployment to stabilize...");
             await new Promise(resolve => setTimeout(resolve, 10000));
 
-            console.log("Closing deployment...");
+            // Close deployment
             const closeDeploymentDetails = await sdk.deployment.closeDeployment(deploymentTxn.leaseId);
             console.log("Deployment closed:", closeDeploymentDetails);
         }

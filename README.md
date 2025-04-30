@@ -121,21 +121,62 @@ Make sure to set any necessary environment variables as described in the [Provid
 
 ### Initializing the SDK
 
-Import and initialize the SDK in your Node.js application:
+To use the Spheron SDK, import it and initialize it with the desired configuration:
 
 ```javascript
-const { SpheronSDK } = require("@spheron/protocol-sdk");
+const { SpheronSDK } = require('@spheron/protocol-sdk');
 
-const sdk = new SpheronSDK("testnet");
+// Basic initialization
+const sdk = new SpheronSDK({
+  networkType: 'mainnet' // 'mainnet' (default) or 'testnet'
+});
+
+// Initialization with private key for write operations
+const sdk = new SpheronSDK({
+  networkType: 'mainnet',
+  privateKey: 'your-private-key'
+});
+
+// Full initialization with all optional parameters
+const sdk = new SpheronSDK({
+  networkType: 'mainnet',
+  privateKey: 'your-private-key',
+  rpcUrls: {
+    http: 'your-http-rpc-url',
+    websocket: 'your-websocket-rpc-url'
+  },
+  gaslessOptions: {
+    type: 'coinbase', // or 'biconomy'
+    bundlerUrl: 'your-bundler-url',
+    paymasterUrl: 'your-paymaster-url'
+  }
+});
 ```
 
-If performing write operations, provide a private key:
+#### Configuration Parameters:
 
+- `networkType` (optional): Specifies the environment - 'mainnet' (default) or 'testnet'
+- `privateKey` (optional): Your private key for signing transactions
+- `rpcUrls` (optional): Custom RPC URLs for the network
+  - `http`: HTTP RPC endpoint
+  - `websocket`: WebSocket RPC endpoint
+- `gaslessOptions` (optional): Configuration for gasless transactions
+  - `type`: 'coinbase' or 'biconomy'
+  - `bundlerUrl`: URL for the bundler service
+  - `paymasterUrl`: URL for the paymaster service
+
+#### Using Gasless Transactions
+
+When using gasless transactions, follow these steps:
+
+1. First, get your smart wallet details:
 ```javascript
-const sdk = new SpheronSDK("testnet", "your-private-key");
+const smartWalletDetails = await sdk.escrow.getSmartWalletDetails();
+console.log('Smart Wallet Address:', smartWalletDetails.address);
+console.log('Smart Wallet Balance:', smartWalletDetails.balance);
 ```
 
-**Note:** Never hardcode your private key; use environment variables or secure key management systems.
+2. Before making any deposits using `depositBalance`, ensure you have deposited funds into your smart wallet.
 
 ### Examples
 

@@ -19,7 +19,7 @@ export class SpheronSDK {
   private smartWalletBundlerClientPromise?: Promise<SmartWalletBundlerClient>;
 
   constructor({
-    networkType,
+    networkType = 'mainnet',
     privateKey,
     rpcUrls = {
       http: publicRpcUrls[networkType].http,
