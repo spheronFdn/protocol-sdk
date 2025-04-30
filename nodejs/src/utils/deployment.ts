@@ -2,7 +2,8 @@ import * as yaml from 'js-yaml';
 import { getTokenDetails } from '@utils/index';
 import { NetworkType } from '@config/index';
 import {
-  GPUAttributesManifest,
+  AttributesManifest,
+  getServiceParams,
   ICL,
   manifestExpose,
   Service,
@@ -171,6 +172,25 @@ const convertGpuAttributes = (gpu: GPUInput): ConvertedGPU => {
   };
 };
 
+const convertStorageAttrbutes = (
+  storageAttributes: Record<string, string>
+): ConvertedAttribute[] | undefined => {
+  if (!storageAttributes) return undefined;
+
+  const pairs = Object.keys(storageAttributes).map((key) => ({
+    Key: key,
+    Value: storageAttributes[key].toString(),
+  }));
+
+  if (storageAttributes.class === 'ram' && !('persistent' in storageAttributes)) {
+    pairs.push({ Key: 'persistent', Value: 'false' });
+  }
+
+  pairs.sort((a, b) => a.Key.localeCompare(b.Key));
+
+  return pairs;
+};
+
 interface Pricing {
   amount: number;
   token?: string;
@@ -184,6 +204,8 @@ interface Placement {
     region_exclude?: string;
     desired_fizz?: string;
     desired_provider?: string;
+    cpu_model?: string;
+    bandwidth?: string;
   };
 }
 
@@ -191,7 +213,9 @@ interface ComputeProfile {
   resources: {
     cpu: { units: number };
     memory: { size: string };
-    storage: { size: string } | { size: string }[];
+    storage:
+      | { size: string; attributes?: Record<string, any> }
+      | { size: string; attributes?: Record<string, any> }[];
     gpu?: GPUInput;
   };
 }
@@ -310,11 +334,11 @@ export const yamlToOrderDetails = (
     const attributes = [
       {
         Key: 'cpu_model',
-        Value: 'any',
+        Value: firstPlacement?.attributes?.cpu_model || 'any',
       },
       {
         Key: 'bandwidth',
-        Value: 'any',
+        Value: firstPlacement?.attributes?.bandwidth || 'any',
       },
     ];
 
@@ -422,8 +446,8 @@ interface Input {
   vendor: Record<string, Model[]>;
 }
 
-function convertGpuAttributesIcl(input: Input): GPUAttributesManifest[] {
-  const output: GPUAttributesManifest[] = [];
+const convertGpuAttributesIcl = (input: Input): AttributesManifest[] => {
+  const output: AttributesManifest[] = [];
 
   for (const vendor in input.vendor) {
     if (input.vendor.hasOwnProperty(vendor)) {
@@ -437,7 +461,35 @@ function convertGpuAttributesIcl(input: Input): GPUAttributesManifest[] {
   }
 
   return output;
-}
+};
+
+const convertStorageAttrbutesIcl = (
+  storageAttributes: Record<string, any>
+): AttributesManifest[] => {
+  const pairs = Object.keys(storageAttributes).map((key) => ({
+    key,
+    value: storageAttributes[key].toString(),
+  }));
+
+  if (storageAttributes.class === 'ram' && !('persistent' in storageAttributes)) {
+    pairs.push({ key: 'persistent', value: 'false' });
+  }
+
+  pairs.sort((a, b) => a.key.localeCompare(b.key));
+
+  return pairs;
+};
+
+const getStorageAttributes = (
+  storage:
+    | { size: string; attributes?: Record<string, any> }
+    | { size: string; attributes?: Record<string, any> }[]
+): AttributesManifest[] | undefined => {
+  if (Array.isArray(storage)) {
+    return convertStorageAttrbutesIcl(storage[0].attributes || {});
+  }
+  return storage.attributes ? convertStorageAttrbutesIcl(storage.attributes) : undefined;
+};
 
 export const getManifestIcl = (
   yamlInput: string
@@ -451,7 +503,8 @@ export const getManifestIcl = (
     {
       name: placement,
       services: Object.entries(input.services).map(([serviceName, serviceData], index) => {
-        const { image, env, command, args, credentials, pull_policy } = serviceData as Service;
+        const { image, env, command, args, credentials, pull_policy, params } =
+          serviceData as Service;
         const { cpu, memory, storage, gpu } = input.profiles.compute[serviceName].resources;
         const count = input.deployment[serviceName][placement].count;
 
@@ -483,6 +536,7 @@ export const getManifestIcl = (
                     ? convertSize(storage[0].size).toString()
                     : convertSize(storage.size).toString(),
                 },
+                attributes: getStorageAttributes(storage),
               },
             ],
             gpu: {
@@ -495,7 +549,7 @@ export const getManifestIcl = (
           },
           count,
           expose: manifestExpose(serviceData, input),
-          params: null,
+          params: params ? getServiceParams(params) : null,
         };
       }),
     },
