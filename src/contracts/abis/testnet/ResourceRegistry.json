@@ -1,16 +1,5 @@
 [
   {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_resourceRegistryImplementation",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "constructor"
-  },
-  {
     "inputs": [],
     "name": "AccessControlBadConfirmation",
     "type": "error"
@@ -33,32 +22,100 @@
   },
   {
     "inputs": [],
-    "name": "ERC1167FailedCreateClone",
+    "name": "InvalidInitialization",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "NotInitializing",
     "type": "error"
   },
   {
     "anonymous": false,
     "inputs": [
       {
-        "indexed": true,
-        "internalType": "address",
-        "name": "creator",
-        "type": "address"
-      },
+        "indexed": false,
+        "internalType": "uint64",
+        "name": "version",
+        "type": "uint64"
+      }
+    ],
+    "name": "Initialized",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
       {
         "indexed": false,
-        "internalType": "address",
-        "name": "resourceRegistry",
-        "type": "address"
+        "internalType": "uint256",
+        "name": "resourceID",
+        "type": "uint256"
       },
       {
         "indexed": false,
         "internalType": "string",
-        "name": "resourceType",
+        "name": "name",
         "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "tier",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "multiplier",
+        "type": "uint256"
       }
     ],
-    "name": "ResourceRegistryCreated",
+    "name": "ResourceAdded",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "resourceID",
+        "type": "uint256"
+      }
+    ],
+    "name": "ResourceDeleted",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "resourceID",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "name",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "tier",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "multiplier",
+        "type": "uint256"
+      }
+    ],
+    "name": "ResourceUpdated",
     "type": "event"
   },
   {
@@ -152,19 +209,41 @@
   {
     "inputs": [
       {
-        "internalType": "string",
-        "name": "resourceType",
-        "type": "string"
-      }
-    ],
-    "name": "createResourceRegistry",
-    "outputs": [
+        "internalType": "uint256[]",
+        "name": "_resourceIDs",
+        "type": "uint256[]"
+      },
       {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
+        "internalType": "string[]",
+        "name": "_names",
+        "type": "string[]"
+      },
+      {
+        "internalType": "string[]",
+        "name": "_tiers",
+        "type": "string[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "_multipliers",
+        "type": "uint256[]"
       }
     ],
+    "name": "addResource",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256[]",
+        "name": "_resourceIDs",
+        "type": "uint256[]"
+      }
+    ],
+    "name": "deleteResource",
+    "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },
@@ -172,56 +251,26 @@
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "",
+        "name": "_resourceID",
         "type": "uint256"
       }
     ],
-    "name": "createdRegistries",
+    "name": "getResource",
     "outputs": [
       {
-        "internalType": "address",
-        "name": "creator",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "registryAddress",
-        "type": "address"
+        "internalType": "string",
+        "name": "",
+        "type": "string"
       },
       {
         "internalType": "string",
-        "name": "resourceType",
-        "type": "string"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "getAllCreatedRegistries",
-    "outputs": [
-      {
-        "components": [
-          {
-            "internalType": "address",
-            "name": "creator",
-            "type": "address"
-          },
-          {
-            "internalType": "address",
-            "name": "registryAddress",
-            "type": "address"
-          },
-          {
-            "internalType": "string",
-            "name": "resourceType",
-            "type": "string"
-          }
-        ],
-        "internalType": "struct ResourceRegistryFactory.CreatedRegistry[]",
         "name": "",
-        "type": "tuple[]"
+        "type": "string"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -291,6 +340,24 @@
   {
     "inputs": [
       {
+        "internalType": "string",
+        "name": "_resourceType",
+        "type": "string"
+      },
+      {
+        "internalType": "address",
+        "name": "_admin",
+        "type": "address"
+      }
+    ],
+    "name": "initialize",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "bytes32",
         "name": "role",
         "type": "bytes32"
@@ -308,12 +375,59 @@
   },
   {
     "inputs": [],
-    "name": "resourceRegistryImplementation",
+    "name": "resourceCounter",
     "outputs": [
       {
-        "internalType": "address",
+        "internalType": "uint256",
         "name": "",
-        "type": "address"
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "resourceType",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "resources",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "name",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "tier",
+        "type": "string"
+      },
+      {
+        "internalType": "uint256",
+        "name": "multiplier",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bool",
+        "name": "exists",
+        "type": "bool"
       }
     ],
     "stateMutability": "view",
@@ -354,6 +468,34 @@
       }
     ],
     "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256[]",
+        "name": "_resourceIDs",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "string[]",
+        "name": "_names",
+        "type": "string[]"
+      },
+      {
+        "internalType": "string[]",
+        "name": "_tiers",
+        "type": "string[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "_multipliers",
+        "type": "uint256[]"
+      }
+    ],
+    "name": "updateResource",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   }
 ]

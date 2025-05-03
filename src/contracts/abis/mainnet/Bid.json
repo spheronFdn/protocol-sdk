@@ -23,6 +23,11 @@
       },
       {
         "internalType": "address",
+        "name": "_tokenRegistry",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
         "name": "_access",
         "type": "address"
       }
@@ -78,6 +83,11 @@
   {
     "inputs": [],
     "name": "ProviderNotActive",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "TokenNotAccepted",
     "type": "error"
   },
   {
@@ -196,6 +206,12 @@
       {
         "indexed": false,
         "internalType": "uint256",
+        "name": "fizzId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
         "name": "providerId",
         "type": "uint256"
       },
@@ -239,6 +255,19 @@
       }
     ],
     "name": "ProviderRegistryUpdated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "tokenRegistry",
+        "type": "address"
+      }
+    ],
+    "name": "TokenRegistryUpdated",
     "type": "event"
   },
   {
@@ -650,6 +679,19 @@
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "tokenRegistry",
+    "outputs": [
+      {
+        "internalType": "contract ITokenRegistry",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "address",
@@ -715,6 +757,19 @@
       }
     ],
     "name": "updateProviderAdress",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_tokenRegistry",
+        "type": "address"
+      }
+    ],
+    "name": "updateTokenRegistryAddress",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
