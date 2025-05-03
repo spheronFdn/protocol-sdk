@@ -12,8 +12,8 @@ export const ComputeLeaseTestnet = '0x86F24B4C3BF800E295926B261532CEa44788DEc8';
 export const BidTestnet = '0x87314967BaD22AAA7d4FB2bb149a6C57380535a3';
 export const ProviderResourceRegistryCPUTestnet = '0x67B8c2201Eef00d1a8193a2aF301312DD21a286B';
 export const ProviderResourceRegistryGPUTestnet = '0x2B73F279044347A3B6c9F122Ec6b479b6C2beAc9';
-export const FizzResourceRegistryCPUTestnet = '0x67B8c2201Eef00d1a8193a2aF301312DD21a286B';
-export const FizzResourceRegistryGPUTestnet = '0x2B73F279044347A3B6c9F122Ec6b479b6C2beAc9';
+export const FizzResourceRegistryCPUTestnet = '0x67B8c2201Eef00d1a8193a2aF301312DD21a286B'; // TODO: Needs to be updated as per new fizz CPU Registry contract
+export const FizzResourceRegistryGPUTestnet = '0x2B73F279044347A3B6c9F122Ec6b479b6C2beAc9'; // TODO: Needs to be updated as per new fizz GPU Registry contract
 export const ProviderRewardManagerTestnet = '0xe32279Bf9d47E20AEbb9ec04Ba5FB46536BA2aB5';
 export const FizzRewardManagerTestnet = '0xd653644FFD4ec06d173237FbA952C450A4973f5c';
 export const RewardTokenTestnet = '0xB28aA1E5074AE0222cf764e2934182775Ee7AB42';
@@ -95,8 +95,8 @@ export const contractAddresses = {
     bid: BidMainnet,
     providerResourceRegistryCPU: ProviderResourceRegistryCPUMainnet,
     providerResourceRegistryGPU: ProviderResourceRegistryGPUMainnet,
-    fizzResourceRegistryCPU: FizzResourceRegistryCPUMainnet, // TODO: Needs to be updated as per new fizz CPU Registry contract
-    fizzResourceRegistryGPU: FizzResourceRegistryGPUMainnet, // TODO: Needs to be updated as per new fizz GPU Registry contract
+    fizzResourceRegistryCPU: FizzResourceRegistryCPUMainnet,
+    fizzResourceRegistryGPU: FizzResourceRegistryGPUMainnet,
     resourceRegistryFactory: ResourceRegistryFactoryMainnet,
     providerRewardManager: ProviderRewardManagerMainnet,
     fizzRewardManager: FizzRewardManagerMainnet,
