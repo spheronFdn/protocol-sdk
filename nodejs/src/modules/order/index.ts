@@ -380,9 +380,9 @@ export class OrderModule {
         reject({ error: true, msg: 'Order updation Failed' });
       }, timeoutTime);
 
-      contract.on('UpdateRequestAccepted', (orderId, providerAddress, tenantAddress) => {
+      contract.on('UpdateRequestAccepted', async (orderId, providerAddress, tenantAddress) => {
         if (tenantAddress.toString().toLowerCase() === account.toString().toLowerCase()) {
-          onSuccessCallback(orderId, providerAddress);
+          await onSuccessCallback(orderId, providerAddress);
           this.websocketProvider?.destroy();
           contract.off('UpdateRequestAccepted');
           clearTimeout(this.updateTimeoutId as NodeJS.Timeout);

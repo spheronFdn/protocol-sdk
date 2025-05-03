@@ -160,6 +160,9 @@ export class DeploymentModule {
         throw new Error('Insufficient Balance');
       }
 
+      const transactionHash = await this.orderModule.updateOrder(leaseId, details);
+      let updateLeaseResponse = null;
+
       const updatedOrderLease: Promise<OrderUpdatedEvent> = this.orderModule.listenToOrderUpdated(
         120_000,
         (orderId, providerAddress) => {
@@ -171,32 +174,35 @@ export class DeploymentModule {
       );
       const updateOrderAcceptance: Promise<OrderUpdateAcceptedEvent> =
         this.orderModule.listenToOrderUpdateAccepted(
-          120_000,
-          (orderId) => {
+          60_000,
+          async (orderId: string, providerAddress: string) => {
             updateOrderAcceptedCallback?.(orderId);
+
+            const providerDetails: IProvider = await this.providerModule.getProviderDetails(
+              providerAddress
+            );
+            const { certificate, hostUri } = providerDetails;
+            const port = details.mode === 0 ? 8543 : 8443;
+            const spheronProvider = new SpheronProviderModule(
+              `https://${hostUri}:${port}`,
+              providerProxyUrl
+            );
+            const authToken = await createAuthorizationToken(this.wallet!);
+            await spheronProvider.submitManfiest(
+              certificate,
+              authToken,
+              orderId as string,
+              sdlManifest
+            );
+            const updateOrderLeaseResponse = await updatedOrderLease;
+            updateLeaseResponse = { ...updateOrderLeaseResponse };
           },
           () => {
             updateOrderFailedCallback?.();
           }
         );
-
-      const transactionHash = await this.orderModule.updateOrder(leaseId, details);
-      const updateOrderAcceptanceResponse = await updateOrderAcceptance;
-
-      const { orderId, providerAddress } = updateOrderAcceptanceResponse;
-      const providerDetails: IProvider = await this.providerModule.getProviderDetails(
-        providerAddress
-      );
-      const { certificate, hostUri } = providerDetails;
-      const port = details.mode === 0 ? 8543 : 8443;
-      const spheronProvider = new SpheronProviderModule(
-        `https://${hostUri}:${port}`,
-        providerProxyUrl
-      );
-      const authToken = await createAuthorizationToken(this.wallet);
-      await spheronProvider.submitManfiest(certificate, authToken, orderId as string, sdlManifest);
-      const updateOrderLeaseResponse = await updatedOrderLease;
-      return { transactionHash, updateLeaseResponse: updateOrderLeaseResponse };
+      await updateOrderAcceptance;
+      return { transactionHash, updateLeaseResponse };
     } catch (error) {
       throw error;
     }
