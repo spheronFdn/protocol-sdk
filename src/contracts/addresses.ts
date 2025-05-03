@@ -38,8 +38,10 @@ export const EscrowProtocolMainnet = '0x7381F084D31EF2F983c95572b7DD6Ee99eE03d8d
 export const OrderRequestMainnet = '0xC1A0AF3224465c2a5099C14c5A1A4f6680C30A86';
 export const ComputeLeaseMainnet = '0x8A9f22D855bBE978C0D47De0963a3B15022E8ce0';
 export const BidMainnet = '0x1582D6f9A7098B112dC76dd55a98d11d95f4702A';
-export const ResourceRegistryCPUMainnet = '0x8Ac7BD17fA6E51E9719FaEfD8FD8Cc46ECAa93A9';
-export const ResourceRegistryGPUMainnet = '0x360135261AB6CF9c9bBeF4c5d2B1fB9bb1671C8e';
+export const ProviderResourceRegistryCPUMainnet = '0x8Ac7BD17fA6E51E9719FaEfD8FD8Cc46ECAa93A9';
+export const ProviderResourceRegistryGPUMainnet = '0x360135261AB6CF9c9bBeF4c5d2B1fB9bb1671C8e';
+export const FizzResourceRegistryCPUMainnet = '0x285ce6294277FC29efD326c91dd3825fdEf76Ddb';
+export const FizzResourceRegistryGPUMainnet = '0xcfa353C1E6d3f625648f6E49D102026d63727c8A';
 export const ResourceRegistryFactoryMainnet = '0xF302Af7f042A6D2e6A4c1fF67e4f69109d8f4Fa0';
 export const ProviderRewardCalculatorMainnet = '0xa8F2FaECaeCe5654DB1927437b10852dffE659F6';
 export const ProviderRewardManagerMainnet = '0x20f2159b1082529089752Bce0549a649B0f0032C';
@@ -63,8 +65,10 @@ export const contractAddresses = {
     orderRequest: OrderRequestDev,
     computeLease: ComputeLeaseDev,
     bid: BidDev,
-    resourceRegistryCPU: ResourceRegistryCPUDev,
-    resourceRegistryGPU: ResourceRegistryGPUDev,
+    providerResourceRegistryCPU: ResourceRegistryCPUDev,
+    providerResourceRegistryGPU: ResourceRegistryGPUDev,
+    fizzResourceRegistryCPU: ResourceRegistryCPUDev,
+    fizzResourceRegistryGPU: ResourceRegistryGPUDev,
     providerRewardManager: ProviderRewardManagerDev,
     fizzRewardManager: FizzRewardManagerDev,
     rewardToken: RewardTokenDev,
@@ -88,8 +92,10 @@ export const contractAddresses = {
     orderRequest: OrderRequestMainnet,
     computeLease: ComputeLeaseMainnet,
     bid: BidMainnet,
-    resourceRegistryCPU: ResourceRegistryCPUMainnet,
-    resourceRegistryGPU: ResourceRegistryGPUMainnet,
+    providerResourceRegistryCPU: ProviderResourceRegistryCPUMainnet,
+    providerResourceRegistryGPU: ProviderResourceRegistryGPUMainnet,
+    fizzResourceRegistryCPU: FizzResourceRegistryCPUMainnet,
+    fizzResourceRegistryGPU: FizzResourceRegistryGPUMainnet,
     resourceRegistryFactory: ResourceRegistryFactoryMainnet,
     providerRewardManager: ProviderRewardManagerMainnet,
     fizzRewardManager: FizzRewardManagerMainnet,
