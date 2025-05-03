@@ -238,8 +238,8 @@ export class FizzModule {
       const contractAbi = abiMap[this.networkType as NetworkType].resourceRegistry;
       const contractAddress =
         category === 'CPU'
-          ? contractAddresses[this.networkType as NetworkType].resourceRegistryCPU
-          : contractAddresses[this.networkType as NetworkType].resourceRegistryGPU;
+          ? contractAddresses[this.networkType as NetworkType].fizzResourceRegistryCPU
+          : contractAddresses[this.networkType as NetworkType].fizzResourceRegistryGPU;
 
       const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
 

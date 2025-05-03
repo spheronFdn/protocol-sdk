@@ -123,20 +123,6 @@ export const tokenMap: Record<NetworkType, IToken[]> = {
   ],
   mainnet: [
     {
-      id: 1,
-      name: 'USDT',
-      symbol: 'USDT',
-      decimal: 6,
-      address: contractAddresses.mainnet.USDT,
-    },
-    {
-      id: 2,
-      name: 'USDC',
-      symbol: 'USDC',
-      decimal: 6,
-      address: contractAddresses.mainnet.USDC,
-    },
-    {
       id: 2,
       name: 'uSPON',
       symbol: 'uSPON',
