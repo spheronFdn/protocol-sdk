@@ -404,7 +404,7 @@ console.log('Update result:', updateResult);
 ##### Returns:
 
 - `Promise<object>`: An object containing:
-  - `orderId` (string): The ID of the updated order.
+  - `leaseId` (string): The ID of the updated order.
   - `providerAddress` (string): The address of the provider handling the deployment.
 
 #### 3. `getDeployment`
@@ -604,7 +604,7 @@ Sets up a listener for the `LeaseClosed` event.
 
 ```javascript
 sdk.leases.listenToLeaseClosedEvent(
-  ({ orderId, providerAddress, tenantAddress }) => {
+  ({ leaseId, providerAddress, tenantAddress }) => {
     console.log('Lease closed:', orderId);
   },
   () => {

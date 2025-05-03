@@ -78,7 +78,7 @@ export class DeploymentModule {
             createOrderFailedCallback?.(transaction?.hash || '');
           }
         );
-        const { orderId, providerAddress } = await newOrderEvent;
+        const { leaseId: orderId, providerAddress } = await newOrderEvent;
 
         const providerDetails: IProvider = await this.providerModule.getProviderDetails(
           providerAddress
@@ -168,7 +168,7 @@ export class DeploymentModule {
       await this.orderModule.updateOrder(leaseId, details);
       const updateOrderAcceptanceResponse = await updateOrderAcceptance;
 
-      const { orderId, providerAddress } = updateOrderAcceptanceResponse;
+      const { leaseId: orderId, providerAddress } = updateOrderAcceptanceResponse;
       const providerDetails: IProvider = await this.providerModule.getProviderDetails(
         providerAddress
       );

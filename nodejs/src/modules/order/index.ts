@@ -104,7 +104,7 @@ export class OrderModule {
   async listenToOrderCreated(
     timeoutTime = 60000,
     onSuccessCallback: (
-      orderId: string,
+      leaseId: string,
       providerAddress: string,
       providerId: string | number | bigint,
       acceptedPrice: string | number | bigint,
@@ -144,7 +144,13 @@ export class OrderModule {
             this.websocketProvider?.destroy();
             contract.off('OrderMatched');
             clearTimeout(this.createTimeoutId as NodeJS.Timeout);
-            resolve({ orderId, providerAddress, providerId, acceptedPrice, creatorAddress });
+            resolve({
+              leaseId: orderId,
+              providerAddress,
+              providerId,
+              acceptedPrice,
+              creatorAddress,
+            });
           }
         }
       );
@@ -154,7 +160,7 @@ export class OrderModule {
   async listenToOrderUpdated(
     timeoutTime = 60000,
     onSuccessCallback: (
-      orderId: string,
+      leaseId: string,
       providerAddress: string,
       tenantAddress?: string,
       acceptedPrice?: string
@@ -186,7 +192,7 @@ export class OrderModule {
           this.websocketProvider?.destroy();
           contract.off('LeaseUpdated');
           clearTimeout(this.updateTimeoutId as NodeJS.Timeout);
-          resolve({ orderId, providerAddress, tenantAddress, acceptedPrice });
+          resolve({ leaseId: orderId, providerAddress, tenantAddress, acceptedPrice });
         }
       });
     });
@@ -194,7 +200,7 @@ export class OrderModule {
 
   async listenToOrderUpdateAccepted(
     timeoutTime = 60000,
-    onSuccessCallback: (orderId: string, providerAddress: string) => void,
+    onSuccessCallback: (leaseId: string, providerAddress: string) => void,
     onFailureCallback: () => void
   ): Promise<OrderUpdateAcceptedEvent> {
     if (!this.websocketProvider) {
@@ -222,7 +228,7 @@ export class OrderModule {
           this.websocketProvider?.destroy();
           contract.off('UpdateRequestAccepted');
           clearTimeout(this.updateTimeoutId as NodeJS.Timeout);
-          resolve({ orderId, providerAddress });
+          resolve({ leaseId: orderId, providerAddress });
         }
       });
     });
