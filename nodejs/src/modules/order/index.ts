@@ -252,7 +252,7 @@ export class OrderModule {
   async listenToOrderCreated(
     timeoutTime = 60000,
     onSuccessCallback: (
-      orderId: string,
+      leaseId: string,
       providerAddress: string,
       fizzId: string | number | bigint,
       providerId: string | number | bigint,
@@ -282,7 +282,7 @@ export class OrderModule {
       contract.on(
         'OrderMatched',
         (
-          orderId: string,
+          leaseId: string,
           providerAddress: string,
           fizzId: string | number | bigint,
           providerId: string | number | bigint,
@@ -291,7 +291,7 @@ export class OrderModule {
         ) => {
           if (creatorAddress.toString().toLowerCase() === account.toString().toLowerCase()) {
             onSuccessCallback(
-              orderId,
+              leaseId,
               providerAddress,
               fizzId,
               providerId,
@@ -302,7 +302,7 @@ export class OrderModule {
             contract.off('OrderMatched');
             clearTimeout(this.createTimeoutId as NodeJS.Timeout);
             resolve({
-              orderId,
+              leaseId,
               providerAddress,
               fizzId,
               providerId,
@@ -318,7 +318,7 @@ export class OrderModule {
   async listenToOrderUpdated(
     timeoutTime = 60000,
     onSuccessCallback: (
-      orderId: string,
+      leaseId: string,
       providerAddress: string,
       tenantAddress?: string,
       acceptedPrice?: string
@@ -344,13 +344,13 @@ export class OrderModule {
         reject({ error: true, msg: 'Order updation Failed' });
       }, timeoutTime);
 
-      contract.on('LeaseUpdated', (orderId, providerAddress, tenantAddress, acceptedPrice) => {
+      contract.on('LeaseUpdated', (leaseId, providerAddress, tenantAddress, acceptedPrice) => {
         if (tenantAddress.toString().toLowerCase() === account.toString().toLowerCase()) {
-          onSuccessCallback(orderId, providerAddress, tenantAddress, acceptedPrice?.toString());
+          onSuccessCallback(leaseId, providerAddress, tenantAddress, acceptedPrice?.toString());
           this.websocketProvider?.destroy();
           contract.off('LeaseUpdated');
           clearTimeout(this.updateTimeoutId as NodeJS.Timeout);
-          resolve({ orderId, providerAddress, tenantAddress, acceptedPrice });
+          resolve({ leaseId, providerAddress, tenantAddress, acceptedPrice });
         }
       });
     });
@@ -358,7 +358,7 @@ export class OrderModule {
 
   async listenToOrderUpdateAccepted(
     timeoutTime = 60000,
-    onSuccessCallback: (orderId: string, providerAddress: string) => void,
+    onSuccessCallback: (leaseId: string, providerAddress: string) => void,
     onFailureCallback: () => void
   ): Promise<OrderUpdateAcceptedEvent> {
     if (!this.websocketProvider) {
@@ -380,13 +380,13 @@ export class OrderModule {
         reject({ error: true, msg: 'Order updation Failed' });
       }, timeoutTime);
 
-      contract.on('UpdateRequestAccepted', async (orderId, providerAddress, tenantAddress) => {
+      contract.on('UpdateRequestAccepted', async (leaseId, providerAddress, tenantAddress) => {
         if (tenantAddress.toString().toLowerCase() === account.toString().toLowerCase()) {
-          await onSuccessCallback(orderId, providerAddress);
+          await onSuccessCallback(leaseId, providerAddress);
           this.websocketProvider?.destroy();
           contract.off('UpdateRequestAccepted');
           clearTimeout(this.updateTimeoutId as NodeJS.Timeout);
-          resolve({ orderId, providerAddress });
+          resolve({ leaseId, providerAddress });
         }
       });
     });
