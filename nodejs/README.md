@@ -129,7 +129,7 @@ console.log('Your uSPON balance in escrow is:', balance);
 
 ##### Parameters:
 
-- `token` (string): The token symbol. Supported tokens are `uSPON`, `USDC`.
+- `token` (string): The token symbol. Supported token is `uSPON`.
 - `walletAddress` (string, optional): The wallet address to query. If not provided, the wallet associated with the provided private key will be used.
 
 ##### Returns:
@@ -161,7 +161,7 @@ Once your smart wallet is funded, you can make deposits:
 
 ```javascript
 const depositReceipt = await sdk.escrow.depositBalance({
-  token: 'USDC',
+  token: 'uSPON',
   amount: 100,
 });
 console.log('Deposit transaction receipt:', depositReceipt);
@@ -169,7 +169,7 @@ console.log('Deposit transaction receipt:', depositReceipt);
 
 ##### Parameters:
 
-- `token` (string): The token symbol to deposit (`uSPON`, `USDC`).
+- `token` (string): The token symbol to deposit (`uSPON`).
 - `amount` (number): The amount to deposit.
 
 ##### Returns:
@@ -190,7 +190,7 @@ console.log('Withdrawal transaction receipt:', withdrawReceipt);
 
 ##### Parameters:
 
-- `token` (string): The token symbol to withdraw (`uSPON`, `USDC`).
+- `token` (string): The token symbol to withdraw (`uSPON`).
 - `amount` (number): The amount to withdraw.
 
 ##### Returns:
