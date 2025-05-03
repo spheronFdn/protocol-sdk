@@ -14,7 +14,7 @@ import { getTokenDetails } from '@utils/index';
 import { createAuthorizationToken } from '@utils/provider-auth';
 import { NetworkType } from '@config/index';
 import { ethers } from 'ethers';
-import { CreateDeploymentResponse, DeploymentResponse } from './types';
+import { CreateDeploymentResponse, DeploymentResponse, UpdateDeploymentResponse } from './types';
 import { SmartWalletBundlerClient } from '@utils/smart-wallet';
 
 export class DeploymentModule {
@@ -93,7 +93,7 @@ export class DeploymentModule {
             createOrderFailedCallback?.(transactionHash || '');
           }
         );
-        const { leaseId: orderId, providerAddress } = await newOrderEvent;
+        const { leaseId, providerAddress } = await newOrderEvent;
 
         const providerDetails: IProvider = await this.providerModule.getProviderDetails(
           providerAddress
@@ -109,10 +109,10 @@ export class DeploymentModule {
           await spheronProvider.submitManfiest(
             certificate,
             authToken,
-            orderId.toString(),
+            leaseId.toString(),
             sdlManifest
           );
-          return { leaseId: orderId, transactionHash };
+          return { leaseId, transactionHash };
         } catch (error) {
           throw new Error('Error occured in sending manifest');
         }
@@ -128,12 +128,12 @@ export class DeploymentModule {
     leaseId: string,
     iclYaml: string,
     providerProxyUrl: string,
-    updatedOrderLeaseCallback?: (orderId: string, providerAddress: string) => void,
+    updatedOrderLeaseCallback?: (leaseId: string, providerAddress: string) => void,
     updatedOrderLeaseFailedCallback?: () => void,
-    updateOrderAcceptedCallback?: (orderId: string) => void,
+    updateOrderAcceptedCallback?: (leaseId: string) => void,
     updateOrderFailedCallback?: () => void,
     isOperator: boolean = false
-  ): Promise<{ transactionHash: string | null; updateLeaseResponse: OrderUpdatedEvent | null }> {
+  ): Promise<UpdateDeploymentResponse> {
     try {
       const { error, orderDetails: details } = yamlToOrderDetails(iclYaml, this.networkType);
       if (error || typeof details === 'undefined') {
@@ -161,12 +161,12 @@ export class DeploymentModule {
       }
 
       const transactionHash = await this.orderModule.updateOrder(leaseId, details);
-      let updateLeaseResponse = null;
+      let updateLeaseResponse: OrderUpdatedEvent | undefined;
 
       const updatedOrderLease: Promise<OrderUpdatedEvent> = this.orderModule.listenToOrderUpdated(
         120_000,
-        (orderId, providerAddress) => {
-          updatedOrderLeaseCallback?.(orderId, providerAddress);
+        (leaseId, providerAddress) => {
+          updatedOrderLeaseCallback?.(leaseId, providerAddress);
         },
         () => {
           updatedOrderLeaseFailedCallback?.();
@@ -175,8 +175,8 @@ export class DeploymentModule {
       const updateOrderAcceptance: Promise<OrderUpdateAcceptedEvent> =
         this.orderModule.listenToOrderUpdateAccepted(
           60_000,
-          async (orderId: string, providerAddress: string) => {
-            updateOrderAcceptedCallback?.(orderId);
+          async (leaseId: string, providerAddress: string) => {
+            updateOrderAcceptedCallback?.(leaseId);
 
             const providerDetails: IProvider = await this.providerModule.getProviderDetails(
               providerAddress
@@ -191,10 +191,10 @@ export class DeploymentModule {
             await spheronProvider.submitManfiest(
               certificate,
               authToken,
-              orderId as string,
+              leaseId as string,
               sdlManifest
             );
-            const updateOrderLeaseResponse = await updatedOrderLease;
+            const updateOrderLeaseResponse: OrderUpdatedEvent = await updatedOrderLease;
             updateLeaseResponse = { ...updateOrderLeaseResponse };
           },
           () => {
@@ -202,7 +202,11 @@ export class DeploymentModule {
           }
         );
       await updateOrderAcceptance;
-      return { transactionHash, updateLeaseResponse };
+      return {
+        transactionHash,
+        leaseId,
+        providerAddress: updateLeaseResponse?.providerAddress || '',
+      };
     } catch (error) {
       throw error;
     }

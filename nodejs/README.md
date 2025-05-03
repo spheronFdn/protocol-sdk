@@ -377,7 +377,7 @@ console.log('Deployment result:', deploymentResult);
 
 - `Promise<object>`: An object containing:
   - `leaseId` (string): The ID of the newly created lease.
-  - `transaction` (object): The transaction details of the deployment creation.
+  - `transactionHash` (string): The transaction hash of the deployment creation.
 
 #### 2. `updateDeployment`
 
@@ -455,6 +455,7 @@ console.log('Update result:', updateResult);
 - `Promise<object>`: An object containing:
   - `leaseId` (string): The ID of the updated order.
   - `providerAddress` (string): The address of the provider handling the deployment.
+  - `transactionHash` (string): The transaction hash of the deployment update.
 
 #### 3. `getDeployment`
 
@@ -654,7 +655,7 @@ Sets up a listener for the `LeaseClosed` event.
 ```javascript
 sdk.leases.listenToLeaseClosedEvent(
   ({ leaseId, providerAddress, tenantAddress }) => {
-    console.log('Lease closed:', orderId);
+    console.log('Lease closed:', leaseId);
   },
   () => {
     console.error('Listening failed or timed out');
