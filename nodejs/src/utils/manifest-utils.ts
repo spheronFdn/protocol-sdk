@@ -68,6 +68,10 @@ export type ServiceParams = {
   storage?: Record<string, ServiceStorageParams>;
 };
 
+export type ServiceParamsManifest = {
+  storage?: ServiceStorageParams[];
+};
+
 export type ServiceImageCredentials = {
   host: string;
   email?: string;
@@ -91,21 +95,44 @@ export type ICL = {
   services: Record<string, Service>;
 };
 
-export interface GPUAttributesManifest {
+export interface AttributesManifest {
   key: string;
   value: string;
 }
-export interface ServiceManifest extends Omit<Service, 'expose'> {
+
+export interface ServiceManifest extends Omit<Service, 'expose' | 'params'> {
   name: string;
   resources: {
     cpu: { units: { val: string } };
     memory: { size: { val: string } };
-    storage: { size: { val: string } } | { size: { val: string } }[];
-    gpu?: { units: { val: string }; attributes: GPUAttributesManifest[] };
+    storage:
+      | { size: { val: string }; attributes?: AttributesManifest[] }
+      | { size: { val: string }; attributes?: AttributesManifest[] }[];
+    gpu?: { units: { val: string }; attributes: AttributesManifest[] };
   };
   count: number | undefined;
   expose: ServiceExpose[];
+  params: ServiceParamsManifest | null;
 }
+
+export const getServiceParams = (
+  params: ServiceParams | undefined
+): ServiceParamsManifest | null => {
+  if (params === undefined) {
+    return null;
+  }
+
+  return {
+    storage: Object.keys(params?.storage ?? {}).map((name) => {
+      if (!params?.storage) throw new Error('Storage is undefined');
+      return {
+        name: name,
+        mount: params.storage[name]?.mount,
+        readOnly: params.storage[name]?.readOnly || false,
+      };
+    }),
+  };
+};
 
 function computeEndpointSequenceNumbers(icl: ICL): Record<string, number> {
   return Object.fromEntries(

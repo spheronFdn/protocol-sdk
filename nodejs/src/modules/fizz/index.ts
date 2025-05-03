@@ -2,13 +2,7 @@ import FizzRegistryAbi from '@contracts/abis/testnet/FizzRegistry.json';
 import FizzAttributeRegistryAbi from '@contracts/abis/testnet/FizzAttributeRegistry.json';
 import ResourceRegistryAbi from '@contracts/abis/testnet/ResourceRegistry.json';
 import ComputeLeaseAbi from '@contracts/abis/testnet/ComputeLease.json';
-import {
-  FizzRegistryTestnet,
-  ResourceRegistryCPUTestnet,
-  ResourceRegistryGPUTestnet,
-  ComputeLeaseTestnet,
-  FizzAttributeRegistryTestnet,
-} from '@contracts/addresses';
+import { contractAddresses } from '@contracts/addresses';
 import { ethers } from 'ethers';
 import {
   FizzNode,
@@ -24,6 +18,8 @@ import {
 import { initializeSigner } from '@utils/index';
 import { handleContractError } from '@utils/errors';
 import { ProviderModule } from '@modules/provider';
+import { NetworkType } from '@config/index';
+import { abiMap } from '@contracts/abi-map';
 
 export class FizzModule {
   private provider: ethers.Provider;
@@ -31,24 +27,27 @@ export class FizzModule {
   private timeoutId: NodeJS.Timeout | undefined;
   private wallet: ethers.Wallet | undefined;
   private providerModule: ProviderModule;
+  private networkType: NetworkType | undefined;
 
   constructor(
     provider: ethers.Provider,
     webSocketProvider?: ethers.WebSocketProvider,
-    wallet?: ethers.Wallet
+    wallet?: ethers.Wallet,
+    networkType?: NetworkType
   ) {
     this.provider = provider;
     this.webSocketProvider = webSocketProvider;
     this.wallet = wallet;
-    this.providerModule = new ProviderModule(provider);
+    this.providerModule = new ProviderModule(provider, networkType);
+    this.networkType = networkType;
   }
 
   async addFizzNode(fizzParams: FizzParams): Promise<unknown> {
     try {
       const { signer } = await initializeSigner({ wallet: this.wallet });
 
-      const contractAddress = FizzRegistryTestnet;
-      const abi = FizzRegistryAbi;
+      const contractAddress = contractAddresses[this.networkType as NetworkType].fizzRegistry;
+      const abi = abiMap[this.networkType as NetworkType].fizzRegistry;
       const contract = new ethers.Contract(contractAddress, abi, signer);
 
       const tx = await contract.addFizzNode(fizzParams);
@@ -66,8 +65,8 @@ export class FizzModule {
       const { signer } = await initializeSigner({ wallet: this.wallet });
 
       // Contract address (hardcoded or retrieved from an environment variable)
-      const contractAddress = FizzRegistryTestnet;
-      const abi = FizzRegistryAbi;
+      const contractAddress = contractAddresses[this.networkType as NetworkType].fizzRegistry;
+      const abi = abiMap[this.networkType as NetworkType].fizzRegistry;
       const contract = new ethers.Contract(contractAddress, abi, signer);
 
       const tx = await contract.updateFizzName(newName);
@@ -83,8 +82,8 @@ export class FizzModule {
 
   async getFizzById(fizzId: bigint): Promise<FizzDetails> {
     try {
-      const contractAddress = FizzRegistryTestnet;
-      const contractAbi = FizzRegistryAbi;
+      const contractAddress = contractAddresses[this.networkType as NetworkType].fizzRegistry;
+      const contractAbi = abiMap[this.networkType as NetworkType].fizzRegistry;
 
       const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
 
@@ -118,8 +117,8 @@ export class FizzModule {
 
   async getFizzNodeByAddress(walletAddress: string) {
     try {
-      const contractAddress = FizzRegistryTestnet;
-      const contractAbi = FizzRegistryAbi;
+      const contractAddress = contractAddresses[this.networkType as NetworkType].fizzRegistry;
+      const contractAbi = abiMap[this.networkType as NetworkType].fizzRegistry;
 
       const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
 
@@ -147,8 +146,8 @@ export class FizzModule {
 
   async getTotalFizzNodes(): Promise<bigint> {
     try {
-      const contractAddress = FizzRegistryTestnet;
-      const contractAbi = FizzRegistryAbi;
+      const contractAddress = contractAddresses[this.networkType as NetworkType].fizzRegistry;
+      const contractAbi = abiMap[this.networkType as NetworkType].fizzRegistry;
 
       const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
       const fizzCounter = await contract.nextFizzId();
@@ -161,8 +160,8 @@ export class FizzModule {
 
   async getAllFizzNodes(): Promise<FizzNode[]> {
     try {
-      const contractAddress = FizzRegistryTestnet;
-      const contractAbi = FizzRegistryAbi;
+      const contractAddress = contractAddresses[this.networkType as NetworkType].fizzRegistry;
+      const contractAbi = abiMap[this.networkType as NetworkType].fizzRegistry;
 
       const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
 
@@ -188,8 +187,9 @@ export class FizzModule {
 
   async getAttributes(providerAddress: string, category: string): Promise<FizzAttribute[]> {
     try {
-      const contractAddress = FizzAttributeRegistryTestnet;
-      const contractAbi = FizzAttributeRegistryAbi;
+      const contractAddress =
+        contractAddresses[this.networkType as NetworkType].fizzAttributeRegistry;
+      const contractAbi = abiMap[this.networkType as NetworkType].fizzAttributeRegistry;
 
       const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
 
@@ -211,8 +211,9 @@ export class FizzModule {
 
   async getPendingAttributes(providerAddress: string, category: string): Promise<FizzAttribute[]> {
     try {
-      const contractAddress = FizzAttributeRegistryTestnet;
-      const contractAbi = FizzAttributeRegistryAbi;
+      const contractAddress =
+        contractAddresses[this.networkType as NetworkType].fizzAttributeRegistry;
+      const contractAbi = abiMap[this.networkType as NetworkType].fizzAttributeRegistry;
 
       const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
 
@@ -234,9 +235,11 @@ export class FizzModule {
 
   async getResource(resourceID: bigint, category: string): Promise<Resource> {
     try {
-      const contractAbi = ResourceRegistryAbi;
+      const contractAbi = abiMap[this.networkType as NetworkType].resourceRegistry;
       const contractAddress =
-        category === 'CPU' ? ResourceRegistryCPUTestnet : ResourceRegistryGPUTestnet;
+        category === 'CPU'
+          ? contractAddresses[this.networkType as NetworkType].fizzResourceRegistryCPU
+          : contractAddresses[this.networkType as NetworkType].fizzResourceRegistryGPU;
 
       const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
 
@@ -262,8 +265,8 @@ export class FizzModule {
       const providerData = await this.providerModule.getProvider(providerId);
       const walletAddress = providerData.walletAddress;
 
-      const leaseContractAddress = ComputeLeaseTestnet;
-      const leaseContractAbi = ComputeLeaseAbi;
+      const leaseContractAddress = contractAddresses[this.networkType as NetworkType].computeLease;
+      const leaseContractAbi = abiMap[this.networkType as NetworkType].computeLease;
       const leaseContract = new ethers.Contract(
         leaseContractAddress,
         leaseContractAbi,
@@ -309,8 +312,8 @@ export class FizzModule {
     onFailureCallback: () => void,
     timeoutTime = 60000
   ) {
-    const contractAddress = FizzRegistryTestnet;
-    const contractAbi = FizzRegistryAbi;
+    const contractAddress = contractAddresses[this.networkType as NetworkType].fizzRegistry;
+    const contractAbi = abiMap[this.networkType as NetworkType].fizzRegistry;
 
     try {
       const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
@@ -343,8 +346,8 @@ export class FizzModule {
     try {
       const { signer } = await initializeSigner({ wallet: this.wallet });
 
-      const contractAddress = FizzRegistryTestnet;
-      const contractAbi = FizzRegistryAbi;
+      const contractAddress = contractAddresses[this.networkType as NetworkType].fizzRegistry;
+      const contractAbi = abiMap[this.networkType as NetworkType].fizzRegistry;
 
       const contract = new ethers.Contract(contractAddress, contractAbi, signer);
 
@@ -364,8 +367,8 @@ export class FizzModule {
     onFailureCallback: () => void,
     timeoutTime = 60000
   ) {
-    const contractAddress = FizzRegistryTestnet;
-    const contractAbi = FizzRegistryAbi;
+    const contractAddress = contractAddresses[this.networkType as NetworkType].fizzRegistry;
+    const contractAbi = abiMap[this.networkType as NetworkType].fizzRegistry;
 
     try {
       const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
@@ -403,8 +406,8 @@ export class FizzModule {
     try {
       const { signer } = await initializeSigner({ wallet: this.wallet });
 
-      const contractAddress = FizzRegistryTestnet;
-      const contractAbi = FizzRegistryAbi;
+      const contractAddress = contractAddresses[this.networkType as NetworkType].fizzRegistry;
+      const contractAbi = abiMap[this.networkType as NetworkType].fizzRegistry;
 
       const contract = new ethers.Contract(contractAddress, contractAbi, signer);
 
@@ -424,8 +427,8 @@ export class FizzModule {
     onFailureCallback: () => void,
     timeoutTime = 60000
   ) {
-    const contractAddress = FizzRegistryTestnet;
-    const contractAbi = FizzRegistryAbi;
+    const contractAddress = contractAddresses[this.networkType as NetworkType].fizzRegistry;
+    const contractAbi = abiMap[this.networkType as NetworkType].fizzRegistry;
 
     try {
       const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
@@ -463,8 +466,8 @@ export class FizzModule {
     try {
       const { signer } = await initializeSigner({ wallet: this.wallet });
 
-      const contractAddress = FizzRegistryTestnet;
-      const contractAbi = FizzRegistryAbi;
+      const contractAddress = contractAddresses[this.networkType as NetworkType].fizzRegistry;
+      const contractAbi = abiMap[this.networkType as NetworkType].fizzRegistry;
 
       const contract = new ethers.Contract(contractAddress, contractAbi, signer);
 
@@ -484,8 +487,8 @@ export class FizzModule {
     onFailureCallback: () => void,
     timeoutTime = 60000
   ) {
-    const contractAddress = FizzRegistryTestnet;
-    const contractAbi = FizzRegistryAbi;
+    const contractAddress = contractAddresses[this.networkType as NetworkType].fizzRegistry;
+    const contractAbi = abiMap[this.networkType as NetworkType].fizzRegistry;
 
     try {
       const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
@@ -523,8 +526,8 @@ export class FizzModule {
     try {
       const { signer } = await initializeSigner({ wallet: this.wallet });
 
-      const contractAddress = FizzRegistryTestnet;
-      const contractAbi = FizzRegistryAbi;
+      const contractAddress = contractAddresses[this.networkType as NetworkType].fizzRegistry;
+      const contractAbi = abiMap[this.networkType as NetworkType].fizzRegistry;
 
       const contract = new ethers.Contract(contractAddress, contractAbi, signer);
 
@@ -544,8 +547,8 @@ export class FizzModule {
     onFailureCallback: () => void,
     timeoutTime = 60000
   ) {
-    const contractAddress = FizzRegistryTestnet;
-    const contractAbi = FizzRegistryAbi;
+    const contractAddress = contractAddresses[this.networkType as NetworkType].fizzRegistry;
+    const contractAbi = abiMap[this.networkType as NetworkType].fizzRegistry;
 
     try {
       const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
@@ -583,8 +586,8 @@ export class FizzModule {
     try {
       const { signer } = await initializeSigner({ wallet: this.wallet });
 
-      const contractAddress = FizzRegistryTestnet;
-      const contractAbi = FizzRegistryAbi;
+      const contractAddress = contractAddresses[this.networkType as NetworkType].fizzRegistry;
+      const contractAbi = abiMap[this.networkType as NetworkType].fizzRegistry;
 
       const contract = new ethers.Contract(contractAddress, contractAbi, signer);
 
@@ -604,8 +607,8 @@ export class FizzModule {
     onFailureCallback: () => void,
     timeoutTime = 60000
   ) {
-    const contractAddress = FizzRegistryTestnet;
-    const contractAbi = FizzRegistryAbi;
+    const contractAddress = contractAddresses[this.networkType as NetworkType].fizzRegistry;
+    const contractAbi = abiMap[this.networkType as NetworkType].fizzRegistry;
 
     try {
       const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });

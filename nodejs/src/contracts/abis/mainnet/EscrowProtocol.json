@@ -13,7 +13,7 @@
       },
       {
         "internalType": "address",
-        "name": "_tokenRegistryAddress",
+        "name": "_escrow",
         "type": "address"
       },
       {
@@ -64,48 +64,6 @@
   {
     "inputs": [
       {
-        "internalType": "address",
-        "name": "target",
-        "type": "address"
-      }
-    ],
-    "name": "AddressEmptyCode",
-    "type": "error"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "account",
-        "type": "address"
-      }
-    ],
-    "name": "AddressInsufficientBalance",
-    "type": "error"
-  },
-  {
-    "inputs": [],
-    "name": "DifferentOwnerExists",
-    "type": "error"
-  },
-  {
-    "inputs": [],
-    "name": "EnforcedPause",
-    "type": "error"
-  },
-  {
-    "inputs": [],
-    "name": "ExpectedPause",
-    "type": "error"
-  },
-  {
-    "inputs": [],
-    "name": "FailedInnerCall",
-    "type": "error"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "uint256",
         "name": "available",
         "type": "uint256"
@@ -131,38 +89,7 @@
   },
   {
     "inputs": [],
-    "name": "InvalidOperator",
-    "type": "error"
-  },
-  {
-    "inputs": [],
-    "name": "MinimumDepositNotMet",
-    "type": "error"
-  },
-  {
-    "inputs": [],
     "name": "ReentrancyGuardReentrantCall",
-    "type": "error"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "token",
-        "type": "address"
-      }
-    ],
-    "name": "SafeERC20FailedOperation",
-    "type": "error"
-  },
-  {
-    "inputs": [],
-    "name": "TokenNotAccepted",
-    "type": "error"
-  },
-  {
-    "inputs": [],
-    "name": "TransferFailed",
     "type": "error"
   },
   {
@@ -175,7 +102,7 @@
     "inputs": [
       {
         "indexed": true,
-        "internalType": "enum Escrow.AddressType",
+        "internalType": "enum EscrowProtocol.AddressType",
         "name": "_type",
         "type": "uint8"
       },
@@ -194,12 +121,6 @@
     "inputs": [
       {
         "indexed": true,
-        "internalType": "address",
-        "name": "from",
-        "type": "address"
-      },
-      {
-        "indexed": true,
         "internalType": "uint256",
         "name": "fizzId",
         "type": "uint256"
@@ -215,12 +136,6 @@
         "internalType": "uint256",
         "name": "amount",
         "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint8",
-        "name": "movementType",
-        "type": "uint8"
       }
     ],
     "name": "FizzMovement",
@@ -286,19 +201,6 @@
       }
     ],
     "name": "LockedTokenTransferedToFizz",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "account",
-        "type": "address"
-      }
-    ],
-    "name": "Paused",
     "type": "event"
   },
   {
@@ -417,22 +319,9 @@
     "anonymous": false,
     "inputs": [
       {
-        "indexed": false,
-        "internalType": "address",
-        "name": "account",
-        "type": "address"
-      }
-    ],
-    "name": "Unpaused",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
         "indexed": true,
         "internalType": "address",
-        "name": "user",
+        "name": "treasury",
         "type": "address"
       },
       {
@@ -444,36 +333,11 @@
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "deposit",
+        "name": "amount",
         "type": "uint256"
       }
     ],
-    "name": "UserTokenLocked",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "user",
-        "type": "address"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "token",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "deposit",
-        "type": "uint256"
-      }
-    ],
-    "name": "UserTokenUnlocked",
+    "name": "TreasuryMovement",
     "type": "event"
   },
   {
@@ -503,44 +367,16 @@
     "type": "function"
   },
   {
-    "inputs": [
+    "inputs": [],
+    "name": "escrow",
+    "outputs": [
       {
-        "internalType": "address",
-        "name": "_token",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_amount",
-        "type": "uint256"
-      }
-    ],
-    "name": "deposit",
-    "outputs": [],
-    "stateMutability": "payable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_token",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_amount",
-        "type": "uint256"
-      },
-      {
-        "internalType": "address",
-        "name": "_operator",
+        "internalType": "contract IEscrowUser",
+        "name": "",
         "type": "address"
       }
     ],
-    "name": "depositForOperator",
-    "outputs": [],
-    "stateMutability": "payable",
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -643,47 +479,6 @@
   {
     "inputs": [
       {
-        "internalType": "address",
-        "name": "_provider",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_token",
-        "type": "address"
-      }
-    ],
-    "name": "getProviderEarnings",
-    "outputs": [
-      {
-        "components": [
-          {
-            "internalType": "uint128",
-            "name": "earned",
-            "type": "uint128"
-          },
-          {
-            "internalType": "uint128",
-            "name": "withdrawn",
-            "type": "uint128"
-          },
-          {
-            "internalType": "uint128",
-            "name": "balance",
-            "type": "uint128"
-          }
-        ],
-        "internalType": "struct Escrow.ProviderTokenData",
-        "name": "",
-        "type": "tuple"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "bytes32",
         "name": "role",
         "type": "bytes32"
@@ -695,47 +490,6 @@
         "internalType": "bytes32",
         "name": "",
         "type": "bytes32"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_user",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_token",
-        "type": "address"
-      },
-      {
-        "internalType": "bool",
-        "name": "_isOperator",
-        "type": "bool"
-      }
-    ],
-    "name": "getUserData",
-    "outputs": [
-      {
-        "components": [
-          {
-            "internalType": "uint128",
-            "name": "lockedBalance",
-            "type": "uint128"
-          },
-          {
-            "internalType": "uint128",
-            "name": "unlockedBalance",
-            "type": "uint128"
-          }
-        ],
-        "internalType": "struct Escrow.UserTokenData",
-        "name": "",
-        "type": "tuple"
       }
     ],
     "stateMutability": "view",
@@ -773,112 +527,6 @@
       }
     ],
     "name": "hasRole",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_operator",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_token",
-        "type": "address"
-      }
-    ],
-    "name": "isOperatorAddress",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_user",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_token",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      },
-      {
-        "internalType": "bool",
-        "name": "_isOperator",
-        "type": "bool"
-      }
-    ],
-    "name": "lockTokens",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "name": "operatorBalance",
-    "outputs": [
-      {
-        "internalType": "uint128",
-        "name": "lockedBalance",
-        "type": "uint128"
-      },
-      {
-        "internalType": "uint128",
-        "name": "unlockedBalance",
-        "type": "uint128"
-      },
-      {
-        "internalType": "address",
-        "name": "owner",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "pause",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "paused",
     "outputs": [
       {
         "internalType": "bool",
@@ -1028,19 +676,6 @@
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "tokenRegistry",
-    "outputs": [
-      {
-        "internalType": "contract ITokenRegistry",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
     "inputs": [
       {
         "internalType": "address",
@@ -1138,46 +773,11 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "_user",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_token",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      },
-      {
-        "internalType": "bool",
-        "name": "_isOperator",
-        "type": "bool"
-      }
-    ],
-    "name": "unlockTokens",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "unpause",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
         "name": "_newAddress",
         "type": "address"
       },
       {
-        "internalType": "enum Escrow.AddressType",
+        "internalType": "enum EscrowProtocol.AddressType",
         "name": "_type",
         "type": "uint8"
       }
@@ -1185,35 +785,6 @@
     "name": "updateAddress",
     "outputs": [],
     "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "name": "userBalance",
-    "outputs": [
-      {
-        "internalType": "uint128",
-        "name": "lockedBalance",
-        "type": "uint128"
-      },
-      {
-        "internalType": "uint128",
-        "name": "unlockedBalance",
-        "type": "uint128"
-      }
-    ],
-    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -1233,51 +804,15 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "_token",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_amount",
-        "type": "uint256"
-      }
-    ],
-    "name": "withdraw",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_token",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_amount",
-        "type": "uint256"
-      },
-      {
-        "internalType": "address",
-        "name": "_operator",
-        "type": "address"
-      }
-    ],
-    "name": "withdrawFromOperator",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
         "name": "_provider",
         "type": "address"
       },
       {
+        "internalType": "uint256",
+        "name": "_fizzId",
+        "type": "uint256"
+      },
+      {
         "internalType": "address",
         "name": "_token",
         "type": "address"
@@ -1288,7 +823,25 @@
         "type": "uint256"
       }
     ],
-    "name": "withdrawProviderEarnings",
+    "name": "withdrawEarnings",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_token",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "withdrawFees",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

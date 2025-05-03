@@ -1,6 +1,6 @@
 {
   "name": "@spheron/protocol-sdk",
-  "version": "1.4.1",
+  "version": "2.0.0",
   "description": "Spheron Protocol SDK",
   "repository": {
     "type": "git",
@@ -34,7 +34,9 @@
     "format": "prettier --write 'src/**/*.{js,ts}'",
     "dev": "node dist/esm/index.js"
   },
-  "sideEffects": false,
+  "sideEffects": [
+    "*.js"
+  ],
   "devDependencies": {
     "@rollup/plugin-alias": "^5.1.0",
     "@rollup/plugin-commonjs": "^26.0.1",
@@ -55,12 +57,15 @@
     "rollup-plugin-dts": "^6.1.1",
     "ts-jest": "^29.0.0",
     "ts-node": "^10.9.2",
-    "typescript": "^5.5.4"
+    "typescript": "^5.8.2"
   },
   "dependencies": {
+    "@biconomy/abstractjs": "^0.3.0",
+    "@rhinestone/module-sdk": "^0.2.7",
     "base64-js": "^1.5.1",
     "ethers": "^6.13.1",
-    "js-yaml": "^4.1.0"
+    "js-yaml": "^4.1.0",
+    "viem": "^2.23.14"
   },
   "publishConfig": {
     "access": "public"

@@ -1,24 +1,25 @@
 import { contractAddresses } from '@contracts/addresses';
 
-// Testnet URLs
+// Testnet RPC URLs
 export const SPHERON_TESTNET_HTTP_URL = 'https://base-sepolia-rpc.publicnode.com';
 export const SPHERON_TESTNET_WSS_URL = 'wss://base-sepolia-rpc.publicnode.com';
 export const SPHERON_TESTNET_EXPLORER_URL = 'https://sepolia.basescan.org';
 
+// Mainnet RPC URLs
 export const SPHERON_MAINNET_HTTP_URL = 'https://mainnet.base.org';
 export const SPHERON_MAINNET_WSS_URL = 'wss://base-rpc.publicnode.com';
 export const SPHERON_MAINNET_EXPLORER_URL = 'https://basescan.org/';
 
-export const rpcUrls = {
+export const publicRpcUrls = {
   testnet: {
-    HTTP_URL: SPHERON_TESTNET_HTTP_URL,
-    WSS_URL: SPHERON_TESTNET_WSS_URL,
-    EXPORER_URL: SPHERON_TESTNET_EXPLORER_URL,
+    http: SPHERON_TESTNET_HTTP_URL,
+    websocket: SPHERON_TESTNET_WSS_URL,
+    explorer: SPHERON_TESTNET_EXPLORER_URL,
   },
   mainnet: {
-    HTTP_URL: SPHERON_TESTNET_HTTP_URL,
-    WSS_URL: SPHERON_TESTNET_WSS_URL,
-    EXPORER_URL: SPHERON_TESTNET_EXPLORER_URL,
+    http: SPHERON_MAINNET_HTTP_URL,
+    websocket: SPHERON_MAINNET_WSS_URL,
+    explorer: SPHERON_MAINNET_EXPLORER_URL,
   },
 };
 
@@ -43,9 +44,9 @@ export interface INetwork {
   blockExplorerUrls: string[];
 }
 
-export interface RpcProvider {
-  HTTP_URL: string;
-  WSS_URL: string;
+export interface RpcUrls {
+  http: string;
+  websocket: string;
 }
 
 export type NetworkType = 'testnet' | 'mainnet';
@@ -60,19 +61,18 @@ export const networkMap: Record<NetworkType, INetwork> = {
       symbol: 'ETH',
       decimals: 18,
     },
-    blockExplorerUrls: ['https://sepolia.basescan.org/'],
+    blockExplorerUrls: [SPHERON_TESTNET_EXPLORER_URL],
   },
-  // TODO: NEED TO UPDATE WHEN MAINNET RELEASE
   mainnet: {
-    chainId: 421614,
-    chainName: 'Arbitrum Sepolia',
-    rpcUrls: ['https://sepolia-rollup.arbitrum.io/rpc'],
+    chainId: 8453,
+    chainName: 'Base Mainnet',
+    rpcUrls: [SPHERON_MAINNET_HTTP_URL],
     nativeCurrency: {
       name: 'Ethereum',
       symbol: 'ETH',
       decimals: 18,
     },
-    blockExplorerUrls: ['https://sepolia.arbiscan.io/'],
+    blockExplorerUrls: [SPHERON_MAINNET_EXPLORER_URL],
   },
 };
 
@@ -84,7 +84,6 @@ export const tokenMap: Record<NetworkType, IToken[]> = {
       symbol: 'USDT',
       decimal: 6,
       address: contractAddresses.testnet.USDT,
-      // logo: USDTIcon,
     },
     {
       id: 2,
@@ -92,7 +91,6 @@ export const tokenMap: Record<NetworkType, IToken[]> = {
       symbol: 'DAI',
       decimal: 18,
       address: contractAddresses.testnet.DAI,
-      // logo: DaiIcon,
     },
     {
       id: 3,
@@ -100,7 +98,6 @@ export const tokenMap: Record<NetworkType, IToken[]> = {
       symbol: 'USDC',
       decimal: 6,
       address: contractAddresses.testnet.USDC,
-      // logo: USDCIcon,
     },
     {
       id: 4,
@@ -108,7 +105,6 @@ export const tokenMap: Record<NetworkType, IToken[]> = {
       symbol: 'WETH',
       decimal: 18,
       address: contractAddresses.testnet.WETH,
-      // logo: WethIcon,
     },
     {
       id: 5,
@@ -116,16 +112,36 @@ export const tokenMap: Record<NetworkType, IToken[]> = {
       symbol: 'CST',
       decimal: 6,
       address: contractAddresses.testnet.CST,
-      // logo: cstIcon,
+    },
+    {
+      id: 6,
+      name: 'uSPON',
+      symbol: 'uSPON',
+      decimal: 6,
+      address: contractAddresses.testnet.uSPON,
     },
   ],
-  mainnet: [],
+  mainnet: [
+    {
+      id: 2,
+      name: 'uSPON',
+      symbol: 'uSPON',
+      decimal: 6,
+      address: contractAddresses.mainnet.uSPON,
+    },
+  ],
 };
-
-export const networkType = (process.env.NETWORK_TYPE as NetworkType) || 'testnet';
 
 export const DEFAULT_PAGE_SIZE = 10;
 
 export const GSEQ = '1';
 
 export const OSEQ = '1';
+
+export type gaslessOptions = {
+  type: 'biconomy' | 'coinbase';
+  bundlerUrl: string;
+  paymasterUrl: string;
+};
+
+export const SIGNATURE_DEADLINE = Number(process.env.SIGNATURE_DEADLINE) || 86_400;

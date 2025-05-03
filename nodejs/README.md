@@ -45,28 +45,64 @@ yarn add @spheron/protocol-sdk
 
 ### Initializing the SDK
 
-To use the Spheron SDK, first import it and initialize it with the desired network type:
+To use the Spheron SDK, import it and initialize it with the desired configuration:
 
 ```javascript
 const { SpheronSDK } = require('@spheron/protocol-sdk');
 
-const sdk = new SpheronSDK('testnet');
-```
+// Basic initialization
+const sdk = new SpheronSDK({
+  networkType: 'mainnet' // 'mainnet' (default) or 'testnet'
+});
 
-**Note:** Chain type can be `testnet` or `mainnet`. But currently, only `testnet` is supported.
+// Initialization with private key for write operations
+const sdk = new SpheronSDK({
+  networkType: 'mainnet',
+  privateKey: 'your-private-key'
+});
 
-If you want to perform write operations, you'll need to provide a private key:
-
-```javascript
-const sdk = new SpheronSDK('testnet', 'your-private-key');
+// Initialization with custom RPC URLs and gasless options
+const sdk = new SpheronSDK({
+  networkType: 'mainnet',
+  privateKey: 'your-private-key',
+  rpcUrls: {
+    http: 'your-http-rpc-url',
+    websocket: 'your-websocket-rpc-url'
+  },
+  gaslessOptions: {
+    type: 'coinbase', // or 'biconomy'
+    bundlerUrl: 'your-bundler-url',
+    paymasterUrl: 'your-paymaster-url'
+  }
+});
 ```
 
 **Note:** Never hardcode your private key; use environment variables or secure key management systems.
 
 #### Constructor Parameters:
 
-- `networkType`: Specifies the environment. Possible values are `'testnet'` or `'mainnet'`.
+- `networkType` (optional): Specifies the environment. Possible values are `'mainnet'` (default) or `'testnet'`.
 - `privateKey` (optional): Private key for signing transactions.
+- `rpcUrls` (optional): Custom RPC URLs for the network:
+  - `http`: HTTP RPC endpoint
+  - `websocket`: WebSocket RPC endpoint
+- `gaslessOptions` (optional): Configuration for gasless transactions:
+  - `type`: Type of gasless service ('coinbase' or 'biconomy')
+  - `bundlerUrl`: URL for the bundler service
+  - `paymasterUrl`: URL for the paymaster service
+
+##### Using Gasless Transactions
+
+If you're using gasless transactions (`gaslessOptions`), you need to:
+
+1. Get your smart wallet details first:
+```javascript
+const smartWalletDetails = await sdk.escrow.getSmartWalletDetails();
+console.log('Smart Wallet Address:', smartWalletDetails.address);
+console.log('Smart Wallet Balance:', smartWalletDetails.balance);
+```
+
+2. Deposit funds into your smart wallet before making any deposits using `depositBalance`.
 
 ### Modules Overview
 
@@ -87,13 +123,13 @@ The Escrow Module handles operations related to the escrow system, allowing user
 Fetches the user's balance from the escrow contract for a given token and wallet address.
 
 ```javascript
-const balance = await sdk.escrow.getUserBalance('USDT', '0xYourWalletAddress');
-console.log('Your USDT balance in escrow is:', balance);
+const balance = await sdk.escrow.getUserBalance('uSPON', '0xYourWalletAddress');
+console.log('Your uSPON balance in escrow is:', balance);
 ```
 
 ##### Parameters:
 
-- `token` (string): The token symbol. Supported tokens are `USDT`, `USDC`, `DAI`, and `WETH`.
+- `token` (string): The token symbol. Supported token is `uSPON`.
 - `walletAddress` (string, optional): The wallet address to query. If not provided, the wallet associated with the provided private key will be used.
 
 ##### Returns:
@@ -110,9 +146,22 @@ console.log('Your USDT balance in escrow is:', balance);
 
 Deposits a specified amount of tokens into the escrow contract.
 
+**Note:** If you're using gasless transactions (`gaslessOptions`), you must first ensure your smart wallet has sufficient funds:
+
+1. Get your smart wallet details:
+```javascript
+const smartWalletDetails = await sdk.escrow.getSmartWalletDetails();
+console.log('Smart Wallet Address:', smartWalletDetails.address);
+console.log('Smart Wallet Balance:', smartWalletDetails.balance);
+```
+
+2. Fund your smart wallet with native tokens (e.g., ETH on Base network) before making deposits.
+
+Once your smart wallet is funded, you can make deposits:
+
 ```javascript
 const depositReceipt = await sdk.escrow.depositBalance({
-  token: 'USDC',
+  token: 'uSPON',
   amount: 100,
 });
 console.log('Deposit transaction receipt:', depositReceipt);
@@ -120,7 +169,7 @@ console.log('Deposit transaction receipt:', depositReceipt);
 
 ##### Parameters:
 
-- `token` (string): The token symbol to deposit (`USDT`, `USDC`, `DAI`, `WETH`).
+- `token` (string): The token symbol to deposit (`uSPON`).
 - `amount` (number): The amount to deposit.
 
 ##### Returns:
@@ -133,7 +182,7 @@ Withdraws a specified amount of tokens from the escrow contract.
 
 ```javascript
 const withdrawReceipt = await sdk.escrow.withdrawBalance({
-  token: 'DAI',
+  token: 'uSPON',
   amount: 50,
 });
 console.log('Withdrawal transaction receipt:', withdrawReceipt);
@@ -141,7 +190,7 @@ console.log('Withdrawal transaction receipt:', withdrawReceipt);
 
 ##### Parameters:
 
-- `token` (string): The token symbol to withdraw (`USDT`, `USDC`, `DAI`, `WETH`).
+- `token` (string): The token symbol to withdraw (`uSPON`).
 - `amount` (number): The amount to withdraw.
 
 ##### Returns:
@@ -303,7 +352,7 @@ profiles:
         region: us-central
       pricing:
         py-cuda:
-          token: USDT
+          token: uSPON
           amount: 10
 
 deployment:
@@ -328,7 +377,7 @@ console.log('Deployment result:', deploymentResult);
 
 - `Promise<object>`: An object containing:
   - `leaseId` (string): The ID of the newly created lease.
-  - `transaction` (object): The transaction details of the deployment creation.
+  - `transactionHash` (string): The transaction hash of the deployment creation.
 
 #### 2. `updateDeployment`
 
@@ -375,7 +424,7 @@ profiles:
         region: us-central
       pricing:
         py-cuda:
-          token: USDT
+          token: uSPON
           amount: 10
 
 deployment:
@@ -406,6 +455,7 @@ console.log('Update result:', updateResult);
 - `Promise<object>`: An object containing:
   - `leaseId` (string): The ID of the updated order.
   - `providerAddress` (string): The address of the provider handling the deployment.
+  - `transactionHash` (string): The transaction hash of the deployment update.
 
 #### 3. `getDeployment`
 
@@ -605,7 +655,7 @@ Sets up a listener for the `LeaseClosed` event.
 ```javascript
 sdk.leases.listenToLeaseClosedEvent(
   ({ leaseId, providerAddress, tenantAddress }) => {
-    console.log('Lease closed:', orderId);
+    console.log('Lease closed:', leaseId);
   },
   () => {
     console.error('Listening failed or timed out');

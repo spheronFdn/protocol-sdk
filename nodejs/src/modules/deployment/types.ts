@@ -2,7 +2,13 @@ import { ethers } from 'ethers';
 
 export interface CreateDeploymentResponse {
   leaseId: string;
-  transaction: ethers.ContractTransactionReceipt | null;
+  transactionHash: string | null;
+}
+
+export interface UpdateDeploymentResponse {
+  leaseId: string;
+  providerAddress: string;
+  transactionHash: string | null;
 }
 
 export interface DeploymentResponse {

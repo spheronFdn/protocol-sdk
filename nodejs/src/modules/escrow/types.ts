@@ -31,6 +31,10 @@ export interface DepositData {
   onFailureCallback?: (data: unknown) => void;
 }
 
+export interface WithdrawData extends DepositData {
+  operator?: string;
+}
+
 export interface TokenDetails {
   name: string;
   symbol: string;
@@ -41,4 +45,16 @@ export interface UserBalance {
   lockedBalance: string;
   unlockedBalance: string;
   token: TokenDetails;
+}
+
+export interface WithdrawEarningsData {
+  providerAddress: string;
+  fizzId: string;
+  token: string;
+  amount: number;
+  isFizz: boolean;
+}
+
+export interface DepositForOperatorData extends DepositData {
+  operatorAddresses: string[];
 }
