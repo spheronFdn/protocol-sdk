@@ -1,11 +1,11 @@
 import { contractAddresses } from '@contracts/addresses';
 
-// Testnet URLs
+// Testnet RPC URLs
 export const SPHERON_TESTNET_HTTP_URL = 'https://base-sepolia-rpc.publicnode.com';
 export const SPHERON_TESTNET_WSS_URL = 'wss://base-sepolia-rpc.publicnode.com';
 export const SPHERON_TESTNET_EXPLORER_URL = 'https://sepolia.basescan.org';
 
-// Mainnet URLs
+// Mainnet RPC URLs
 export const SPHERON_MAINNET_HTTP_URL = 'https://mainnet.base.org';
 export const SPHERON_MAINNET_WSS_URL = 'wss://base-rpc.publicnode.com';
 export const SPHERON_MAINNET_EXPLORER_URL = 'https://basescan.org/';
