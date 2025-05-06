@@ -1,10 +1,10 @@
 import { NetworkType } from '@config/index';
 
 const SUBGRAPH_URL =
-  'https://gateway.thegraph.com/api/2b6ae639b99052f02452fe8e65007ee3/subgraphs/id/8XPmGxKD883S8hGW3QqrZs872FJYMM5VFx6akwVY6Nmo';
+  'https://api.goldsky.com/api/public/project_cm16apa2e540c01wz70x34xzf/subgraphs/sph-base-sepolia-new/1.0.0/gn';
 
 const SUBGRAPH_MAINNET_URL =
-  'https://api.studio.thegraph.com/query/10660/spheron-network/version/latest';
+  'https://api.goldsky.com/api/public/project_cm16apa2e540c01wz70x34xzf/subgraphs/sph-base-mainnet/1.0.2/gn';
 
 const SUBGRAPH_MAP = {
   testnet: SUBGRAPH_URL,
