@@ -21,9 +21,6 @@ import { handleContractError } from '@utils/errors';
 import { ProviderModule } from '@modules/provider';
 import { NetworkType } from '@config/index';
 import { abiMap } from '@contracts/abi-map';
-import { createAuthorizationToken } from '@utils/provider-auth';
-import { Provider, ProviderStatus } from '@modules/provider/types';
-import { subgraphGetProviders } from '@utils/subgraph';
 
 export class FizzModule {
   private provider: ethers.Provider;
@@ -37,7 +34,7 @@ export class FizzModule {
     provider: ethers.Provider,
     webSocketProvider?: ethers.WebSocketProvider,
     wallet?: ethers.Wallet,
-    networkType?: NetworkType,
+    networkType?: NetworkType
   ) {
     this.provider = provider;
     this.webSocketProvider = webSocketProvider;
@@ -306,8 +303,8 @@ export class FizzModule {
       const contractAbi = abiMap[this.networkType as NetworkType].resourceRegistry;
       const contractAddress =
         category === 'CPU'
-          ? contractAddresses[this.networkType as NetworkType].resourceRegistryCPU
-          : contractAddresses[this.networkType as NetworkType].resourceRegistryGPU;
+          ? contractAddresses[this.networkType as NetworkType].fizzResourceRegistryCPU
+          : contractAddresses[this.networkType as NetworkType].fizzResourceRegistryGPU;
 
       const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
 

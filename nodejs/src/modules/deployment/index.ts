@@ -14,7 +14,7 @@ import { getTokenDetails } from '@utils/index';
 import { createAuthorizationToken } from '@utils/provider-auth';
 import { NetworkType } from '@config/index';
 import { ethers } from 'ethers';
-import { CreateDeploymentResponse, DeploymentResponse } from './types';
+import { CreateDeploymentResponse, DeploymentResponse, UpdateDeploymentResponse } from './types';
 import { SmartWalletBundlerClient } from '@utils/smart-wallet';
 
 export class DeploymentModule {
@@ -68,9 +68,7 @@ export class DeploymentModule {
       const { token, maxPrice, numOfBlocks } = details;
       const tokenDetails = getTokenDetails(token, this.networkType as NetworkType);
       const decimal = 18;
-      const totalCost =
-        Number(Number(maxPrice.toString()) / 10 ** (decimal || 0)) * Number(numOfBlocks);
-
+      const totalCost = (Number(maxPrice.toString()) / 10 ** decimal) * Number(numOfBlocks);
       if (!this.wallet) {
         throw new Error('Unable to access wallet');
       }
@@ -95,7 +93,7 @@ export class DeploymentModule {
             createOrderFailedCallback?.(transactionHash || '');
           }
         );
-        const { orderId, providerAddress } = await newOrderEvent;
+        const { leaseId, providerAddress } = await newOrderEvent;
 
         const providerDetails: IProvider = await this.providerModule.getProviderDetails(
           providerAddress
@@ -111,10 +109,10 @@ export class DeploymentModule {
           await spheronProvider.submitManfiest(
             certificate,
             authToken,
-            orderId.toString(),
+            leaseId.toString(),
             sdlManifest
           );
-          return { leaseId: orderId, transactionHash };
+          return { leaseId, transactionHash };
         } catch (error) {
           throw new Error('Error occured in sending manifest');
         }
@@ -130,12 +128,12 @@ export class DeploymentModule {
     leaseId: string,
     iclYaml: string,
     providerProxyUrl: string,
-    updatedOrderLeaseCallback?: (orderId: string, providerAddress: string) => void,
+    updatedOrderLeaseCallback?: (leaseId: string, providerAddress: string) => void,
     updatedOrderLeaseFailedCallback?: () => void,
-    updateOrderAcceptedCallback?: (orderId: string) => void,
+    updateOrderAcceptedCallback?: (leaseId: string) => void,
     updateOrderFailedCallback?: () => void,
     isOperator: boolean = false
-  ): Promise<{ transactionHash: string | null; updateLeaseResponse: OrderUpdatedEvent | null }> {
+  ): Promise<UpdateDeploymentResponse> {
     try {
       const { error, orderDetails: details } = yamlToOrderDetails(iclYaml, this.networkType);
       if (error || typeof details === 'undefined') {
@@ -162,10 +160,13 @@ export class DeploymentModule {
         throw new Error('Insufficient Balance');
       }
 
+      const transactionHash = await this.orderModule.updateOrder(leaseId, details);
+      let updateLeaseResponse: OrderUpdatedEvent | undefined;
+
       const updatedOrderLease: Promise<OrderUpdatedEvent> = this.orderModule.listenToOrderUpdated(
         120_000,
-        (orderId, providerAddress) => {
-          updatedOrderLeaseCallback?.(orderId, providerAddress);
+        (leaseId, providerAddress) => {
+          updatedOrderLeaseCallback?.(leaseId, providerAddress);
         },
         () => {
           updatedOrderLeaseFailedCallback?.();
@@ -173,32 +174,39 @@ export class DeploymentModule {
       );
       const updateOrderAcceptance: Promise<OrderUpdateAcceptedEvent> =
         this.orderModule.listenToOrderUpdateAccepted(
-          120_000,
-          (orderId) => {
-            updateOrderAcceptedCallback?.(orderId);
+          60_000,
+          async (leaseId: string, providerAddress: string) => {
+            updateOrderAcceptedCallback?.(leaseId);
+
+            const providerDetails: IProvider = await this.providerModule.getProviderDetails(
+              providerAddress
+            );
+            const { certificate, hostUri } = providerDetails;
+            const port = details.mode === 0 ? 8543 : 8443;
+            const spheronProvider = new SpheronProviderModule(
+              `https://${hostUri}:${port}`,
+              providerProxyUrl
+            );
+            const authToken = await createAuthorizationToken(this.wallet!);
+            await spheronProvider.submitManfiest(
+              certificate,
+              authToken,
+              leaseId as string,
+              sdlManifest
+            );
+            const updateOrderLeaseResponse: OrderUpdatedEvent = await updatedOrderLease;
+            updateLeaseResponse = { ...updateOrderLeaseResponse };
           },
           () => {
             updateOrderFailedCallback?.();
           }
         );
-
-      const transactionHash = await this.orderModule.updateOrder(leaseId, details);
-      const updateOrderAcceptanceResponse = await updateOrderAcceptance;
-
-      const { orderId, providerAddress } = updateOrderAcceptanceResponse;
-      const providerDetails: IProvider = await this.providerModule.getProviderDetails(
-        providerAddress
-      );
-      const { certificate, hostUri } = providerDetails;
-      const port = details.mode === 0 ? 8543 : 8443;
-      const spheronProvider = new SpheronProviderModule(
-        `https://${hostUri}:${port}`,
-        providerProxyUrl
-      );
-      const authToken = await createAuthorizationToken(this.wallet);
-      await spheronProvider.submitManfiest(certificate, authToken, orderId as string, sdlManifest);
-      const updateOrderLeaseResponse = await updatedOrderLease;
-      return { transactionHash, updateLeaseResponse: updateOrderLeaseResponse };
+      await updateOrderAcceptance;
+      return {
+        transactionHash,
+        leaseId,
+        providerAddress: updateLeaseResponse?.providerAddress || '',
+      };
     } catch (error) {
       throw error;
     }

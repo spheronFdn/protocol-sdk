@@ -22,6 +22,11 @@
   },
   {
     "inputs": [],
+    "name": "DuplicateId",
+    "type": "error"
+  },
+  {
+    "inputs": [],
     "name": "EmptyArray",
     "type": "error"
   },
@@ -49,6 +54,31 @@
     "inputs": [],
     "name": "ProviderNotFound",
     "type": "error"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "submitter",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "totalProcessed",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "successCount",
+        "type": "uint256"
+      }
+    ],
+    "name": "BatchAttributesSubmitted",
+    "type": "event"
   },
   {
     "anonymous": false,
@@ -256,6 +286,41 @@
       }
     ],
     "name": "approveAttributes",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "provider",
+            "type": "address"
+          },
+          {
+            "internalType": "string",
+            "name": "category",
+            "type": "string"
+          },
+          {
+            "internalType": "uint256[]",
+            "name": "ids",
+            "type": "uint256[]"
+          },
+          {
+            "internalType": "uint256[]",
+            "name": "units",
+            "type": "uint256[]"
+          }
+        ],
+        "internalType": "struct ProviderAttributeRegistry.BatchAttributeInput[]",
+        "name": "batchData",
+        "type": "tuple[]"
+      }
+    ],
+    "name": "batchSubmitAttributes",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

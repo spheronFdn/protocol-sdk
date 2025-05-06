@@ -5,6 +5,12 @@ export interface CreateDeploymentResponse {
   transactionHash: string | null;
 }
 
+export interface UpdateDeploymentResponse {
+  leaseId: string;
+  providerAddress: string;
+  transactionHash: string | null;
+}
+
 export interface DeploymentResponse {
   services: Record<string, ServiceDetails> | null;
   forwarded_ports: Record<string, ForwardedPort[]> | null;

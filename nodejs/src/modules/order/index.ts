@@ -11,7 +11,7 @@ import {
 import { getTokenDetails, initializeSigner } from '@utils/index';
 import { getOrderStateAsString } from '@utils/order';
 import { handleContractError } from '@utils/errors';
-import { NetworkType } from '@config/index';
+import { NetworkType, SIGNATURE_DEADLINE } from '@config/index';
 import { abiMap } from '@contracts/abi-map';
 import { SmartWalletBundlerClient } from '@utils/smart-wallet';
 
@@ -73,6 +73,7 @@ export class OrderModule {
 
     const contract = new ethers.Contract(contractAddress, contractAbi, signer);
     const nonce = await contract.nonces(claimedSigner);
+    const deadline = Math.floor(Date.now() / 1000 + SIGNATURE_DEADLINE);
 
     const domain = {
       name: 'Spheron',
@@ -87,6 +88,7 @@ export class OrderModule {
         { name: 'numOfBlocks', type: 'uint64' },
         { name: 'token', type: 'address' },
         { name: 'nonce', type: 'uint256' },
+        { name: 'deadline', type: 'uint256' },
       ],
     };
 
@@ -95,6 +97,7 @@ export class OrderModule {
       numOfBlocks: orderDetails.numOfBlocks,
       token: orderDetails.token,
       nonce,
+      deadline,
     };
 
     // Sign the typed data using EIP-712
@@ -109,7 +112,7 @@ export class OrderModule {
             abi: contractAbi,
             functionName: 'createOrderWithSignature',
             to: contractAddress as `0x${string}`,
-            args: [orderDetails, claimedSigner, nonce, signature],
+            args: [orderDetails, claimedSigner, signature, nonce, deadline],
           },
         ],
       });
@@ -161,6 +164,7 @@ export class OrderModule {
 
     const contract = new ethers.Contract(contractAddress, contractAbi, signer);
     const nonce = await contract.nonces(claimedSigner);
+    const deadline = Math.floor(Date.now() / 1000 + SIGNATURE_DEADLINE);
 
     const domain = {
       name: 'Spheron',
@@ -176,6 +180,7 @@ export class OrderModule {
         { name: 'numOfBlocks', type: 'uint64' },
         { name: 'token', type: 'address' },
         { name: 'nonce', type: 'uint256' },
+        { name: 'deadline', type: 'uint256' },
       ],
     };
 
@@ -185,27 +190,31 @@ export class OrderModule {
       numOfBlocks: orderDetails.numOfBlocks,
       token: orderDetails.token,
       nonce,
+      deadline,
     };
 
     // Sign the typed data using EIP-712
     const signature = await signer.signTypedData(domain, types, value);
 
     const smartWalletBundlerClient = await this.smartWalletBundlerClientPromise;
-
-    const txHash = await smartWalletBundlerClient?.sendUserOperation({
-      calls: [
-        {
-          abi: contractAbi,
-          functionName: 'updateInitialOrderWithSignature',
-          to: contractAddress as `0x${string}`,
-          args: [orderId, orderDetails, claimedSigner, nonce, signature],
-        },
-      ],
-    });
-    const txReceipt = await smartWalletBundlerClient?.waitForUserOperationReceipt({
-      hash: txHash!,
-    });
-    return txReceipt?.receipt.transactionHash || null;
+    try {
+      const txHash = await smartWalletBundlerClient?.sendUserOperation({
+        calls: [
+          {
+            abi: contractAbi,
+            functionName: 'updateInitialOrderWithSignature',
+            to: contractAddress as `0x${string}`,
+            args: [orderId, orderDetails, claimedSigner, signature, nonce, deadline],
+          },
+        ],
+      });
+      const txReceipt = await smartWalletBundlerClient?.waitForUserOperationReceipt({
+        hash: txHash!,
+      });
+      return txReceipt?.receipt.transactionHash || null;
+    } catch (error) {
+      throw error;
+    }
   }
 
   async getOrderDetails(leaseId: string): Promise<InitialOrder> {
@@ -243,7 +252,7 @@ export class OrderModule {
   async listenToOrderCreated(
     timeoutTime = 60000,
     onSuccessCallback: (
-      orderId: string,
+      leaseId: string,
       providerAddress: string,
       fizzId: string | number | bigint,
       providerId: string | number | bigint,
@@ -273,7 +282,7 @@ export class OrderModule {
       contract.on(
         'OrderMatched',
         (
-          orderId: string,
+          leaseId: string,
           providerAddress: string,
           fizzId: string | number | bigint,
           providerId: string | number | bigint,
@@ -282,7 +291,7 @@ export class OrderModule {
         ) => {
           if (creatorAddress.toString().toLowerCase() === account.toString().toLowerCase()) {
             onSuccessCallback(
-              orderId,
+              leaseId,
               providerAddress,
               fizzId,
               providerId,
@@ -293,7 +302,7 @@ export class OrderModule {
             contract.off('OrderMatched');
             clearTimeout(this.createTimeoutId as NodeJS.Timeout);
             resolve({
-              orderId,
+              leaseId,
               providerAddress,
               fizzId,
               providerId,
@@ -309,7 +318,7 @@ export class OrderModule {
   async listenToOrderUpdated(
     timeoutTime = 60000,
     onSuccessCallback: (
-      orderId: string,
+      leaseId: string,
       providerAddress: string,
       tenantAddress?: string,
       acceptedPrice?: string
@@ -335,13 +344,13 @@ export class OrderModule {
         reject({ error: true, msg: 'Order updation Failed' });
       }, timeoutTime);
 
-      contract.on('LeaseUpdated', (orderId, providerAddress, tenantAddress, acceptedPrice) => {
+      contract.on('LeaseUpdated', (leaseId, providerAddress, tenantAddress, acceptedPrice) => {
         if (tenantAddress.toString().toLowerCase() === account.toString().toLowerCase()) {
-          onSuccessCallback(orderId, providerAddress, tenantAddress, acceptedPrice?.toString());
+          onSuccessCallback(leaseId, providerAddress, tenantAddress, acceptedPrice?.toString());
           this.websocketProvider?.destroy();
           contract.off('LeaseUpdated');
           clearTimeout(this.updateTimeoutId as NodeJS.Timeout);
-          resolve({ orderId, providerAddress, tenantAddress, acceptedPrice });
+          resolve({ leaseId, providerAddress, tenantAddress, acceptedPrice });
         }
       });
     });
@@ -349,7 +358,7 @@ export class OrderModule {
 
   async listenToOrderUpdateAccepted(
     timeoutTime = 60000,
-    onSuccessCallback: (orderId: string, providerAddress: string) => void,
+    onSuccessCallback: (leaseId: string, providerAddress: string) => void,
     onFailureCallback: () => void
   ): Promise<OrderUpdateAcceptedEvent> {
     if (!this.websocketProvider) {
@@ -371,13 +380,13 @@ export class OrderModule {
         reject({ error: true, msg: 'Order updation Failed' });
       }, timeoutTime);
 
-      contract.on('UpdateRequestAccepted', (orderId, providerAddress, tenantAddress) => {
+      contract.on('UpdateRequestAccepted', async (leaseId, providerAddress, tenantAddress) => {
         if (tenantAddress.toString().toLowerCase() === account.toString().toLowerCase()) {
-          onSuccessCallback(orderId, providerAddress);
+          await onSuccessCallback(leaseId, providerAddress);
           this.websocketProvider?.destroy();
           contract.off('UpdateRequestAccepted');
           clearTimeout(this.updateTimeoutId as NodeJS.Timeout);
-          resolve({ orderId, providerAddress });
+          resolve({ leaseId, providerAddress });
         }
       });
     });

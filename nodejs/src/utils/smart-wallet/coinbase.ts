@@ -38,7 +38,6 @@ export const initCoinbaseBundlerClient = async ({
   const bundlerClient = createBundlerClient({
     account,
     client,
-    // paymaster: true,
     paymaster: paymasterClient,
     transport: http(gaslessOptions.bundlerUrl),
     chain,

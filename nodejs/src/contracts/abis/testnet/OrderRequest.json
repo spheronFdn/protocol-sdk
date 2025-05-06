@@ -139,6 +139,11 @@
   },
   {
     "inputs": [],
+    "name": "SignatureExpired",
+    "type": "error"
+  },
+  {
+    "inputs": [],
     "name": "UnAuthorized",
     "type": "error"
   },
@@ -513,14 +518,19 @@
         "type": "address"
       },
       {
+        "internalType": "bytes",
+        "name": "signature",
+        "type": "bytes"
+      },
+      {
         "internalType": "uint256",
         "name": "nonce",
         "type": "uint256"
       },
       {
-        "internalType": "bytes",
-        "name": "signature",
-        "type": "bytes"
+        "internalType": "uint256",
+        "name": "deadline",
+        "type": "uint256"
       }
     ],
     "name": "createOrderWithSignature",
@@ -1142,14 +1152,19 @@
         "type": "address"
       },
       {
+        "internalType": "bytes",
+        "name": "signature",
+        "type": "bytes"
+      },
+      {
         "internalType": "uint256",
         "name": "nonce",
         "type": "uint256"
       },
       {
-        "internalType": "bytes",
-        "name": "signature",
-        "type": "bytes"
+        "internalType": "uint256",
+        "name": "deadline",
+        "type": "uint256"
       }
     ],
     "name": "updateInitialOrderWithSignature",

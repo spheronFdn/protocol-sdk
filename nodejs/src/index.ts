@@ -21,7 +21,7 @@ export class SpheronSDK {
   public inventory: InventoryModule;
 
   constructor({
-    networkType,
+    networkType = 'mainnet',
     privateKey,
     rpcUrls = {
       http: publicRpcUrls[networkType].http,
@@ -84,4 +84,3 @@ export * from '@modules/fizz/types';
 export * from '@modules/lease/types';
 export * from '@modules/order/types';
 export * from '@modules/provider/types';
-

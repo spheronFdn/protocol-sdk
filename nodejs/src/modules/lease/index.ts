@@ -4,7 +4,7 @@ import { getTokenDetails, initializeSigner } from '@utils/index';
 import { ethers } from 'ethers';
 import { Lease, LeaseState, LeaseWithOrderDetails } from './types';
 import { getLeaseStateAsString } from '@utils/lease';
-import { DEFAULT_PAGE_SIZE, NetworkType } from '@config/index';
+import { DEFAULT_PAGE_SIZE, NetworkType, SIGNATURE_DEADLINE } from '@config/index';
 import { FizzModule } from '@modules/fizz';
 import { ProviderModule } from '@modules/provider';
 import { handleContractError } from '@utils/errors';
@@ -187,29 +187,68 @@ export class LeaseModule {
     const contractAddress = contractAddresses[this.networkType as NetworkType].computeLease;
     const contractAbi = abiMap[this.networkType as NetworkType].computeLease;
 
+    const network = await this.provider.getNetwork();
+    const chainId = network.chainId;
+
     const bundlerClient = await this.smartWalletBundlerClientPromise;
 
-    const txHash = await bundlerClient?.sendUserOperation({
-      calls: [
-        {
-          abi: contractAbi,
-          functionName: 'closeLease',
-          to: contractAddress as `0x${string}`,
-          args: [leaseId],
-        },
+    const { signer } = await initializeSigner({ wallet: this.wallet });
+    const claimedSigner = signer.address;
+
+    const contract = new ethers.Contract(contractAddress, contractAbi, signer);
+
+    const nonce = await contract.nonces(claimedSigner);
+    const deadline = Math.floor(Date.now() / 1000 + SIGNATURE_DEADLINE);
+
+    const domain = {
+      name: 'Spheron',
+      version: '1',
+      chainId,
+      verifyingContract: contractAddress,
+    };
+
+    const types = {
+      CreateOrder: [
+        { name: 'leaseId', type: 'uint256' },
+        { name: 'nonce', type: 'uint256' },
+        { name: 'deadline', type: 'uint256' },
       ],
-    });
-    const txReceipt = await bundlerClient?.waitForUserOperationReceipt({ hash: txHash! });
-    return txReceipt?.receipt.transactionHash || null;
+    };
+
+    const value = {
+      leaseId,
+      nonce,
+      deadline,
+    };
+
+    // Sign the typed data using EIP-712
+    const signature = await signer.signTypedData(domain, types, value);
+
+    try {
+      const txHash = await bundlerClient?.sendUserOperation({
+        calls: [
+          {
+            abi: contractAbi,
+            functionName: 'closeLeaseWithSignature',
+            to: contractAddress as `0x${string}`,
+            args: [leaseId, claimedSigner, signature, nonce, deadline],
+          },
+        ],
+      });
+      const txReceipt = await bundlerClient?.waitForUserOperationReceipt({ hash: txHash! });
+      return txReceipt?.receipt.transactionHash || null;
+    } catch (error) {
+      throw error;
+    }
   }
 
   async listenToLeaseClosedEvent(
     onSuccessCallback: ({
-      orderId,
+      leaseId,
       providerAddress,
       tenantAddress,
     }: {
-      orderId: string;
+      leaseId: string;
       providerAddress: string;
       tenantAddress: string;
     }) => void,
@@ -240,11 +279,11 @@ export class LeaseModule {
             providerAddress.toString().toLowerCase() === account.toString().toLowerCase() ||
             tenantAddress.toString().toLowerCase() === account.toString().toLowerCase()
           ) {
-            onSuccessCallback({ orderId, providerAddress, tenantAddress });
+            onSuccessCallback({ leaseId: orderId, providerAddress, tenantAddress });
             this.websocketProvider?.destroy();
             contract.off('LeaseClosed');
             clearTimeout(this.leaseCloseTimeoutId as NodeJS.Timeout);
-            resolve({ orderId, providerAddress, tenantAddress });
+            resolve({ leaseId: orderId, providerAddress, tenantAddress });
           }
         }
       );

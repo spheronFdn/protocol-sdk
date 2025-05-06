@@ -516,6 +516,66 @@
     "inputs": [
       {
         "internalType": "uint256",
+        "name": "_fizzId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_providerId",
+        "type": "uint256"
+      }
+    ],
+    "name": "adminUpdateFizzProviderId",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_fizzId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "_spec",
+        "type": "string"
+      }
+    ],
+    "name": "adminUpdateFizzSpec",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "fizzAcceptedTokens",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
         "name": "",
         "type": "uint256"
       }
@@ -856,6 +916,30 @@
       }
     ],
     "name": "isRegisteredFizzNode",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_fizzId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "_tokenAddress",
+        "type": "address"
+      }
+    ],
+    "name": "isTokenAcceptedByFizz",
     "outputs": [
       {
         "internalType": "bool",

@@ -159,6 +159,11 @@
   },
   {
     "inputs": [],
+    "name": "SignatureExpired",
+    "type": "error"
+  },
+  {
+    "inputs": [],
     "name": "TokenNotAccepted",
     "type": "error"
   },
@@ -450,14 +455,19 @@
         "type": "address"
       },
       {
+        "internalType": "bytes",
+        "name": "signature",
+        "type": "bytes"
+      },
+      {
         "internalType": "uint256",
         "name": "nonce",
         "type": "uint256"
       },
       {
-        "internalType": "bytes",
-        "name": "signature",
-        "type": "bytes"
+        "internalType": "uint256",
+        "name": "deadline",
+        "type": "uint256"
       }
     ],
     "name": "depositForOperatorsWithSignature",
@@ -483,14 +493,19 @@
         "type": "address"
       },
       {
+        "internalType": "bytes",
+        "name": "signature",
+        "type": "bytes"
+      },
+      {
         "internalType": "uint256",
         "name": "nonce",
         "type": "uint256"
       },
       {
-        "internalType": "bytes",
-        "name": "signature",
-        "type": "bytes"
+        "internalType": "uint256",
+        "name": "deadline",
+        "type": "uint256"
       }
     ],
     "name": "depositWithSignature",
@@ -940,14 +955,19 @@
         "type": "address"
       },
       {
+        "internalType": "bytes",
+        "name": "signature",
+        "type": "bytes"
+      },
+      {
         "internalType": "uint256",
         "name": "nonce",
         "type": "uint256"
       },
       {
-        "internalType": "bytes",
-        "name": "signature",
-        "type": "bytes"
+        "internalType": "uint256",
+        "name": "deadline",
+        "type": "uint256"
       }
     ],
     "name": "withdrawWithSignature",

@@ -7,7 +7,7 @@ import {
   WithdrawData,
   WithdrawEarningsData,
 } from './types';
-import { NetworkType, tokenMap } from '@config/index';
+import { NetworkType, tokenMap, SIGNATURE_DEADLINE } from '@config/index';
 import { initializeSigner } from '@utils/index';
 import { handleContractError } from '@utils/errors';
 import { abiMap } from '@contracts/abi-map';
@@ -74,6 +74,37 @@ export class EscrowModule {
     }
   }
 
+  async getSmartWalletDetails(): Promise<{ accountAddress: string; balance: string }> {
+    if (this.smartWalletBundlerClientPromise) {
+      const smartWalletBundlerClient = await this.smartWalletBundlerClientPromise;
+      const accountAddress = await smartWalletBundlerClient?.account?.address;
+      if (!accountAddress) {
+        throw new Error('Smart wallet account address not found');
+      }
+
+      const uSponToken = tokenMap[this.networkType].find(
+        (token) => token.symbol.toLowerCase() === 'uspon'
+      );
+      if (!uSponToken) {
+        throw new Error('uSPON token not found');
+      }
+
+      const tokenContract = new ethers.Contract(
+        uSponToken.address,
+        abiMap[this.networkType].testToken,
+        this.provider
+      );
+      const balance = await tokenContract.balanceOf(accountAddress);
+
+      return {
+        accountAddress,
+        balance: balance.toString(),
+      };
+    } else {
+      throw new Error('Gasless options not provided');
+    }
+  }
+
   async depositBalance({ token, amount, onSuccessCallback, onFailureCallback }: DepositData) {
     const contractABI = abiMap[this.networkType].escrow;
     try {
@@ -133,7 +164,6 @@ export class EscrowModule {
       const chainId = network.chainId;
       const { signer } = await initializeSigner({ wallet: this.wallet });
       const signerAddress = signer.address;
-
       // Get the current nonce for the signer
       const contract = new ethers.Contract(contractAddress, contractABI, signer);
       const nonce = await contract.nonces(signerAddress);
@@ -150,6 +180,8 @@ export class EscrowModule {
       const finalAmount = Number(amount.toString());
       const depositAmount = ethers.parseUnits(finalAmount.toFixed(decimals), decimals);
 
+      const deadline = Math.floor(Date.now() / 1000) + SIGNATURE_DEADLINE;
+
       const domain = {
         name: 'Spheron',
         version: '1',
@@ -162,6 +194,7 @@ export class EscrowModule {
           { name: 'token', type: 'address' },
           { name: 'amount', type: 'uint256' },
           { name: 'nonce', type: 'uint256' },
+          { name: 'deadline', type: 'uint256' },
         ],
       };
 
@@ -169,6 +202,7 @@ export class EscrowModule {
         token: tokenAddress,
         amount: depositAmount,
         nonce,
+        deadline,
       };
 
       // Sign the typed data using EIP-712
@@ -197,7 +231,7 @@ export class EscrowModule {
             abi: contractABI,
             functionName: 'depositWithSignature',
             to: contractAddress as `0x${string}`,
-            args: [tokenAddress, depositAmount, signerAddress, nonce, signature],
+            args: [tokenAddress, depositAmount, signerAddress, signature, nonce, deadline],
           },
         ],
       });
@@ -290,6 +324,8 @@ export class EscrowModule {
       const contractAddress = contractAddresses[this.networkType].escrow;
       const contract = new ethers.Contract(contractAddress, contractABI, signer);
 
+      const deadline = Math.floor(Date.now() / 1000 + SIGNATURE_DEADLINE);
+
       // Get the current nonce for the signer
       const nonce = await contract.nonces(signerAddress);
 
@@ -306,6 +342,7 @@ export class EscrowModule {
           { name: 'amount', type: 'uint256' },
           { name: 'operator', type: 'address' },
           { name: 'nonce', type: 'uint256' },
+          { name: 'deadline', type: 'uint256' },
         ],
       };
 
@@ -314,6 +351,7 @@ export class EscrowModule {
         amount: withdrawAmount,
         operator,
         nonce,
+        deadline,
       };
 
       // Sign the typed data using EIP-712
@@ -327,7 +365,15 @@ export class EscrowModule {
             abi: contractABI,
             functionName: 'withdrawWithSignature',
             to: contractAddress as `0x${string}`,
-            args: [tokenAddress, withdrawAmount, operator, signerAddress, nonce, signature],
+            args: [
+              tokenAddress,
+              withdrawAmount,
+              operator,
+              signerAddress,
+              signature,
+              nonce,
+              deadline,
+            ],
           },
         ],
       });
@@ -386,13 +432,7 @@ export class EscrowModule {
     }
   }
 
-  async withdrawEarnings({
-    providerAddress,
-    fizzId = '0',
-    token,
-    amount,
-    isFizz = false,
-  }: WithdrawEarningsData) {
+  async withdrawEarnings({ providerAddress, fizzId = '0', token, amount }: WithdrawEarningsData) {
     const contractABI = abiMap[this.networkType].escrowProtocol;
     try {
       const { signer } = await initializeSigner({ wallet: this.wallet });
@@ -411,13 +451,7 @@ export class EscrowModule {
 
       const contract = new ethers.Contract(contractAddress, contractABI, signer);
 
-      const result = await contract.withdrawEarnings(
-        providerAddress,
-        fizzId,
-        tokenAddress,
-        amount,
-        isFizz
-      );
+      const result = await contract.withdrawEarnings(providerAddress, fizzId, tokenAddress, amount);
       const receipt = await result.wait();
       return receipt;
     } catch (error) {
@@ -426,12 +460,24 @@ export class EscrowModule {
     }
   }
 
-  async depositForOperators({ token, amount, operatorAddresses }: DepositForOperatorData) {
+  async depositForOperators({
+    token,
+    amount,
+    operatorAddresses,
+    onSuccessCallback,
+    onFailureCallback,
+  }: DepositForOperatorData) {
     const contractABI = abiMap[this.networkType].escrow;
 
     try {
       if (this.smartWalletBundlerClientPromise) {
-        return await this.depositForOperatorsGasless({ token, amount, operatorAddresses });
+        return await this.depositForOperatorsGasless({
+          token,
+          amount,
+          operatorAddresses,
+          onSuccessCallback,
+          onFailureCallback,
+        });
       }
       const { signer } = await initializeSigner({ wallet: this.wallet });
       const contractAddress = contractAddresses[this.networkType].escrow;
@@ -459,8 +505,10 @@ export class EscrowModule {
 
       const result = await contract.depositForOperators(tokenAddress, amount, operatorAddresses);
       const receipt = await result.wait();
+      if (onSuccessCallback) onSuccessCallback(receipt);
       return receipt;
     } catch (error) {
+      if (onFailureCallback) onFailureCallback(error);
       const errorMessage = handleContractError(error, contractABI);
       throw errorMessage;
     }
@@ -496,11 +544,13 @@ export class EscrowModule {
       const tokenAddress: string = tokenDetails?.address;
 
       const finalAmount = Number(amount.toString());
-      const depositAmount = ethers.parseUnits(finalAmount.toFixed(decimals), decimals);
+      const depositAmount = ethers.parseUnits(finalAmount.toString(), decimals);
+
+      const deadline = Math.floor(Date.now() / 1000) + SIGNATURE_DEADLINE * 1000;
 
       const smartWalletBundlerClient = await this.smartWalletBundlerClientPromise;
 
-      const approvetTxnHash = await smartWalletBundlerClient?.sendUserOperation({
+      const approveTxnHash = await smartWalletBundlerClient?.sendUserOperation({
         calls: [
           {
             abi: tokenABI,
@@ -511,7 +561,7 @@ export class EscrowModule {
         ],
       });
       await smartWalletBundlerClient?.waitForUserOperationReceipt({
-        hash: approvetTxnHash!,
+        hash: approveTxnHash!,
       });
 
       const domain = {
@@ -526,6 +576,7 @@ export class EscrowModule {
           { name: 'token', type: 'address' },
           { name: 'amount', type: 'uint256' },
           { name: 'nonce', type: 'uint256' },
+          { name: 'deadline', type: 'uint256' },
         ],
       };
 
@@ -533,6 +584,7 @@ export class EscrowModule {
         token: tokenAddress,
         amount: depositAmount,
         nonce,
+        deadline,
       };
 
       const signature = await signer.signTypedData(domain, types, value);
@@ -543,7 +595,15 @@ export class EscrowModule {
             abi: contractAbi,
             functionName: 'depositForOperatorsWithSignature',
             to: contractAddress as `0x${string}`,
-            args: [tokenAddress, amount, operatorAddresses, signerAddress, nonce, signature],
+            args: [
+              tokenAddress,
+              depositAmount,
+              operatorAddresses,
+              signerAddress,
+              signature,
+              nonce,
+              deadline,
+            ],
           },
         ],
       });

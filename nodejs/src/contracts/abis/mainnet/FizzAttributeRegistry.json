@@ -27,6 +27,11 @@
   },
   {
     "inputs": [],
+    "name": "DuplicateId",
+    "type": "error"
+  },
+  {
+    "inputs": [],
     "name": "EmptyArray",
     "type": "error"
   },
@@ -59,6 +64,44 @@
     "anonymous": false,
     "inputs": [
       {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "autoApprove",
+        "type": "bool"
+      }
+    ],
+    "name": "AutoApprovalStateUpdated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "submitter",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "totalProcessed",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "successCount",
+        "type": "uint256"
+      }
+    ],
+    "name": "BatchAttributesSubmitted",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
         "indexed": true,
         "internalType": "address",
         "name": "fizz",
@@ -69,9 +112,27 @@
         "internalType": "string",
         "name": "category",
         "type": "string"
+      },
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "id",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "units",
+            "type": "uint256"
+          }
+        ],
+        "indexed": false,
+        "internalType": "struct FizzAttributeRegistry.Attribute[]",
+        "name": "attributes",
+        "type": "tuple[]"
       }
     ],
-    "name": "AttributesApproved",
+    "name": "FizzAttributesApproved",
     "type": "event"
   },
   {
@@ -90,7 +151,7 @@
         "type": "string"
       }
     ],
-    "name": "AttributesRemoved",
+    "name": "FizzAttributesRemoved",
     "type": "event"
   },
   {
@@ -121,20 +182,7 @@
         "type": "uint256[]"
       }
     ],
-    "name": "AttributesSubmitted",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "bool",
-        "name": "autoApprove",
-        "type": "bool"
-      }
-    ],
-    "name": "AutoApprovalStatedUpdated",
+    "name": "FizzAttributesSubmitted",
     "type": "event"
   },
   {
@@ -156,11 +204,11 @@
       {
         "indexed": false,
         "internalType": "address",
-        "name": "fizzRegistry",
+        "name": "reward",
         "type": "address"
       }
     ],
-    "name": "ProviderRegistryUpdated",
+    "name": "FizzRewardManagerUpdated",
     "type": "event"
   },
   {
@@ -169,11 +217,11 @@
       {
         "indexed": false,
         "internalType": "address",
-        "name": "reward",
+        "name": "fizzRegistry",
         "type": "address"
       }
     ],
-    "name": "RewardManagerAddressUpdated",
+    "name": "ProviderRegistryUpdated",
     "type": "event"
   },
   {
@@ -274,6 +322,41 @@
       }
     ],
     "name": "batchApproveAttributes",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "provider",
+            "type": "address"
+          },
+          {
+            "internalType": "string",
+            "name": "category",
+            "type": "string"
+          },
+          {
+            "internalType": "uint256[]",
+            "name": "ids",
+            "type": "uint256[]"
+          },
+          {
+            "internalType": "uint256[]",
+            "name": "units",
+            "type": "uint256[]"
+          }
+        ],
+        "internalType": "struct FizzAttributeRegistry.BatchAttributeInput[]",
+        "name": "batchData",
+        "type": "tuple[]"
+      }
+    ],
+    "name": "batchSubmitAttributes",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
