@@ -172,8 +172,8 @@ const convertGpuAttributes = (gpu: GPUInput): ConvertedGPU => {
   };
 };
 
-const convertStorageAttrbutes = (
-  storageAttributes: Record<string, string>
+const convertStorageAttributes = (
+  storageAttributes: Record<string, any>
 ): ConvertedAttribute[] | undefined => {
   if (!storageAttributes) return undefined;
 
@@ -302,14 +302,16 @@ export const yamlToOrderDetails = (
           Storage: Array.isArray(obj.resources?.storage)
             ? obj.resources.storage.map((storage) => ({
                 Name: 'default',
-                Attributes: [],
+                Attributes: storage.attributes ? convertStorageAttributes(storage.attributes) : [],
                 Units: convertSize(storage.size),
               }))
             : obj.resources?.storage
             ? [
                 {
                   Name: 'default',
-                  Attributes: [],
+                  Attributes: obj.resources.storage.attributes
+                    ? convertStorageAttributes(obj.resources.storage.attributes)
+                    : [],
                   Units: convertSize(obj.resources.storage.size),
                 },
               ]
@@ -480,7 +482,7 @@ const convertStorageAttrbutesIcl = (
   return pairs;
 };
 
-const getStorageAttributes = (
+const getStorageAttributesIcl = (
   storage:
     | { size: string; attributes?: Record<string, any> }
     | { size: string; attributes?: Record<string, any> }[]
@@ -536,7 +538,7 @@ export const getManifestIcl = (
                     ? convertSize(storage[0].size).toString()
                     : convertSize(storage.size).toString(),
                 },
-                attributes: getStorageAttributes(storage),
+                attributes: getStorageAttributesIcl(storage),
               },
             ],
             gpu: {
