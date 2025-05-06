@@ -468,26 +468,6 @@
         "internalType": "uint256",
         "name": "deadline",
         "type": "uint256"
-      },
-      {
-        "internalType": "address[]",
-        "name": "_operators",
-        "type": "address[]"
-      },
-      {
-        "internalType": "address",
-        "name": "claimedSigner",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "nonce",
-        "type": "uint256"
-      },
-      {
-        "internalType": "bytes",
-        "name": "signature",
-        "type": "bytes"
       }
     ],
     "name": "depositForOperatorsWithSignature",
@@ -988,11 +968,6 @@
         "internalType": "uint256",
         "name": "deadline",
         "type": "uint256"
-      },
-      {
-        "internalType": "bytes",
-        "name": "signature",
-        "type": "bytes"
       }
     ],
     "name": "withdrawWithSignature",
