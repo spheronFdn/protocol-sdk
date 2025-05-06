@@ -48,10 +48,12 @@ export const requestPipeline = async ({
   url,
   method,
   body = undefined,
+  options = {},
 }: {
   url: string;
   method: RequestMethods;
   body?: string;
+  options?: Omit<RequestInit, 'body' | 'method' | 'headers'>;
 }) => {
   const headers = new Headers();
   headers.append('Content-Type', 'application/json');
@@ -61,6 +63,7 @@ export const requestPipeline = async ({
       headers,
       method,
       body,
+      ...options,
     });
 
     const contentType = res.headers.get('Content-Type');

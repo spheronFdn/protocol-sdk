@@ -1,13 +1,14 @@
-import { ethers } from 'ethers';
+import type { NetworkType, RpcUrls, gaslessOptions } from '@config/index';
+import { publicRpcUrls } from '@config/index';
+import { DeploymentModule } from '@modules/deployment';
+import { EscrowModule } from '@modules/escrow';
+import { FizzModule } from '@modules/fizz';
+import { InventoryModule } from '@modules/inventory';
 import { LeaseModule } from '@modules/lease';
 import { OrderModule } from '@modules/order';
-import { EscrowModule } from '@modules/escrow';
-import { DeploymentModule } from '@modules/deployment';
 import { ProviderModule } from '@modules/provider';
-import { FizzModule } from '@modules/fizz';
-import { publicRpcUrls } from '@config/index';
-import type { NetworkType, RpcUrls, gaslessOptions } from '@config/index';
 import { initSmartWalletBundlerClient, type SmartWalletBundlerClient } from '@utils/smart-wallet';
+import { ethers } from 'ethers';
 
 export class SpheronSDK {
   public leases: LeaseModule;
@@ -17,6 +18,7 @@ export class SpheronSDK {
   public fizz: FizzModule;
   public deployment: DeploymentModule;
   private smartWalletBundlerClientPromise?: Promise<SmartWalletBundlerClient>;
+  public inventory: InventoryModule;
 
   constructor({
     networkType = 'mainnet',
@@ -73,11 +75,12 @@ export class SpheronSDK {
       networkType,
       this.smartWalletBundlerClientPromise
     );
+    this.inventory = new InventoryModule(provider, websocketProvider, wallet, networkType);
   }
 }
 
-export * from '@modules/provider/types';
-export * from '@modules/lease/types';
-export * from '@modules/order/types';
 export * from '@modules/escrow/types';
 export * from '@modules/fizz/types';
+export * from '@modules/lease/types';
+export * from '@modules/order/types';
+export * from '@modules/provider/types';
