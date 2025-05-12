@@ -5,7 +5,3 @@ declare global {
     ethereum?: any;
   }
 }
-
-declare module '@biconomy/abstractjs/dist/_esm/index.js' {
-  export * from '@biconomy/abstractjs';
-}
