@@ -122,3 +122,57 @@ export const subgraphGetProviders = async (networkType: NetworkType) => {
 
   return providers;
 };
+
+const totalFizzNodesQuery = `
+  query {
+    globalAttribute(id: "GLOBAL") {
+      totalFizzNodes
+    }
+  }
+`;
+
+const getFizzNodeIdsQuery = `
+query getFizzNodes($first: Int, $skip: Int) {
+  fizzNodes(first: $first, skip: $skip, orderBy: fizzId, orderDirection: asc) {
+    fizzId
+    walletAddress
+  }
+}`;
+
+export const subgraphGetFizzNodeIds = async (networkType: NetworkType) => {
+  const batchSize = 1000;
+  const { globalAttribute } = await fetchSubgraphData(totalFizzNodesQuery, undefined, networkType);
+  const totalFizzNodes = parseInt(globalAttribute.totalFizzNodes, 10);
+
+  const numBatches = Math.ceil(totalFizzNodes / batchSize);
+
+  const requests: Array<() => Promise<any>> = [];
+  for (let i = 0; i < numBatches; i++) {
+    const skip = i * batchSize;
+    const variables = { first: batchSize, skip };
+    requests.push(
+      () =>
+        fetchSubgraphData(getFizzNodeIdsQuery, variables, networkType) as Promise<{
+          fizzNodes: Array<{
+            fizzId: string;
+          }>;
+        }>
+    );
+  }
+
+  const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+  const chunkSize = 200;
+  const results: any[] = [];
+  for (let i = 0; i < requests.length; i += chunkSize) {
+    const chunk = requests.slice(i, i + chunkSize).map((req) => req());
+    results.push(...(await Promise.all(chunk))); // Process each chunk in parallel
+    if (i + chunkSize < requests.length) {
+      await delay(100); // Add a 1-second delay between chunks
+    }
+  }
+
+  const allFizzNodes = results.flatMap((result) => result.fizzNodes);
+  // Step 4: Process fetched data and aggregate region counts
+  return allFizzNodes;
+};
