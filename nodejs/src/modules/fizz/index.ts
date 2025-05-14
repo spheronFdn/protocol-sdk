@@ -21,6 +21,9 @@ import { handleContractError } from '@utils/errors';
 import { ProviderModule } from '@modules/provider';
 import { NetworkType } from '@config/index';
 import { abiMap } from '@contracts/abi-map';
+import { subgraphGetProviders } from '@utils/subgraph';
+import { Provider, ProviderStatus } from '@modules/provider/types';
+import { createAuthorizationToken } from '@utils/provider-auth';
 
 export class FizzModule {
   private provider: ethers.Provider;
