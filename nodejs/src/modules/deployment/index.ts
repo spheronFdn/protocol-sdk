@@ -14,7 +14,12 @@ import { getTokenDetails } from '@utils/index';
 import { createAuthorizationToken } from '@utils/provider-auth';
 import { NetworkType } from '@config/index';
 import { ethers } from 'ethers';
-import { CreateDeploymentResponse, DeploymentResponse, LeaseStatusResponse, UpdateDeploymentResponse } from './types';
+import {
+  CreateDeploymentResponse,
+  DeploymentResponse,
+  LeaseStatusResponse,
+  UpdateDeploymentResponse,
+} from './types';
 import { SmartWalletBundlerClient } from '@utils/smart-wallet';
 import { encodeWithDash } from '@utils/proxy-url';
 
@@ -234,7 +239,11 @@ export class DeploymentModule {
         providerProxyUrl
       );
       const authToken = await createAuthorizationToken(this.wallet);
-      const leaseInfo: LeaseStatusResponse = await spheronProvider.getLeaseStatus(certificate, authToken, leaseId);
+      const leaseInfo: LeaseStatusResponse = await spheronProvider.getLeaseStatus(
+        certificate,
+        authToken,
+        leaseId
+      );
       const forwardedPorts = leaseInfo?.forwarded_ports;
       const serviceKeys = Object.keys(forwardedPorts || []);
       const secureUrls: Record<string, string[]> = {};
@@ -242,14 +251,16 @@ export class DeploymentModule {
         serviceKeys.forEach((serviceName: string) => {
           if (forwardedPorts?.[serviceName]?.length > 0) {
             leaseInfo.forwarded_ports?.[serviceName].forEach((forwardedPort) => {
-              const urlPart = encodeWithDash(`${forwardedPort.externalPort}-${providerDetails.providerId}`);
+              const urlPart = encodeWithDash(
+                `${forwardedPort.externalPort}-${providerDetails.providerId}`
+              );
               const secureUrl = `https://${urlPart}.sphn.link`;
               if (secureUrls[serviceName]?.length > 0) {
                 secureUrls[serviceName].push(secureUrl);
               } else {
                 secureUrls[serviceName] = [secureUrl];
               }
-            })
+            });
           }
         });
       }
