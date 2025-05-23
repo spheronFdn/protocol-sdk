@@ -1,4 +1,5 @@
 export interface IProvider {
+  providerId: string;
   spec: string;
   hostUri: string;
   certificate: string;

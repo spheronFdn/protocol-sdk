@@ -39,8 +39,10 @@ export class ProviderModule {
 
       const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
       const response = await contract.getProviderByAddress(providerAddress);
+      const providerId = await contract.addressToProviderId(providerAddress);
 
       const providerDetailsData: IProvider = {
+        providerId: providerId.toString(),
         spec: response[0],
         hostUri: response[1],
         certificate: response[2],
