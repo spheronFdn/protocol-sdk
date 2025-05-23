@@ -21,7 +21,7 @@ import {
   UpdateDeploymentResponse,
 } from './types';
 import { SmartWalletBundlerClient } from '@utils/smart-wallet';
-import { encodeWithDash } from '@utils/proxy-url';
+import { getSecureProxyUrl } from '@utils/proxy-url';
 
 export class DeploymentModule {
   private wallet: ethers.Wallet | undefined;
@@ -251,10 +251,10 @@ export class DeploymentModule {
         serviceKeys.forEach((serviceName: string) => {
           if (forwardedPorts?.[serviceName]?.length > 0) {
             leaseInfo.forwarded_ports?.[serviceName].forEach((forwardedPort) => {
-              const urlPart = encodeWithDash(
-                `${forwardedPort.externalPort}-${providerDetails.providerId}`
+              const secureUrl = getSecureProxyUrl(
+                forwardedPort.externalPort,
+                providerDetails.providerId
               );
-              const secureUrl = `https://${urlPart}.sphn.link`;
               if (secureUrls[serviceName]?.length > 0) {
                 secureUrls[serviceName].push(secureUrl);
               } else {

@@ -1,7 +1,7 @@
 const BASE = 26;
 const ALPHABET = 'abcdefghijklmnopqrstuvwxyz';
 
-function encodeBase26(n: number): string {
+const encodeBase26 = (n: number): string => {
   if (n === 0) {
     return 'a';
   }
@@ -15,9 +15,9 @@ function encodeBase26(n: number): string {
 
   // Reverse the string
   return result.split('').reverse().join('');
-}
+};
 
-function decodeBase26(s: string): number {
+const decodeBase26 = (s: string): number => {
   let n = 0;
   for (const c of s) {
     if (c < 'a' || c > 'z') {
@@ -26,9 +26,9 @@ function decodeBase26(s: string): number {
     n = n * BASE + (c.charCodeAt(0) - 'a'.charCodeAt(0));
   }
   return n;
-}
+};
 
-export function encodeWithDash(input: string): string {
+export const encodeWithDash = (input: string): string => {
   const parts = input.split('-');
   if (parts.length !== 2) {
     throw new Error('invalid input format');
@@ -45,9 +45,9 @@ export function encodeWithDash(input: string): string {
   const encoded2 = encodeBase26(n2);
 
   return encoded1 + '-' + encoded2;
-}
+};
 
-export function decodeWithDash(encoded: string): string {
+export const decodeWithDash = (encoded: string): string => {
   const parts = encoded.split('-');
   if (parts.length !== 2) {
     throw new Error('encoded string must contain exactly one dash');
@@ -57,4 +57,9 @@ export function decodeWithDash(encoded: string): string {
   const n2 = decodeBase26(parts[1]);
 
   return `${n1}-${n2}`;
-}
+};
+
+export const getSecureProxyUrl = (externalPort: number, providerId: string) => {
+  const subdomain = encodeWithDash(`${externalPort}-${providerId}`);
+  return `https://${subdomain}.sphn.link`;
+};
