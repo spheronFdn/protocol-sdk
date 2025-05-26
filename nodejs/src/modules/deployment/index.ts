@@ -244,10 +244,10 @@ export class DeploymentModule {
         authToken,
         leaseId
       );
-      const forwardedPorts = leaseInfo?.forwarded_ports;
-      const serviceKeys = Object.keys(forwardedPorts || []);
+      const forwardedPorts = leaseInfo?.forwarded_ports || {};
+      const serviceKeys = Object.keys(forwardedPorts);
       const secureUrls: Record<string, string[]> = {};
-      if (forwardedPorts && serviceKeys.length > 0) {
+      if (serviceKeys.length > 0) {
         serviceKeys.forEach((serviceName: string) => {
           if (forwardedPorts?.[serviceName]?.length > 0) {
             leaseInfo.forwarded_ports?.[serviceName].forEach((forwardedPort) => {
