@@ -84,7 +84,7 @@ const decompressOrderSpecData = (compressed: string): object => {
   const preprocess = (str: string): string => {
     return str
       .replace(/([{,])(\w+):/g, '$1"$2":') // Add quotes around keys
-      .replace(/:([\w-/]+)/g, ':"$1"') // Add quotes around simple values, including paths like "vendor/nvidia/model"
+      .replace(/:([\w\-\/;]+)/g, ':"$1"') // Add quotes around values, including paths and semicolon-separated values
       .replace(/:"(\d+|true|false|null)"/g, ':$1') // Remove quotes from numbers, booleans, and null
       .replace(/},\s*}/g, '}}') // Remove trailing commas before closing braces
       .replace(/],\s*}/g, ']}'); // Remove trailing commas in arrays

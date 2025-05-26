@@ -3,7 +3,7 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "_fizzAttributeRegistry",
+        "name": "_providerAttributeRegistry",
         "type": "address"
       },
       {
@@ -47,11 +47,6 @@
   },
   {
     "inputs": [],
-    "name": "FizzCantClaimRewards",
-    "type": "error"
-  },
-  {
-    "inputs": [],
     "name": "InvalidAddress",
     "type": "error"
   },
@@ -82,6 +77,11 @@
   },
   {
     "inputs": [],
+    "name": "ProviderCantClaimRewards",
+    "type": "error"
+  },
+  {
+    "inputs": [],
     "name": "UnAuthorized",
     "type": "error"
   },
@@ -96,11 +96,24 @@
       {
         "indexed": false,
         "internalType": "address",
-        "name": "fizzAttributeRegistry",
+        "name": "account",
         "type": "address"
       }
     ],
-    "name": "FizzAttributeRegistryUpdated",
+    "name": "Paused",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "providerAttributeRegistry",
+        "type": "address"
+      }
+    ],
+    "name": "ProviderAttributeRegistryUpdated",
     "type": "event"
   },
   {
@@ -125,7 +138,7 @@
         "type": "uint256"
       }
     ],
-    "name": "FizzCategoryAdded",
+    "name": "ProviderCategoryAdded",
     "type": "event"
   },
   {
@@ -150,7 +163,7 @@
         "type": "uint256"
       }
     ],
-    "name": "FizzCategoryRemoved",
+    "name": "ProviderCategoryRemoved",
     "type": "event"
   },
   {
@@ -159,7 +172,7 @@
       {
         "indexed": false,
         "internalType": "address",
-        "name": "fizz",
+        "name": "provider",
         "type": "address"
       },
       {
@@ -169,7 +182,7 @@
         "type": "bool"
       }
     ],
-    "name": "FizzDenialStatusUpdated",
+    "name": "ProviderDenialStatusUpdated",
     "type": "event"
   },
   {
@@ -182,7 +195,7 @@
         "type": "uint256"
       }
     ],
-    "name": "FizzEraCountPaused",
+    "name": "ProviderEraCountPaused",
     "type": "event"
   },
   {
@@ -195,7 +208,7 @@
         "type": "uint256"
       }
     ],
-    "name": "FizzEraCountUnpaused",
+    "name": "ProviderEraCountUnpaused",
     "type": "event"
   },
   {
@@ -204,7 +217,7 @@
       {
         "indexed": true,
         "internalType": "address",
-        "name": "fizz",
+        "name": "provider",
         "type": "address"
       },
       {
@@ -220,7 +233,7 @@
         "type": "uint256"
       }
     ],
-    "name": "FizzPaused",
+    "name": "ProviderPaused",
     "type": "event"
   },
   {
@@ -229,7 +242,7 @@
       {
         "indexed": true,
         "internalType": "address",
-        "name": "fizz",
+        "name": "provider",
         "type": "address"
       },
       {
@@ -239,7 +252,7 @@
         "type": "uint256"
       }
     ],
-    "name": "FizzPendingRewardsAdded",
+    "name": "ProviderPendingRewardsAdded",
     "type": "event"
   },
   {
@@ -248,7 +261,7 @@
       {
         "indexed": true,
         "internalType": "address",
-        "name": "fizz",
+        "name": "provider",
         "type": "address"
       },
       {
@@ -258,7 +271,7 @@
         "type": "uint256"
       }
     ],
-    "name": "FizzPendingRewardsUpdated",
+    "name": "ProviderPendingRewardsUpdated",
     "type": "event"
   },
   {
@@ -267,7 +280,7 @@
       {
         "indexed": true,
         "internalType": "address",
-        "name": "fizz",
+        "name": "provider",
         "type": "address"
       },
       {
@@ -277,7 +290,26 @@
         "type": "uint256"
       }
     ],
-    "name": "FizzRewardClaimed",
+    "name": "ProviderRewardClaimed",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "enum TrustTier",
+        "name": "tier",
+        "type": "uint8"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "multiplier",
+        "type": "uint256"
+      }
+    ],
+    "name": "ProviderRewardMultiplierUpdated",
     "type": "event"
   },
   {
@@ -290,7 +322,7 @@
         "type": "address"
       }
     ],
-    "name": "FizzRewardTokenUpdated",
+    "name": "ProviderRewardTokenUpdated",
     "type": "event"
   },
   {
@@ -299,7 +331,7 @@
       {
         "indexed": true,
         "internalType": "address",
-        "name": "fizz",
+        "name": "provider",
         "type": "address"
       },
       {
@@ -321,7 +353,7 @@
         "type": "uint8"
       }
     ],
-    "name": "FizzSlashed",
+    "name": "ProviderSlashed",
     "type": "event"
   },
   {
@@ -330,7 +362,7 @@
       {
         "indexed": true,
         "internalType": "address",
-        "name": "fizz",
+        "name": "provider",
         "type": "address"
       },
       {
@@ -340,7 +372,7 @@
         "type": "uint256"
       }
     ],
-    "name": "FizzUnpaused",
+    "name": "ProviderUnpaused",
     "type": "event"
   },
   {
@@ -349,7 +381,7 @@
       {
         "indexed": true,
         "internalType": "address",
-        "name": "fizz",
+        "name": "provider",
         "type": "address"
       },
       {
@@ -365,20 +397,7 @@
         "type": "uint256"
       }
     ],
-    "name": "FizzUnslashed",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "account",
-        "type": "address"
-      }
-    ],
-    "name": "Paused",
+    "name": "ProviderUnslashed",
     "type": "event"
   },
   {
@@ -447,7 +466,7 @@
     "inputs": [
       {
         "internalType": "address[]",
-        "name": "_fizz",
+        "name": "_provider",
         "type": "address[]"
       },
       {
@@ -456,7 +475,7 @@
         "type": "uint256[]"
       }
     ],
-    "name": "addFizzPendingRewards",
+    "name": "addProviderPendingRewards",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -494,7 +513,7 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "_fizz",
+        "name": "_provider",
         "type": "address"
       }
     ],
@@ -517,124 +536,14 @@
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "fizzAttributeRegistry",
-    "outputs": [
-      {
-        "internalType": "contract IFizzAttributeRegistry",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
     "inputs": [
       {
         "internalType": "address",
-        "name": "",
+        "name": "_provider",
         "type": "address"
       }
     ],
-    "name": "fizzSlashedAmount",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "name": "fizzSlashedEras",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "era",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "slashedAmount",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "name": "fizzez",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "fizz",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "lastClaimedEra",
-        "type": "uint256"
-      },
-      {
-        "internalType": "bool",
-        "name": "denied",
-        "type": "bool"
-      },
-      {
-        "internalType": "uint256",
-        "name": "slashedEras",
-        "type": "uint256"
-      },
-      {
-        "internalType": "bool",
-        "name": "isPaused",
-        "type": "bool"
-      },
-      {
-        "internalType": "uint256",
-        "name": "pausedEra",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "accumulatedRewardsBeforePause",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_fizz",
-        "type": "address"
-      }
-    ],
-    "name": "getAccRewardsForFizz",
+    "name": "getAccRewardsForProvider",
     "outputs": [
       {
         "internalType": "uint256",
@@ -662,17 +571,17 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "_fizz",
+        "name": "_provider",
         "type": "address"
       }
     ],
-    "name": "getFizz",
+    "name": "getProvider",
     "outputs": [
       {
         "components": [
           {
             "internalType": "address",
-            "name": "fizz",
+            "name": "provider",
             "type": "address"
           },
           {
@@ -706,7 +615,7 @@
             "type": "uint256"
           }
         ],
-        "internalType": "struct FizzRewardsManager.Fizz",
+        "internalType": "struct ProviderRewardsManager.Provider",
         "name": "",
         "type": "tuple"
       }
@@ -718,11 +627,11 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "_fizz",
+        "name": "_provider",
         "type": "address"
       }
     ],
-    "name": "getFizzRewardsPerEra",
+    "name": "getProviderRewardsPerEra",
     "outputs": [
       {
         "internalType": "uint256",
@@ -737,11 +646,11 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "_fizz",
+        "name": "_provider",
         "type": "address"
       }
     ],
-    "name": "getFizzSlashedEras",
+    "name": "getProviderSlashedEras",
     "outputs": [
       {
         "components": [
@@ -756,7 +665,7 @@
             "type": "uint256"
           }
         ],
-        "internalType": "struct FizzRewardsManager.SlashedEra[]",
+        "internalType": "struct ProviderRewardsManager.SlashedEra[]",
         "name": "",
         "type": "tuple[]"
       }
@@ -767,17 +676,17 @@
   {
     "inputs": [
       {
-        "internalType": "address",
-        "name": "_fizz",
-        "type": "address"
+        "internalType": "enum TrustTier",
+        "name": "tier",
+        "type": "uint8"
       }
     ],
-    "name": "isDenied",
+    "name": "getRewardMultiplier",
     "outputs": [
       {
-        "internalType": "bool",
+        "internalType": "uint256",
         "name": "",
-        "type": "bool"
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -828,7 +737,7 @@
         "type": "address"
       }
     ],
-    "name": "isPausedFizz",
+    "name": "isPausedProvider",
     "outputs": [
       {
         "internalType": "bool",
@@ -857,11 +766,11 @@
     "inputs": [
       {
         "internalType": "address[]",
-        "name": "_fizzez",
+        "name": "_providers",
         "type": "address[]"
       }
     ],
-    "name": "pauseRewardsForFizzNodes",
+    "name": "pauseRewardsForProviders",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -959,6 +868,116 @@
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "providerAttributeRegistry",
+    "outputs": [
+      {
+        "internalType": "contract IProviderAttributeRegistry",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "providerSlashedAmount",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "providerSlashedEras",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "era",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "slashedAmount",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "providers",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "provider",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "lastClaimedEra",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bool",
+        "name": "denied",
+        "type": "bool"
+      },
+      {
+        "internalType": "uint256",
+        "name": "slashedEras",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bool",
+        "name": "isPaused",
+        "type": "bool"
+      },
+      {
+        "internalType": "uint256",
+        "name": "pausedEra",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "accumulatedRewardsBeforePause",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "string",
@@ -975,7 +994,7 @@
     "inputs": [
       {
         "internalType": "address[]",
-        "name": "_fizzez",
+        "name": "_providers",
         "type": "address[]"
       },
       {
@@ -984,7 +1003,7 @@
         "type": "uint256[]"
       }
     ],
-    "name": "removeSlashErasForFizzes",
+    "name": "removeSlashErasForProviders",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -1005,8 +1024,27 @@
   {
     "inputs": [
       {
+        "internalType": "enum TrustTier",
+        "name": "",
+        "type": "uint8"
+      }
+    ],
+    "name": "rewardsMultipliers",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "address[]",
-        "name": "_fizzez",
+        "name": "_providers",
         "type": "address[]"
       },
       {
@@ -1023,8 +1061,26 @@
   {
     "inputs": [
       {
+        "internalType": "enum TrustTier",
+        "name": "tier",
+        "type": "uint8"
+      },
+      {
+        "internalType": "uint256",
+        "name": "multiplier",
+        "type": "uint256"
+      }
+    ],
+    "name": "setRewardMultiplier",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "address[]",
-        "name": "_fizzez",
+        "name": "_providers",
         "type": "address[]"
       },
       {
@@ -1038,7 +1094,7 @@
         "type": "uint8[]"
       }
     ],
-    "name": "setSlashErasForFizzNodes",
+    "name": "setSlashEraForProviders",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -1061,11 +1117,11 @@
     "inputs": [
       {
         "internalType": "address[]",
-        "name": "_fizzez",
+        "name": "_providers",
         "type": "address[]"
       }
     ],
-    "name": "unpauseRewardsForFizzNodes",
+    "name": "unpauseRewardsForProviders",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -1074,24 +1130,24 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "_fizzAttributes",
-        "type": "address"
-      }
-    ],
-    "name": "updateFizzAttrRegistry",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_fizz",
+        "name": "_provider",
         "type": "address"
       }
     ],
     "name": "updatePendingRewards",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_providerAttributees",
+        "type": "address"
+      }
+    ],
+    "name": "updateProviderAttrRegistry",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
