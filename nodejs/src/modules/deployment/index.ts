@@ -14,8 +14,14 @@ import { getTokenDetails } from '@utils/index';
 import { createAuthorizationToken } from '@utils/provider-auth';
 import { NetworkType } from '@config/index';
 import { ethers } from 'ethers';
-import { CreateDeploymentResponse, DeploymentResponse, UpdateDeploymentResponse } from './types';
+import {
+  CreateDeploymentResponse,
+  DeploymentResponse,
+  LeaseStatusResponse,
+  UpdateDeploymentResponse,
+} from './types';
 import { SmartWalletBundlerClient } from '@utils/smart-wallet';
+import { getSecureProxyUrl } from '@utils/proxy-url';
 
 export class DeploymentModule {
   private wallet: ethers.Wallet | undefined;
@@ -29,7 +35,7 @@ export class DeploymentModule {
     provider: ethers.Provider,
     websocketProvider: ethers.WebSocketProvider,
     wallet?: ethers.Wallet,
-    networkType: NetworkType = 'testnet',
+    networkType: NetworkType = 'mainnet',
     smartWalletBundlerClientPromise?: Promise<SmartWalletBundlerClient>
   ) {
     this.wallet = wallet;
@@ -233,8 +239,36 @@ export class DeploymentModule {
         providerProxyUrl
       );
       const authToken = await createAuthorizationToken(this.wallet);
-      const leaseInfo = await spheronProvider.getLeaseStatus(certificate, authToken, leaseId);
-      return leaseInfo;
+      const leaseInfo: LeaseStatusResponse = await spheronProvider.getLeaseStatus(
+        certificate,
+        authToken,
+        leaseId
+      );
+      const forwardedPorts = leaseInfo?.forwarded_ports || {};
+      const serviceKeys = Object.keys(forwardedPorts);
+      const secureUrls: Record<string, string[]> = {};
+      if (serviceKeys.length > 0) {
+        serviceKeys.forEach((serviceName: string) => {
+          if (forwardedPorts?.[serviceName]?.length > 0) {
+            leaseInfo.forwarded_ports?.[serviceName].forEach((forwardedPort) => {
+              const secureUrl = getSecureProxyUrl(
+                forwardedPort.externalPort,
+                providerDetails.providerId
+              );
+              if (secureUrls[serviceName]?.length > 0) {
+                secureUrls[serviceName].push(secureUrl);
+              } else {
+                secureUrls[serviceName] = [secureUrl];
+              }
+            });
+          }
+        });
+      }
+      const leaseWithSecureUrls = {
+        ...leaseInfo,
+        secureUrls,
+      };
+      return leaseWithSecureUrls;
     } catch (error) {
       throw error;
     }

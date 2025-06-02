@@ -11,10 +11,14 @@ export interface UpdateDeploymentResponse {
   transactionHash: string | null;
 }
 
-export interface DeploymentResponse {
+export interface LeaseStatusResponse {
   services: Record<string, ServiceDetails> | null;
   forwarded_ports: Record<string, ForwardedPort[]> | null;
   ips: string[] | null;
+}
+
+export interface DeploymentResponse extends LeaseStatusResponse {
+  secureUrls: Record<string, string[]>;
 }
 
 interface ServiceDetails {
@@ -49,7 +53,7 @@ interface ContainerState {
   waiting?: { reason: string; message: string };
 }
 
-interface ForwardedPort {
+export interface ForwardedPort {
   host: string;
   port: number;
   externalPort: number;

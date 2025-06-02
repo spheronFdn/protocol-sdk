@@ -21,12 +21,12 @@ export class EscrowModule {
   constructor(
     provider: ethers.Provider,
     wallet?: ethers.Wallet,
-    networkType?: NetworkType,
+    networkType: NetworkType = 'mainnet',
     private smartWalletBundlerClientPromise?: Promise<SmartWalletBundlerClient>
   ) {
     this.provider = provider;
     this.wallet = wallet;
-    this.networkType = networkType ?? 'testnet';
+    this.networkType = networkType;
     this.smartWalletBundlerClientPromise = smartWalletBundlerClientPromise;
   }
 
