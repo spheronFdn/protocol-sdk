@@ -14,13 +14,13 @@ export class InventoryModule {
   private wallet: ethers.Wallet | undefined;
   private providerModule: ProviderModule;
   private fizzModule: FizzModule;
-  private networkType?: NetworkType;
+  private networkType: NetworkType;
 
   constructor(
     provider: ethers.Provider,
     webSocketProvider?: ethers.WebSocketProvider,
     wallet?: ethers.Wallet,
-    networkType?: NetworkType
+    networkType: NetworkType = 'mainnet'
   ) {
     this.wallet = wallet;
     this.providerModule = new ProviderModule(provider, networkType);

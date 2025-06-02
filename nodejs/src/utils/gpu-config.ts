@@ -954,6 +954,21 @@ const GpuConfig = [
     vendor: 'nvidia',
     disabled: false,
   },
+  {
+    id: 76,
+    name: 'NVIDIA RTX 5060 Ti',
+    tier: 'Low 2',
+    shortName: 'rtx5060ti',
+    multiplier: 0.75,
+    baseFnPoints: 500,
+    gpuPricePerHour: 0.14,
+    gpuPricePerMonth: 102.2,
+    cpuPricePerMonth: 0.75,
+    ramPricePerGbPerMonth: 0.1,
+    storagePricePerGbPerMonth: 0.01,
+    vendor: 'nvidia',
+    disabled: false,
+  },
 ];
 
 export default GpuConfig;
