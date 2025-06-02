@@ -35,7 +35,7 @@ export class DeploymentModule {
     provider: ethers.Provider,
     websocketProvider: ethers.WebSocketProvider,
     wallet?: ethers.Wallet,
-    networkType: NetworkType = 'testnet',
+    networkType: NetworkType = 'mainnet',
     smartWalletBundlerClientPromise?: Promise<SmartWalletBundlerClient>
   ) {
     this.wallet = wallet;
