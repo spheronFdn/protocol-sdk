@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Introduced secure deployment URLs when fetching deployment details
 
 ### Changed
+- Update default networkType to mainnet in deployment and escrow module
 
 ## [2.0.1] - 2025-05-06
 
