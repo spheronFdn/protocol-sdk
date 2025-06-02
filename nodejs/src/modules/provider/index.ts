@@ -104,7 +104,7 @@ export class ProviderModule {
         contractAddresses[this.networkType as NetworkType].providerAttributeRegistry;
 
       const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
-      const response = await contract.getProviderAttributes(providerAddress, category);
+      const response = await contract.getAttributes(providerAddress, category);
 
       return response;
     } catch (error) {

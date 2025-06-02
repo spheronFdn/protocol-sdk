@@ -206,6 +206,8 @@ interface Placement {
     desired_provider?: string;
     cpu_model?: string;
     bandwidth?: string;
+    provider_exclude?: string;
+    fizz_exclude?: string;
   };
 }
 
@@ -369,6 +371,20 @@ export const yamlToOrderDetails = (
       attributes.push({
         Key: 'desired_provider',
         Value: firstPlacement.attributes.desired_provider,
+      });
+    }
+
+    if (firstPlacement?.attributes?.provider_exclude) {
+      attributes.push({
+        Key: 'provider_exclude',
+        Value: firstPlacement.attributes.provider_exclude,
+      });
+    }
+
+    if (firstPlacement?.attributes?.fizz_exclude) {
+      attributes.push({
+        Key: 'fizz_exclude',
+        Value: firstPlacement.attributes.fizz_exclude,
       });
     }
 
