@@ -117,3 +117,36 @@ export interface FizzAttribute {
 }
 
 export type RawFizzAttribute = [id: string, units: string];
+
+export interface FizzStatusResponse {
+  name: string;
+  allocatable: {
+    cpu: number;
+    gpu: number;
+    gpu_infos:
+      | null
+      | {
+          vendor: string;
+          name: string;
+          model_id: string;
+          interface: string;
+          memory_size: string;
+          vram_available_percentage: number;
+        }[];
+    memory: number;
+    storage_ephemeral: number;
+  };
+  available: {
+    cpu: number;
+    gpu: number;
+    gpu_infos: null;
+    memory: number;
+    storage_ephemeral: number;
+  };
+  bandwidth: `${string};${string}`;
+  version: `${string};${string}`;
+  os: string;
+  arch: string;
+  cuda_version: string;
+  nvidia_driver_version: string;
+}

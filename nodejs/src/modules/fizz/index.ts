@@ -13,13 +13,16 @@ import {
   FizzDetails,
   RawFizzNode,
   RawFizzAttribute,
+  FizzStatusResponse,
   // FizzProviderTrustTier,
 } from './types';
-import { initializeSigner } from '@utils/index';
+import { initializeSigner, requestPipeline } from '@utils/index';
 import { handleContractError } from '@utils/errors';
 import { ProviderModule } from '@modules/provider';
 import { NetworkType } from '@config/index';
 import { abiMap } from '@contracts/abi-map';
+import { subgraphGetFizzNodeIds, subgraphGetProviders } from '@utils/subgraph';
+import { createAuthorizationToken } from '@utils/provider-auth';
 
 export class FizzModule {
   private provider: ethers.Provider;
@@ -179,6 +182,88 @@ export class FizzModule {
       }));
 
       return fizzNodes;
+    } catch (error) {
+      const errorMessage = handleContractError(error, FizzRegistryAbi);
+      throw errorMessage;
+    }
+  }
+
+  async getActiveFizzNodes(providerProxyUrl: string): Promise<FizzStatusResponse[]> {
+    if (!this.wallet) throw new Error('Wallet not found');
+    if (!this.networkType) throw new Error('Network type not found');
+    try {
+      let providers: Awaited<ReturnType<typeof subgraphGetProviders>> = await subgraphGetProviders(
+        this.networkType
+      );
+
+      const authToken = createAuthorizationToken(this.wallet);
+
+      const fizzNodes = (
+        await Promise.allSettled(
+          providers
+            .filter(
+              (p) =>
+                p.hostUri !== 'localhost' && p.status === 'Active' && p.region !== 'dev-spheron'
+            )
+            .map(async (p) => {
+              const reqBody = {
+                certificate: p.certificate,
+                authToken,
+                method: 'GET',
+                url: `https://${p.hostUri}:8543/status`,
+              };
+
+              const url = `${providerProxyUrl}`;
+              try {
+                const response = await requestPipeline({
+                  url,
+                  method: 'POST',
+                  body: JSON.stringify(reqBody),
+                  options: {
+                    signal: AbortSignal.timeout(2000),
+                  },
+                });
+                return response;
+              } catch (error) {
+                return { cluster: { inventory: { available: { nodes: [] } } } };
+              }
+            })
+        )
+      ).map((result) => {
+        if (result.status === 'fulfilled') {
+          return result.value.cluster.inventory.available;
+        } else {
+          console.error(`Failed to get fizz nodes for provider: ${result.reason}`);
+          return { nodes: [] };
+        }
+      });
+
+      const fizzNodesWithAddress = fizzNodes
+        .map((i) =>
+          i.nodes.map(async (node: { name: string }) => {
+            const walletAddress = `0x${node.name}`;
+            return { walletAddress, ...node };
+          })
+        )
+        .flat()
+        .filter(Boolean);
+
+      const subgraphNodes = await subgraphGetFizzNodeIds(this.networkType);
+
+      const activeNodeAddressIdMap = new Map(
+        fizzNodesWithAddress.map((n) => [n.walletAddress.toLowerCase(), null])
+      );
+
+      subgraphNodes.forEach((node) => {
+        const address = node.walletAddress.toLowerCase();
+        if (activeNodeAddressIdMap.has(address)) activeNodeAddressIdMap.set(address, node.fizzId);
+      });
+
+      const fizzNodesWithId = fizzNodesWithAddress.map((node) => {
+        return { ...node, id: activeNodeAddressIdMap.get(node.walletAddress.toLowerCase()) };
+      });
+
+      return fizzNodesWithId;
     } catch (error) {
       const errorMessage = handleContractError(error, FizzRegistryAbi);
       throw errorMessage;
