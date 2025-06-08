@@ -48,18 +48,20 @@ export class LeaseModule {
     this.smartWalletBundlerClientPromise = smartWalletBundlerClientPromise;
   }
 
-  async getLeaseDetails(leaseId: string) {
+  async getLeaseDetails(leaseId: string): Promise<Lease> {
     const contractAbi = abiMap[this.networkType as NetworkType].computeLease;
     const contractAddress = contractAddresses[this.networkType as NetworkType].computeLease;
 
     const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
     const response = await contract.leases(leaseId);
+    const leaseHourlyCost = Number(response.acceptedPrice) * 1800 / 10 ** 18;
 
     const lease: Lease = {
       leaseId: response.leaseId.toString(),
       fizzId: response.fizzId.toString(),
       requestId: response.requestId.toString(),
       acceptedPrice: Number(response.acceptedPrice),
+      leaseHourlyCost,
       providerAddress: response.providerAddress.toString(),
       tenantAddress: response.tenantAddress.toString(),
       startBlock: response.startBlock.toString(),
