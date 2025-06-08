@@ -54,12 +54,14 @@ export class LeaseModule {
 
     const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
     const response = await contract.leases(leaseId);
+    const leaseHourlyCost = Number(response.acceptedPrice) * 1800 / 10 ** 18;
 
     const lease: Lease = {
       leaseId: response.leaseId.toString(),
       fizzId: response.fizzId.toString(),
       requestId: response.requestId.toString(),
       acceptedPrice: Number(response.acceptedPrice),
+      leaseHourlyCost,
       providerAddress: response.providerAddress.toString(),
       tenantAddress: response.tenantAddress.toString(),
       startBlock: response.startBlock.toString(),

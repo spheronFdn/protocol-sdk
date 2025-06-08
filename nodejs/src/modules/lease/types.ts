@@ -21,6 +21,7 @@ export interface Lease {
   fizzId: string;
   requestId: string;
   acceptedPrice: number;
+  leaseHourlyCost: number;
   providerAddress: string;
   tenantAddress: string;
   startBlock: string;

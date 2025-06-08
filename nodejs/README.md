@@ -555,7 +555,8 @@ console.log('Lease details:', leaseDetails);
     - `gpuAttributes` (array): Additional GPU attributes.
     - `endpointsKind` (number): Type of endpoints.
     - `endpointsSequenceNumber` (number): Sequence number for endpoints.
-  - `acceptedPrice` (string): The accepted price for the lease.
+  - `acceptedPrice` (number): The accepted price for the lease.
+  - `hourlyCost` (number): The per hour cost for the lease.
   - `providerAddress` (string): The address of the provider.
   - `tenantAddress` (string): The address of the tenant.
   - `startBlock` (string): The block number when the lease started.
