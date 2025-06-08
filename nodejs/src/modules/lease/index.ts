@@ -48,7 +48,7 @@ export class LeaseModule {
     this.smartWalletBundlerClientPromise = smartWalletBundlerClientPromise;
   }
 
-  async getLeaseDetails(leaseId: string) {
+  async getLeaseDetails(leaseId: string): Promise<Lease> {
     const contractAbi = abiMap[this.networkType as NetworkType].computeLease;
     const contractAddress = contractAddresses[this.networkType as NetworkType].computeLease;
 
