@@ -7,23 +7,25 @@ import {
 } from 'viem/account-abstraction';
 import { privateKeyToAccount } from 'viem/accounts';
 import { createBundlerClient } from 'viem/account-abstraction';
-import { NetworkType, gaslessOptions } from '@config/index';
+import { NetworkType, RpcUrls, gaslessOptions } from '@config/index';
 
 export const initCoinbaseBundlerClient = async ({
   networkType,
   privateKey,
   gaslessOptions,
+  rpcUrls,
 }: {
   networkType: NetworkType;
   privateKey: string;
   gaslessOptions: gaslessOptions;
+  rpcUrls: RpcUrls;
 }): Promise<BundlerClient> => {
   const chain = networkType === 'mainnet' ? base : baseSepolia;
   const cleanPrivateKey = privateKey.startsWith('0x') ? privateKey.slice(2) : privateKey;
   const owner = privateKeyToAccount(`0x${cleanPrivateKey}`);
   const client = createPublicClient({
     chain,
-    transport: http(),
+    transport: http(rpcUrls.http),
   });
 
   const account = await toCoinbaseSmartAccount({
