@@ -13,7 +13,6 @@ export const initCoinbaseBundlerClient = async ({
   networkType,
   privateKey,
   gaslessOptions,
-  rpcUrls,
 }: {
   networkType: NetworkType;
   privateKey: string;
@@ -25,7 +24,7 @@ export const initCoinbaseBundlerClient = async ({
   const owner = privateKeyToAccount(`0x${cleanPrivateKey}`);
   const client = createPublicClient({
     chain,
-    transport: http(rpcUrls.http),
+    transport: http(gaslessOptions.bundlerUrl),
   });
 
   const account = await toCoinbaseSmartAccount({
