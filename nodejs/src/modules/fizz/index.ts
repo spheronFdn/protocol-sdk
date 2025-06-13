@@ -188,7 +188,10 @@ export class FizzModule {
     }
   }
 
-  async getActiveFizzNodes(providerProxyUrl: string): Promise<FizzStatusResponse[]> {
+  async getActiveFizzNodes(
+    providerProxyUrl: string,
+    timeout: number = 2000
+  ): Promise<FizzStatusResponse[]> {
     if (!this.wallet) throw new Error('Wallet not found');
     if (!this.networkType) throw new Error('Network type not found');
     try {
@@ -220,7 +223,7 @@ export class FizzModule {
                   method: 'POST',
                   body: JSON.stringify(reqBody),
                   options: {
-                    signal: AbortSignal.timeout(2000),
+                    signal: AbortSignal.timeout(timeout),
                   },
                 });
                 return response;
@@ -250,23 +253,29 @@ export class FizzModule {
 
       const subgraphNodes = await subgraphGetFizzNodeIds(this.networkType);
 
-      const activeNodeAddressIdMap = new Map(
-        fizzNodesWithAddress.map((n) => [n.walletAddress.toLowerCase(), null])
+      const mappedNodes = await Promise.all(
+        fizzNodesWithAddress.map(async (nPromise) => {
+          const n = await nPromise;
+          return [n.walletAddress.toLowerCase(), null] as [string, null];
+        })
       );
+      const activeNodeAddressIdMap = new Map<string, number | null>(mappedNodes);
 
       subgraphNodes.forEach((node) => {
         const address = node.walletAddress.toLowerCase();
         if (activeNodeAddressIdMap.has(address)) activeNodeAddressIdMap.set(address, node.fizzId);
       });
 
-      const fizzNodesWithId = fizzNodesWithAddress.map((node) => {
-        return { ...node, id: activeNodeAddressIdMap.get(node.walletAddress.toLowerCase()) };
-      });
+      const fizzNodesWithId = await Promise.all(
+        fizzNodesWithAddress.map(async (nodePromise) => {
+          const node = await nodePromise;
+          return { ...node, id: activeNodeAddressIdMap.get(node.walletAddress.toLowerCase()) };
+        })
+      );
 
       return fizzNodesWithId;
     } catch (error) {
-      const errorMessage = handleContractError(error, FizzRegistryAbi);
-      throw errorMessage;
+      throw error;
     }
   }
 

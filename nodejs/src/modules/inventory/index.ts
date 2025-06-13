@@ -28,9 +28,15 @@ export class InventoryModule {
     this.networkType = networkType;
   }
 
-  async getFizzInventory(providerProxyUrl: string, options?: { groupBy: 'fizzAddress' | 'gpu' }) {
+  async getFizzInventory(
+    providerProxyUrl: string,
+    options?: { groupBy?: 'fizzAddress' | 'gpu'; timeout?: number }
+  ) {
     try {
-      const activeFizzNodes = await this.fizzModule.getActiveFizzNodes(providerProxyUrl);
+      const activeFizzNodes = await this.fizzModule.getActiveFizzNodes(
+        providerProxyUrl,
+        options?.timeout || 2000
+      );
 
       if (!options) options = { groupBy: 'gpu' };
       if (!options.groupBy) options.groupBy = 'gpu';
@@ -130,14 +136,13 @@ export class InventoryModule {
         return { fizzInventory };
       }
     } catch (error) {
-      const errorMessage = handleContractError(error, FizzRegistryAbi);
-      throw errorMessage;
+      throw error;
     }
   }
 
   async getProviderInventory(
     providerProxyUrl?: string,
-    options?: { groupBy: 'providerAddress' | 'gpu' }
+    options?: { groupBy?: 'providerAddress' | 'gpu'; timeout?: number }
   ) {
     try {
       if (!this.wallet) throw new Error('Wallet is required');
@@ -177,7 +182,7 @@ export class InventoryModule {
                 method: 'POST',
                 body: JSON.stringify(reqBody),
                 options: {
-                  signal: AbortSignal.timeout(2000),
+                  signal: AbortSignal.timeout(options?.timeout || 2000),
                 },
               });
               return { walletAddress: provider.walletAddress, response };
@@ -318,9 +323,7 @@ export class InventoryModule {
         return { providerInventory };
       }
     } catch (error) {
-      console.log(error);
-      const errorMessage = handleContractError(error, FizzRegistryAbi);
-      throw errorMessage;
+      throw error;
     }
   }
 }
