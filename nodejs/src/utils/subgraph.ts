@@ -4,7 +4,7 @@ const SUBGRAPH_URL =
   'https://api.goldsky.com/api/public/project_cm16apa2e540c01wz70x34xzf/subgraphs/sph-base-sepolia-new/1.0.0/gn';
 
 const SUBGRAPH_MAINNET_URL =
-  'https://api.goldsky.com/api/public/project_cm16apa2e540c01wz70x34xzf/subgraphs/sph-base-mainnet/1.0.2/gn';
+  'https://api.goldsky.com/api/public/project_cm16apa2e540c01wz70x34xzf/subgraphs/sph-base-mainnet/1.0.3/gn';
 
 const SUBGRAPH_MAP = {
   testnet: SUBGRAPH_URL,
