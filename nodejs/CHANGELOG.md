@@ -5,6 +5,19 @@ All notable changes to the Spheron Protocol SDK will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.0] - 2025-06-13
+
+### Added
+- Add custom HTTP RPC in smart wallet public client
+- Add timeout option on provider and fizz inventory module
+
+### Changed
+- Update deployment error log messages
+
+### Fixed
+- Fix fetching of active fizz nodes (`getActiveFizzNodes`)
+- Fix websocket provider getting destroyed for multiple deployments on same SDK instance
+
 ## [2.1.1] - 2025-06-08
 
 ### Added
