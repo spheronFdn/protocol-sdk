@@ -54,7 +54,7 @@ export class LeaseModule {
 
     const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
     const response = await contract.leases(leaseId);
-    const leaseHourlyCost = Number(response.acceptedPrice) * 1800 / 10 ** 18;
+    const leaseHourlyCost = (Number(response.acceptedPrice) * 1800) / 10 ** 18;
 
     const lease: Lease = {
       leaseId: response.leaseId.toString(),
@@ -282,7 +282,6 @@ export class LeaseModule {
             tenantAddress.toString().toLowerCase() === account.toString().toLowerCase()
           ) {
             onSuccessCallback({ leaseId: orderId, providerAddress, tenantAddress });
-            this.websocketProvider?.destroy();
             contract.off('LeaseClosed');
             clearTimeout(this.leaseCloseTimeoutId as NodeJS.Timeout);
             resolve({ leaseId: orderId, providerAddress, tenantAddress });

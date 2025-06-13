@@ -414,7 +414,6 @@ export class FizzModule {
         contract.on('FizzNodeAdded', (fizzId: bigint, walletAddress: string) => {
           if (walletAddress.toString().toLowerCase() === accounts[0].toString().toLowerCase()) {
             onSuccessCallback(fizzId, walletAddress);
-            this.webSocketProvider?.destroy();
             contract.off('FizzNodeAdded');
             clearTimeout(this.timeoutId as NodeJS.Timeout);
             resolve({ fizzId, walletAddress });
@@ -474,7 +473,6 @@ export class FizzModule {
             fizz.walletAddress.toString().toLowerCase() === accounts[0].toString().toLowerCase()
           ) {
             onSuccessCallback(fizzId, specs, fizz.walletAddress);
-            this.webSocketProvider?.destroy();
             contract.off('FizzNodeSpecUpdated');
             clearTimeout(timeoutId as NodeJS.Timeout);
             resolve({ fizzId, specs, walletAddress: fizz.walletAddress });
@@ -534,7 +532,6 @@ export class FizzModule {
             fizz.walletAddress.toString().toLowerCase() === accounts[0].toString().toLowerCase()
           ) {
             onSuccessCallback(fizzId, region, fizz.walletAddress);
-            this.webSocketProvider?.destroy();
             contract.off('FizzNodeRegionUpdated');
             clearTimeout(timeoutId as NodeJS.Timeout);
             resolve({ fizzId, region, walletAddress: fizz.walletAddress });
@@ -594,7 +591,6 @@ export class FizzModule {
             fizz.walletAddress.toString().toLowerCase() === accounts[0].toString().toLowerCase()
           ) {
             onSuccessCallback(fizzId, providerId, fizz.walletAddress);
-            this.webSocketProvider?.destroy();
             contract.off('FizzNodeProviderIdUpdated');
             clearTimeout(timeoutId as NodeJS.Timeout);
             resolve({ fizzId, providerId, walletAddress: fizz.walletAddress });
@@ -654,7 +650,6 @@ export class FizzModule {
             fizz.walletAddress.toString().toLowerCase() === accounts[0].toString().toLowerCase()
           ) {
             onSuccessCallback(fizzId, tokenAddress, fizz.walletAddress);
-            this.webSocketProvider?.destroy();
             contract.off('PaymentAdded');
             clearTimeout(timeoutId as NodeJS.Timeout);
             resolve({ fizzId, tokenAddress, walletAddress: fizz.walletAddress });
@@ -714,7 +709,6 @@ export class FizzModule {
             fizz.walletAddress.toString().toLowerCase() === accounts[0].toString().toLowerCase()
           ) {
             onSuccessCallback(fizzId, tokenAddress, fizz.walletAddress);
-            this.webSocketProvider?.destroy();
             contract.off('PaymentRemoved');
             clearTimeout(timeoutId as NodeJS.Timeout);
             resolve({ fizzId, tokenAddress, walletAddress: fizz.walletAddress });

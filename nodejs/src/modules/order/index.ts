@@ -57,6 +57,9 @@ export class OrderModule {
       const receipt: ethers.ContractTransactionReceipt | null = await tx.wait();
       return receipt?.hash || null;
     } catch (error) {
+      if (this.smartWalletBundlerClientPromise) {
+        throw error;
+      }
       const errorMessage = handleContractError(error, contractAbi);
       throw errorMessage;
     }
@@ -145,6 +148,9 @@ export class OrderModule {
       const receipt: ethers.ContractTransactionReceipt | null = await tx.wait();
       return receipt?.hash || null;
     } catch (error) {
+      if (this.smartWalletBundlerClientPromise) {
+        throw error;
+      }
       const errorMessage = handleContractError(error, contractAbi);
       throw errorMessage;
     }
@@ -276,7 +282,7 @@ export class OrderModule {
       this.createTimeoutId = setTimeout(() => {
         contract.off('OrderMatched');
         onFailureCallback();
-        reject({ error: true, msg: 'Order creation failed' });
+        reject({ error: true, msg: 'Order not matched within timeout' });
       }, timeoutTime);
 
       contract.on(
@@ -298,7 +304,6 @@ export class OrderModule {
               acceptedPrice,
               creatorAddress
             );
-            this.websocketProvider?.destroy();
             contract.off('OrderMatched');
             clearTimeout(this.createTimeoutId as NodeJS.Timeout);
             resolve({
@@ -341,13 +346,12 @@ export class OrderModule {
       this.updateTimeoutId = setTimeout(() => {
         contract.off('LeaseUpdated');
         onFailureCallback();
-        reject({ error: true, msg: 'Order updation Failed' });
+        reject({ error: true, msg: 'Order update failed' });
       }, timeoutTime);
 
       contract.on('LeaseUpdated', (leaseId, providerAddress, tenantAddress, acceptedPrice) => {
         if (tenantAddress.toString().toLowerCase() === account.toString().toLowerCase()) {
           onSuccessCallback(leaseId, providerAddress, tenantAddress, acceptedPrice?.toString());
-          this.websocketProvider?.destroy();
           contract.off('LeaseUpdated');
           clearTimeout(this.updateTimeoutId as NodeJS.Timeout);
           resolve({ leaseId, providerAddress, tenantAddress, acceptedPrice });
@@ -377,13 +381,12 @@ export class OrderModule {
       this.updateTimeoutId = setTimeout(() => {
         contract.off('UpdateRequestAccepted');
         onFailureCallback();
-        reject({ error: true, msg: 'Order updation Failed' });
+        reject({ error: true, msg: 'Order not accepted within timeout' });
       }, timeoutTime);
 
       contract.on('UpdateRequestAccepted', async (leaseId, providerAddress, tenantAddress) => {
         if (tenantAddress.toString().toLowerCase() === account.toString().toLowerCase()) {
           await onSuccessCallback(leaseId, providerAddress);
-          this.websocketProvider?.destroy();
           contract.off('UpdateRequestAccepted');
           clearTimeout(this.updateTimeoutId as NodeJS.Timeout);
           resolve({ leaseId, providerAddress });
