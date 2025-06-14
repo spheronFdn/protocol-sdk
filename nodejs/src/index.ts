@@ -43,6 +43,7 @@ export class SpheronSDK {
         networkType,
         privateKey,
         gaslessOptions,
+        rpcUrls,
       });
     }
 
