@@ -208,6 +208,7 @@ interface Placement {
     bandwidth?: string;
     provider_exclude?: string;
     fizz_exclude?: string;
+    req_vram?: string;
   };
 }
 
@@ -345,6 +346,13 @@ export const yamlToOrderDetails = (
         Value: firstPlacement?.attributes?.bandwidth || 'any',
       },
     ];
+
+    if (firstPlacement?.attributes?.req_vram) {
+      attributes.push({
+        Key: 'req_vram',
+        Value: firstPlacement.attributes.req_vram,
+      });
+    }
 
     if (firstPlacement?.attributes?.region) {
       attributes.push({
