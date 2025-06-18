@@ -135,6 +135,7 @@ interface GPUAttributes {
   vendor: {
     [key: string]: GPUModel[];
   };
+  req_vram?: string;
 }
 
 interface GPUInput {
@@ -163,6 +164,13 @@ const convertGpuAttributes = (gpu: GPUInput): ConvertedGPU => {
         Key: key,
         Value: 'true',
       });
+    });
+  }
+
+  if (gpu.attributes.req_vram) {
+    attributes.push({
+      Key: 'req_vram',
+      Value: gpu.attributes.req_vram,
     });
   }
 
@@ -346,13 +354,6 @@ export const yamlToOrderDetails = (
         Value: firstPlacement?.attributes?.bandwidth || 'any',
       },
     ];
-
-    if (firstPlacement?.attributes?.req_vram) {
-      attributes.push({
-        Key: 'req_vram',
-        Value: firstPlacement.attributes.req_vram,
-      });
-    }
 
     if (firstPlacement?.attributes?.region) {
       attributes.push({
