@@ -167,7 +167,7 @@ const convertGpuAttributes = (gpu: GPUInput): ConvertedGPU => {
     });
   }
 
-  if (gpu.attributes.req_vram) {
+  if (gpu.attributes?.req_vram) {
     attributes.push({
       Key: 'req_vram',
       Value: gpu.attributes.req_vram,
