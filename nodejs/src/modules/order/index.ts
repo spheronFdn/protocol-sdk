@@ -1,5 +1,5 @@
 import { contractAddresses } from '@contracts/addresses';
-import { ethers } from 'ethers';
+import { ethers, WebSocketProvider } from 'ethers';
 import {
   InitialOrder,
   OrderDetails,
@@ -11,32 +11,32 @@ import {
 import { getTokenDetails, initializeSigner } from '@utils/index';
 import { getOrderStateAsString } from '@utils/order';
 import { handleContractError } from '@utils/errors';
-import { NetworkType, SIGNATURE_DEADLINE } from '@config/index';
+import { NetworkType, RpcUrls, SIGNATURE_DEADLINE } from '@config/index';
 import { abiMap } from '@contracts/abi-map';
 import { SmartWalletBundlerClient } from '@utils/smart-wallet';
 
 export class OrderModule {
   private provider: ethers.Provider;
-  private websocketProvider: ethers.WebSocketProvider | undefined;
   private createTimeoutId: NodeJS.Timeout | null;
   private updateTimeoutId: NodeJS.Timeout | null;
   private wallet: ethers.Wallet | undefined;
   private networkType: NetworkType | undefined;
+  private rpcUrls: RpcUrls | undefined;
 
   constructor(
     provider: ethers.Provider,
-    websocketProvider?: ethers.WebSocketProvider,
     wallet?: ethers.Wallet,
     networkType?: NetworkType,
-    private smartWalletBundlerClientPromise?: Promise<SmartWalletBundlerClient>
+    private smartWalletBundlerClientPromise?: Promise<SmartWalletBundlerClient>,
+    rpcUrls?: RpcUrls
   ) {
     this.provider = provider;
-    this.websocketProvider = websocketProvider;
     this.createTimeoutId = null;
     this.updateTimeoutId = null;
     this.wallet = wallet;
     this.networkType = networkType;
     this.smartWalletBundlerClientPromise = smartWalletBundlerClientPromise;
+    this.rpcUrls = rpcUrls;
   }
 
   async createOrder(orderDetails: OrderDetails): Promise<string | null> {
@@ -267,8 +267,12 @@ export class OrderModule {
     ) => void,
     onFailureCallback: () => void
   ): Promise<OrderMatchedEvent> {
-    if (!this.websocketProvider) {
-      throw new Error('Please pass websocket provider in constructor');
+    let orderWssProvider: WebSocketProvider | null = null;
+    if (this.rpcUrls?.websocket) {
+      orderWssProvider = new ethers.WebSocketProvider(this.rpcUrls?.websocket);
+    }
+    if (!orderWssProvider) {
+      throw new Error('Order WSS provider not created');
     }
     const { signer } = await initializeSigner({ wallet: this.wallet });
     const account = await signer.getAddress();
@@ -276,11 +280,12 @@ export class OrderModule {
     const contractAbi = abiMap[this.networkType as NetworkType].bid;
     const contractAddress = contractAddresses[this.networkType as NetworkType].bid;
 
-    const contract = new ethers.Contract(contractAddress, contractAbi, this.websocketProvider);
+    const contract = new ethers.Contract(contractAddress, contractAbi, orderWssProvider);
 
     return new Promise((resolve, reject) => {
       this.createTimeoutId = setTimeout(() => {
         contract.off('OrderMatched');
+        orderWssProvider.destroy();
         onFailureCallback();
         reject({ error: true, msg: 'Order not matched within timeout' });
       }, timeoutTime);
@@ -305,6 +310,7 @@ export class OrderModule {
               creatorAddress
             );
             contract.off('OrderMatched');
+            orderWssProvider.destroy();
             clearTimeout(this.createTimeoutId as NodeJS.Timeout);
             resolve({
               leaseId,
@@ -330,8 +336,12 @@ export class OrderModule {
     ) => void,
     onFailureCallback: () => void
   ): Promise<OrderUpdatedEvent> {
-    if (!this.websocketProvider) {
-      throw new Error('Please pass websocket provider in constructor');
+    let orderWssProvider: WebSocketProvider | null = null;
+    if (this.rpcUrls?.websocket) {
+      orderWssProvider = new ethers.WebSocketProvider(this.rpcUrls?.websocket);
+    }
+    if (!orderWssProvider) {
+      throw new Error('Order WSS provider not created');
     }
 
     const { signer } = await initializeSigner({ wallet: this.wallet });
@@ -340,11 +350,12 @@ export class OrderModule {
     const contractAbi = abiMap[this.networkType as NetworkType].bid;
     const contractAddress = contractAddresses[this.networkType as NetworkType].bid;
 
-    const contract = new ethers.Contract(contractAddress, contractAbi, this.websocketProvider);
+    const contract = new ethers.Contract(contractAddress, contractAbi, orderWssProvider);
 
     return new Promise((resolve, reject) => {
       this.updateTimeoutId = setTimeout(() => {
         contract.off('LeaseUpdated');
+        orderWssProvider.destroy();
         onFailureCallback();
         reject({ error: true, msg: 'Order update failed' });
       }, timeoutTime);
@@ -353,6 +364,7 @@ export class OrderModule {
         if (tenantAddress.toString().toLowerCase() === account.toString().toLowerCase()) {
           onSuccessCallback(leaseId, providerAddress, tenantAddress, acceptedPrice?.toString());
           contract.off('LeaseUpdated');
+          orderWssProvider.destroy();
           clearTimeout(this.updateTimeoutId as NodeJS.Timeout);
           resolve({ leaseId, providerAddress, tenantAddress, acceptedPrice });
         }
@@ -365,8 +377,12 @@ export class OrderModule {
     onSuccessCallback: (leaseId: string, providerAddress: string) => void,
     onFailureCallback: () => void
   ): Promise<OrderUpdateAcceptedEvent> {
-    if (!this.websocketProvider) {
-      throw new Error('Please pass websocket provider in constructor');
+    let orderWssProvider: WebSocketProvider | null = null;
+    if (this.rpcUrls?.websocket) {
+      orderWssProvider = new ethers.WebSocketProvider(this.rpcUrls?.websocket);
+    }
+    if (!orderWssProvider) {
+      throw new Error('Order WSS provider not created');
     }
 
     const { signer } = await initializeSigner({ wallet: this.wallet });
@@ -375,11 +391,12 @@ export class OrderModule {
     const contractAbi = abiMap[this.networkType as NetworkType].bid;
     const contractAddress = contractAddresses[this.networkType as NetworkType].bid;
 
-    const contract = new ethers.Contract(contractAddress, contractAbi, this.websocketProvider);
+    const contract = new ethers.Contract(contractAddress, contractAbi, orderWssProvider);
 
     return new Promise((resolve, reject) => {
       this.updateTimeoutId = setTimeout(() => {
         contract.off('UpdateRequestAccepted');
+        orderWssProvider.destroy();
         onFailureCallback();
         reject({ error: true, msg: 'Order not accepted within timeout' });
       }, timeoutTime);
@@ -388,6 +405,7 @@ export class OrderModule {
         if (tenantAddress.toString().toLowerCase() === account.toString().toLowerCase()) {
           await onSuccessCallback(leaseId, providerAddress);
           contract.off('UpdateRequestAccepted');
+          orderWssProvider.destroy();
           clearTimeout(this.updateTimeoutId as NodeJS.Timeout);
           resolve({ leaseId, providerAddress });
         }

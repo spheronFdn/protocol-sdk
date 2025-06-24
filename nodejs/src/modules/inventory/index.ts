@@ -1,4 +1,4 @@
-import { NetworkType } from '@config/index';
+import { NetworkType, RpcUrls } from '@config/index';
 import FizzRegistryAbi from '@contracts/abis/testnet/FizzRegistry.json';
 import { FizzModule } from '@modules/fizz';
 import { ProviderModule } from '@modules/provider';
@@ -15,16 +15,18 @@ export class InventoryModule {
   private providerModule: ProviderModule;
   private fizzModule: FizzModule;
   private networkType: NetworkType;
+  private rpcUrls: RpcUrls | undefined;
 
   constructor(
     provider: ethers.Provider,
-    webSocketProvider?: ethers.WebSocketProvider,
     wallet?: ethers.Wallet,
-    networkType: NetworkType = 'mainnet'
+    networkType: NetworkType = 'mainnet',
+    rpcUrls?: RpcUrls | undefined
   ) {
     this.wallet = wallet;
+    this.rpcUrls = rpcUrls;
     this.providerModule = new ProviderModule(provider, networkType);
-    this.fizzModule = new FizzModule(provider, webSocketProvider, wallet, networkType);
+    this.fizzModule = new FizzModule(provider, wallet, networkType, this.rpcUrls);
     this.networkType = networkType;
   }
 

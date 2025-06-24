@@ -17,8 +17,8 @@ export class SpheronSDK {
   public provider: ProviderModule;
   public fizz: FizzModule;
   public deployment: DeploymentModule;
-  private smartWalletBundlerClientPromise?: Promise<SmartWalletBundlerClient>;
   public inventory: InventoryModule;
+  private smartWalletBundlerClientPromise?: Promise<SmartWalletBundlerClient>;
 
   constructor({
     networkType = 'mainnet',
@@ -35,7 +35,6 @@ export class SpheronSDK {
     gaslessOptions?: gaslessOptions;
   }) {
     const provider = new ethers.JsonRpcProvider(rpcUrls.http);
-    const websocketProvider = new ethers.WebSocketProvider(rpcUrls.websocket);
     const wallet = privateKey ? new ethers.Wallet(privateKey, provider) : undefined;
 
     if (privateKey && gaslessOptions) {
@@ -49,17 +48,17 @@ export class SpheronSDK {
 
     this.leases = new LeaseModule(
       provider,
-      websocketProvider,
       wallet,
       networkType,
-      this.smartWalletBundlerClientPromise
+      this.smartWalletBundlerClientPromise,
+      rpcUrls,
     );
     this.orders = new OrderModule(
       provider,
-      websocketProvider,
       wallet,
       networkType,
-      this.smartWalletBundlerClientPromise
+      this.smartWalletBundlerClientPromise,
+      rpcUrls,
     );
     this.escrow = new EscrowModule(
       provider,
@@ -68,15 +67,15 @@ export class SpheronSDK {
       this.smartWalletBundlerClientPromise
     );
     this.provider = new ProviderModule(provider, networkType);
-    this.fizz = new FizzModule(provider, websocketProvider, wallet, networkType);
+    this.fizz = new FizzModule(provider, wallet, networkType);
     this.deployment = new DeploymentModule(
       provider,
-      websocketProvider,
       wallet,
       networkType,
-      this.smartWalletBundlerClientPromise
+      this.smartWalletBundlerClientPromise,
+      rpcUrls,
     );
-    this.inventory = new InventoryModule(provider, websocketProvider, wallet, networkType);
+    this.inventory = new InventoryModule(provider, wallet, networkType, rpcUrls);
   }
 }
 
