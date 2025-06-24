@@ -12,7 +12,7 @@ import { SpheronProviderModule } from '@modules/spheron-provider';
 import { getManifestIcl, yamlToOrderDetails } from '@utils/deployment';
 import { getTokenDetails } from '@utils/index';
 import { createAuthorizationToken } from '@utils/provider-auth';
-import { NetworkType } from '@config/index';
+import { NetworkType, RpcUrls } from '@config/index';
 import { ethers } from 'ethers';
 import {
   CreateDeploymentResponse,
@@ -33,23 +33,22 @@ export class DeploymentModule {
 
   constructor(
     provider: ethers.Provider,
-    websocketProvider: ethers.WebSocketProvider,
     wallet?: ethers.Wallet,
     networkType: NetworkType = 'mainnet',
-    smartWalletBundlerClientPromise?: Promise<SmartWalletBundlerClient>
+    smartWalletBundlerClientPromise?: Promise<SmartWalletBundlerClient>,
+    rpcUrls?: RpcUrls
   ) {
     this.wallet = wallet;
     this.escrowModule = new EscrowModule(provider, wallet, networkType);
     this.orderModule = new OrderModule(
       provider,
-      websocketProvider,
       wallet,
       networkType,
-      smartWalletBundlerClientPromise
+      smartWalletBundlerClientPromise,
+      rpcUrls
     );
     this.leaseModule = new LeaseModule(
       provider,
-      websocketProvider,
       wallet,
       networkType,
       smartWalletBundlerClientPromise
@@ -120,7 +119,7 @@ export class DeploymentModule {
           );
           return { leaseId, transactionHash };
         } catch (error) {
-          throw new Error('Error occured in sending manifest');
+          throw new Error('Error occurred in sending manifest');
         }
       } catch (error) {
         throw error;

@@ -1,10 +1,10 @@
 import { contractAddresses } from '@contracts/addresses';
 import { OrderModule } from '@modules/order';
 import { getTokenDetails, initializeSigner } from '@utils/index';
-import { ethers } from 'ethers';
+import { ethers, WebSocketProvider } from 'ethers';
 import { Lease, LeaseState, LeaseWithOrderDetails } from './types';
 import { getLeaseStateAsString } from '@utils/lease';
-import { DEFAULT_PAGE_SIZE, NetworkType, SIGNATURE_DEADLINE } from '@config/index';
+import { DEFAULT_PAGE_SIZE, NetworkType, RpcUrls, SIGNATURE_DEADLINE } from '@config/index';
 import { FizzModule } from '@modules/fizz';
 import { ProviderModule } from '@modules/provider';
 import { handleContractError } from '@utils/errors';
@@ -15,32 +15,31 @@ import { type SmartWalletBundlerClient } from '@utils/smart-wallet';
 
 export class LeaseModule {
   private provider: ethers.Provider;
-  private websocketProvider?: ethers.WebSocketProvider;
   private orderModule: OrderModule;
   private fizzModule: FizzModule;
   private providerModule: ProviderModule;
   private leaseCloseTimeoutId: NodeJS.Timeout | null;
   private wallet: ethers.Wallet | undefined;
   private networkType: NetworkType | undefined;
+  private rpcUrls: RpcUrls | undefined;
 
   constructor(
     provider: ethers.Provider,
-    websocketProvider?: ethers.WebSocketProvider,
     wallet?: ethers.Wallet,
     networkType?: NetworkType,
-    private smartWalletBundlerClientPromise?: Promise<SmartWalletBundlerClient>
+    private smartWalletBundlerClientPromise?: Promise<SmartWalletBundlerClient>,
+    rpcUrls?: RpcUrls,
   ) {
     this.provider = provider;
-    this.websocketProvider = websocketProvider;
     this.getLeaseDetails = this.getLeaseDetails.bind(this);
     this.orderModule = new OrderModule(
       provider,
-      websocketProvider,
       wallet,
       networkType,
-      smartWalletBundlerClientPromise
+      smartWalletBundlerClientPromise,
+      rpcUrls
     );
-    this.fizzModule = new FizzModule(provider, websocketProvider, wallet, networkType);
+    this.fizzModule = new FizzModule(provider, wallet, networkType, rpcUrls);
     this.providerModule = new ProviderModule(provider, networkType);
     this.leaseCloseTimeoutId = null;
     this.wallet = wallet;
@@ -257,15 +256,20 @@ export class LeaseModule {
     onFailureCallback: () => void,
     timeout = 60000
   ) {
-    if (!this.websocketProvider) {
-      throw new Error('Please pass websocket provider in constructor');
+    let leaseWssProvider: WebSocketProvider | null = null;
+    if (this.rpcUrls?.websocket) {
+      leaseWssProvider = new ethers.WebSocketProvider(this.rpcUrls?.websocket);
     }
+    if (!leaseWssProvider) {
+      throw new Error('Lease WSS provider not created');
+    }
+
     const { signer } = await initializeSigner({ wallet: this.wallet });
     const account = await signer.getAddress();
     const contractAbi = abiMap[this.networkType as NetworkType].computeLease;
     const contractAddress = contractAddresses[this.networkType as NetworkType].computeLease;
 
-    const contract = new ethers.Contract(contractAddress, contractAbi, this.websocketProvider);
+    const contract = new ethers.Contract(contractAddress, contractAbi, leaseWssProvider);
 
     return new Promise((resolve, reject) => {
       this.leaseCloseTimeoutId = setTimeout(() => {
