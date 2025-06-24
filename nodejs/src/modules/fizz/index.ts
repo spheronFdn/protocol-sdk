@@ -3,7 +3,7 @@ import FizzAttributeRegistryAbi from '@contracts/abis/testnet/FizzAttributeRegis
 import ResourceRegistryAbi from '@contracts/abis/testnet/ResourceRegistry.json';
 import ComputeLeaseAbi from '@contracts/abis/testnet/ComputeLease.json';
 import { contractAddresses } from '@contracts/addresses';
-import { ethers } from 'ethers';
+import { ethers, WebSocketProvider } from 'ethers';
 import {
   FizzNode,
   FizzParams,
@@ -19,30 +19,30 @@ import {
 import { initializeSigner, requestPipeline } from '@utils/index';
 import { handleContractError } from '@utils/errors';
 import { ProviderModule } from '@modules/provider';
-import { NetworkType } from '@config/index';
+import { NetworkType, RpcUrls } from '@config/index';
 import { abiMap } from '@contracts/abi-map';
 import { subgraphGetFizzNodeIds, subgraphGetProviders } from '@utils/subgraph';
 import { createAuthorizationToken } from '@utils/provider-auth';
 
 export class FizzModule {
   private provider: ethers.Provider;
-  private webSocketProvider: ethers.WebSocketProvider | undefined;
   private timeoutId: NodeJS.Timeout | undefined;
   private wallet: ethers.Wallet | undefined;
   private providerModule: ProviderModule;
   private networkType: NetworkType | undefined;
+  private rpcUrls: RpcUrls | undefined;
 
   constructor(
     provider: ethers.Provider,
-    webSocketProvider?: ethers.WebSocketProvider,
     wallet?: ethers.Wallet,
-    networkType?: NetworkType
+    networkType?: NetworkType,
+    rpcUrls?: RpcUrls,
   ) {
     this.provider = provider;
-    this.webSocketProvider = webSocketProvider;
     this.wallet = wallet;
     this.providerModule = new ProviderModule(provider, networkType);
     this.networkType = networkType;
+    this.rpcUrls = rpcUrls;
   }
 
   async addFizzNode(fizzParams: FizzParams): Promise<unknown> {
@@ -411,7 +411,7 @@ export class FizzModule {
 
     try {
       const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-      const contract = new ethers.Contract(contractAddress, contractAbi, this.webSocketProvider);
+      const contract = new ethers.Contract(contractAddress, contractAbi, );
 
       return new Promise((resolve, reject) => {
         this.timeoutId = setTimeout(() => {
@@ -460,12 +460,19 @@ export class FizzModule {
     onFailureCallback: () => void,
     timeoutTime = 60000
   ) {
+    let wssProvider: WebSocketProvider | null = null;
+    if (this.rpcUrls?.websocket) {
+      wssProvider = new ethers.WebSocketProvider(this.rpcUrls?.websocket);
+    }
+    if (!wssProvider) {
+      throw new Error('Fizz WSS provider not created');
+    }
     const contractAddress = contractAddresses[this.networkType as NetworkType].fizzRegistry;
     const contractAbi = abiMap[this.networkType as NetworkType].fizzRegistry;
 
     try {
       const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-      const contract = new ethers.Contract(contractAddress, contractAbi, this.webSocketProvider);
+      const contract = new ethers.Contract(contractAddress, contractAbi, wssProvider);
 
       let timeoutId: NodeJS.Timeout | undefined;
 
@@ -519,12 +526,20 @@ export class FizzModule {
     onFailureCallback: () => void,
     timeoutTime = 60000
   ) {
+    let wssProvider: WebSocketProvider | null = null;
+    if (this.rpcUrls?.websocket) {
+      wssProvider = new ethers.WebSocketProvider(this.rpcUrls?.websocket);
+    }
+    if (!wssProvider) {
+      throw new Error('Fizz WSS provider not created');
+    }
+
     const contractAddress = contractAddresses[this.networkType as NetworkType].fizzRegistry;
     const contractAbi = abiMap[this.networkType as NetworkType].fizzRegistry;
 
     try {
       const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-      const contract = new ethers.Contract(contractAddress, contractAbi, this.webSocketProvider);
+      const contract = new ethers.Contract(contractAddress, contractAbi, wssProvider);
 
       let timeoutId: NodeJS.Timeout | undefined;
 
@@ -578,12 +593,20 @@ export class FizzModule {
     onFailureCallback: () => void,
     timeoutTime = 60000
   ) {
+    let wssProvider: WebSocketProvider | null = null;
+    if (this.rpcUrls?.websocket) {
+      wssProvider = new ethers.WebSocketProvider(this.rpcUrls?.websocket);
+    }
+    if (!wssProvider) {
+      throw new Error('Fizz WSS provider not created');
+    }
+
     const contractAddress = contractAddresses[this.networkType as NetworkType].fizzRegistry;
     const contractAbi = abiMap[this.networkType as NetworkType].fizzRegistry;
 
     try {
       const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-      const contract = new ethers.Contract(contractAddress, contractAbi, this.webSocketProvider);
+      const contract = new ethers.Contract(contractAddress, contractAbi, wssProvider);
 
       let timeoutId: NodeJS.Timeout | undefined;
 
@@ -637,12 +660,20 @@ export class FizzModule {
     onFailureCallback: () => void,
     timeoutTime = 60000
   ) {
+    let wssProvider: WebSocketProvider | null = null;
+    if (this.rpcUrls?.websocket) {
+      wssProvider = new ethers.WebSocketProvider(this.rpcUrls?.websocket);
+    }
+    if (!wssProvider) {
+      throw new Error('Fizz WSS provider not created');
+    }
+
     const contractAddress = contractAddresses[this.networkType as NetworkType].fizzRegistry;
     const contractAbi = abiMap[this.networkType as NetworkType].fizzRegistry;
 
     try {
       const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-      const contract = new ethers.Contract(contractAddress, contractAbi, this.webSocketProvider);
+      const contract = new ethers.Contract(contractAddress, contractAbi, wssProvider);
 
       let timeoutId: NodeJS.Timeout | undefined;
 
@@ -696,12 +727,20 @@ export class FizzModule {
     onFailureCallback: () => void,
     timeoutTime = 60000
   ) {
+    let wssProvider: WebSocketProvider | null = null;
+    if (this.rpcUrls?.websocket) {
+      wssProvider = new ethers.WebSocketProvider(this.rpcUrls?.websocket);
+    }
+    if (!wssProvider) {
+      throw new Error('Fizz WSS provider not created');
+    }
+
     const contractAddress = contractAddresses[this.networkType as NetworkType].fizzRegistry;
     const contractAbi = abiMap[this.networkType as NetworkType].fizzRegistry;
 
     try {
       const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-      const contract = new ethers.Contract(contractAddress, contractAbi, this.webSocketProvider);
+      const contract = new ethers.Contract(contractAddress, contractAbi, wssProvider);
 
       let timeoutId: NodeJS.Timeout | undefined;
 
