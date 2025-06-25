@@ -9,23 +9,23 @@ import { ethers } from 'ethers';
 import { InitialOrder, OrderDetails, Tier } from './types';
 import { getTokenDetails } from '@utils/index';
 import { getOrderStateAsString } from '@utils/order';
-import { NetworkType } from '@config/index';
+import { NetworkType, RpcProvider } from '@config/index';
 
 export class OrderModule {
   private provider: ethers.Provider;
-  private websocketProvider?: ethers.WebSocketProvider;
   private createTimeoutId: NodeJS.Timeout | null;
   private updateTimeoutId: NodeJS.Timeout | null;
   private networkType: NetworkType;
+  private rpcProvider: RpcProvider;
 
   constructor(
     provider: ethers.Provider,
-    websocketProvider?: ethers.WebSocketProvider,
-    networkType: NetworkType = 'testnet'
+    networkType: NetworkType = 'testnet',
+    rpcProvider: RpcProvider
   ) {
     this.networkType = networkType;
     this.provider = provider;
-    this.websocketProvider = websocketProvider;
+    this.rpcProvider = rpcProvider;
     this.createTimeoutId = null;
     this.updateTimeoutId = null;
   }
@@ -131,7 +131,8 @@ export class OrderModule {
     ) => void,
     onFailureCallback: () => void
   ) {
-    if (!this.websocketProvider) {
+    const webSocketProvider = new ethers.WebSocketProvider(this.rpcProvider.WSS_URL);
+    if (!webSocketProvider) {
       console.log('Please pass websocket provider in constructor');
       return;
     }
@@ -139,11 +140,12 @@ export class OrderModule {
     const contractAbi = BidAbi;
     const contractAddress = contractAddresses[this.networkType].bid;
 
-    const contract = new ethers.Contract(contractAddress, contractAbi, this.websocketProvider);
+    const contract = new ethers.Contract(contractAddress, contractAbi, webSocketProvider);
 
     return new Promise((resolve, reject) => {
       this.createTimeoutId = setTimeout(() => {
         contract.off('OrderMatched');
+        webSocketProvider?.destroy();
         onFailureCallback();
         reject({ error: true, msg: 'Order creation Failed' });
       }, timeoutTime);
@@ -159,7 +161,7 @@ export class OrderModule {
         ) => {
           if (creatorAddress.toString().toLowerCase() === accounts[0].toString().toLowerCase()) {
             onSuccessCallback(orderId, providerAddress, providerId, acceptedPrice, creatorAddress);
-            this.websocketProvider?.destroy();
+            webSocketProvider?.destroy();
             contract.off('OrderMatched');
             clearTimeout(this.createTimeoutId as NodeJS.Timeout);
             resolve({ orderId, providerAddress, providerId, acceptedPrice, creatorAddress });
@@ -188,11 +190,13 @@ export class OrderModule {
     const contractAbi = BidAbi;
     const contractAddress = contractAddresses[this.networkType].bid;
 
-    const contract = new ethers.Contract(contractAddress, contractAbi, this.websocketProvider);
+    const webSocketProvider = new ethers.WebSocketProvider(this.rpcProvider.WSS_URL);
+    const contract = new ethers.Contract(contractAddress, contractAbi, webSocketProvider);
 
     return new Promise((resolve, reject) => {
       this.updateTimeoutId = setTimeout(() => {
         contract.off('LeaseUpdated');
+        webSocketProvider?.destroy();
         onFailureCallback();
         reject({ error: true, msg: 'Order updation Failed' });
       }, timeoutTime);
@@ -200,7 +204,7 @@ export class OrderModule {
       contract.on('LeaseUpdated', (orderId, providerAddress, tenantAddress, acceptedPrice) => {
         if (tenantAddress.toString().toLowerCase() === accounts[0].toString().toLowerCase()) {
           onSuccessCallback(orderId, providerAddress, tenantAddress, acceptedPrice?.toString());
-          this.websocketProvider?.destroy();
+          webSocketProvider?.destroy();
           contract.off('LeaseUpdated');
           clearTimeout(this.updateTimeoutId as NodeJS.Timeout);
           resolve(orderId);
@@ -223,11 +227,13 @@ export class OrderModule {
     const contractAbi = BidAbi;
     const contractAddress = contractAddresses[this.networkType].bid;
 
-    const contract = new ethers.Contract(contractAddress, contractAbi, this.websocketProvider);
+    const webSocketProvider = new ethers.WebSocketProvider(this.rpcProvider.WSS_URL);
+    const contract = new ethers.Contract(contractAddress, contractAbi, webSocketProvider);
 
     return new Promise((resolve, reject) => {
       this.updateTimeoutId = setTimeout(() => {
         contract.off('UpdateRequestAccepted');
+        webSocketProvider?.destroy();
         onFailureCallback();
         reject({ error: true, msg: 'Order updation Failed' });
       }, timeoutTime);
@@ -235,7 +241,7 @@ export class OrderModule {
       contract.on('UpdateRequestAccepted', (orderId, providerAddress, tenantAddress) => {
         if (tenantAddress.toString().toLowerCase() === accounts[0].toString().toLowerCase()) {
           onSuccessCallback(orderId, providerAddress);
-          this.websocketProvider?.destroy();
+          webSocketProvider?.destroy();
           contract.off('UpdateRequestAccepted');
           clearTimeout(this.updateTimeoutId as NodeJS.Timeout);
           resolve(orderId);

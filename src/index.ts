@@ -27,12 +27,11 @@ export class SpheronSDK {
   ) {
     this.networkType = networkType;
     const provider = new ethers.JsonRpcProvider(rpcProvider.HTTP_URL);
-    const websocketProvider = new ethers.WebSocketProvider(rpcProvider.WSS_URL);
-    this.leases = new LeaseModule(provider, websocketProvider, networkType);
-    this.orders = new OrderModule(provider, websocketProvider, networkType);
+    this.leases = new LeaseModule(provider, networkType, rpcProvider);
+    this.orders = new OrderModule(provider, networkType, rpcProvider);
     this.escrow = new EscrowModule(provider, networkType);
     this.provider = new ProviderModule(provider, networkType);
-    this.fizz = new FizzModule(provider, websocketProvider, networkType);
+    this.fizz = new FizzModule(provider, networkType, rpcProvider);
     this.spheronProvider = new SpheronProviderModule(providerUrl, proxyUrl);
   }
 }
