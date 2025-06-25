@@ -1,7 +1,5 @@
 import { GSEQ, OSEQ } from '@config/index';
-import { LeaseModule } from '@modules/lease';
 import { requestPipeline } from '@utils/index';
-import { ethers } from 'ethers';
 
 export class SpheronProviderModule {
   private providerHostUrl: string;
@@ -240,23 +238,6 @@ export class SpheronProviderModule {
       return response;
     } catch (error) {
       console.log('Error in leaseShell ->', error);
-      throw error;
-    }
-  }
-
-  async closeDeploymentAndLease(
-    certificate: string,
-    authToken: string,
-    provider: ethers.Provider,
-    leaseId: string
-  ) {
-    try {
-      const lease = new LeaseModule(provider);
-      const leaseResponse = await lease.closeLease(leaseId);
-      const closeDeployment = await this.closeDeployment(certificate, authToken);
-      return { lease: leaseResponse, closeDeployment };
-    } catch (error) {
-      console.log('Error in close deployment and Lease ->', error);
       throw error;
     }
   }

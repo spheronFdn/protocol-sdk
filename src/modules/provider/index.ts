@@ -9,7 +9,7 @@ export class ProviderModule {
   private provider: ethers.Provider;
   private networkType: NetworkType;
 
-  constructor(provider: ethers.Provider, networkType: NetworkType = 'testnet') {
+  constructor(provider: ethers.Provider, networkType: NetworkType = 'mainnet') {
     this.provider = provider;
     this.networkType = networkType;
   }

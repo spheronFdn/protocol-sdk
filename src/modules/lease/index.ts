@@ -19,7 +19,7 @@ export class LeaseModule {
 
   constructor(
     provider: ethers.Provider,
-    networkType: NetworkType = 'testnet',
+    networkType: NetworkType = 'mainnet',
     rpcProvider: RpcProvider
   ) {
     this.networkType = networkType;

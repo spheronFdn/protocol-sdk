@@ -49,7 +49,7 @@ export interface INetwork {
   blockExplorerUrls: string[];
 }
 
-export type NetworkType = 'testnet' | 'mainnet';
+export type NetworkType = 'mainnet' | 'testnet';
 
 export const networkMap: Record<NetworkType, INetwork> = {
   testnet: {
@@ -125,7 +125,7 @@ export const tokenMap: Record<NetworkType, IToken[]> = {
   ],
 };
 
-export const networkType = (process.env.NEXT_PUBLIC_NETWORK_TYPE as string) || 'testnet';
+export const networkType = (process.env.NEXT_PUBLIC_NETWORK_TYPE as string) || 'mainnet';
 
 export const DEFAULT_PAGE_SIZE = 10;
 

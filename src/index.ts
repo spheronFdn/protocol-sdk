@@ -19,7 +19,7 @@ export class SpheronSDK {
   constructor(
     providerUrl = '',
     proxyUrl = '',
-    networkType: NetworkType = 'testnet',
+    networkType: NetworkType = 'mainnet',
     rpcProvider: RpcProvider = {
       HTTP_URL: SPHERON_RPC_MAP[networkType].http,
       WSS_URL: SPHERON_RPC_MAP[networkType].wss,
