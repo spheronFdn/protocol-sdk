@@ -1,19 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import EscrowAbi from '@contracts/abis/devnet/Escrow.json';
-import FizzRegistryAbi from '@contracts/abis/devnet/FizzRegistry.json';
-import ProviderRegistryAbi from '@contracts/abis/devnet/ProviderRegistry.json';
-import FizzAttributeRegistryAbi from '@contracts/abis/devnet/FizzAttributeRegistry.json';
-import ResourceRegistryAbi from '@contracts/abis/devnet/ResourceRegistry.json';
-import ComputeLeaseAbi from '@contracts/abis/devnet/ComputeLease.json';
-import {
-  EscrowDev,
-  FizzRegistryDev,
-  FizzAttributeRegistryDev,
-  ResourceRegistryCPUDev,
-  ResourceRegistryGPUDev,
-  ProviderRegistryDev,
-  ComputeLeaseDev,
-} from '@contracts/addresses';
+import EscrowProtocolAbi from '@contracts/abis/testnet/EscrowProtocol.json';
+import EscrowAbi from '@contracts/abis/testnet/EscrowUser.json';
+import FizzRegistryAbi from '@contracts/abis/testnet/FizzRegistry.json';
+import ProviderRegistryAbi from '@contracts/abis/testnet/ProviderRegistry.json';
+import FizzAttributeRegistryAbi from '@contracts/abis/testnet/FizzAttributeRegistry.json';
+import ResourceRegistryAbi from '@contracts/abis/testnet/ResourceRegistry.json';
+import ComputeLeaseAbi from '@contracts/abis/testnet/ComputeLease.json';
+import { contractAddresses } from '@contracts/addresses';
 import { ethers } from 'ethers';
 import {
   Attribute,
@@ -27,63 +20,27 @@ import {
 } from './types';
 import { TransactionData } from '@modules/escrow/types';
 import { decompressProviderSpec } from '@utils/spec';
-
+import { NetworkType, RpcProvider } from '@config/index';
 export class FizzModule {
   private provider: ethers.Provider;
-  private webSocketProvider: ethers.WebSocketProvider | undefined;
   private timeoutId: NodeJS.Timeout | undefined;
+  private networkType: NetworkType;
+  private rpcProvider: RpcProvider;
 
-  constructor(provider: ethers.Provider, webSocketProvider?: ethers.WebSocketProvider) {
+  constructor(
+    provider: ethers.Provider,
+    networkType: NetworkType = 'mainnet',
+    rpcProvider: RpcProvider
+  ) {
+    this.networkType = networkType;
     this.provider = provider;
-    this.webSocketProvider = webSocketProvider;
-  }
-
-  async withdrawFizzEarnings({
-    rewardWallet,
-    tokenAddress,
-    amount,
-    decimals,
-    onSuccessCallback,
-    onFailureCallback,
-  }: TransactionData) {
-    if (typeof window?.ethereum === 'undefined') {
-      console.log('Please install MetaMask');
-      return;
-    }
-
-    try {
-      await window.ethereum.request({ method: 'eth_requestAccounts' });
-
-      const provider = new ethers.BrowserProvider(window.ethereum);
-      const signer = await provider.getSigner();
-
-      const contractABI = EscrowAbi;
-      const contractAddress = EscrowDev;
-      const contract = new ethers.Contract(contractAddress, contractABI, signer);
-
-      const finalAmount = (Number(amount.toString()) - 1) / 10 ** decimals;
-      const withdrawAmount = ethers.parseUnits(finalAmount.toFixed(decimals), decimals);
-
-      const result = await contract.withdrawFizzNodeEarnings(
-        rewardWallet,
-        tokenAddress,
-        withdrawAmount
-      );
-      const receipt = await result.wait();
-      console.log('Withdraw earnings successful -> ', receipt);
-      if (onSuccessCallback) onSuccessCallback(receipt);
-      return receipt;
-    } catch (error) {
-      console.error('Error withdrawing fizz earnings -> ', error);
-      if (onFailureCallback) onFailureCallback(error);
-      throw error;
-    }
+    this.rpcProvider = rpcProvider;
   }
 
   async getFizzEarnings(fizzAddress: string, tokenAddress: string) {
     try {
-      const contractAbi = EscrowAbi;
-      const contractAddress = EscrowDev;
+      const contractAbi = EscrowProtocolAbi;
+      const contractAddress = contractAddresses[this.networkType].escrowProtocol;
       const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
 
       const response = await contract.getFizzNodeEarnings(fizzAddress, tokenAddress);
@@ -115,7 +72,7 @@ export class FizzModule {
       const provider = new ethers.BrowserProvider(window.ethereum);
       const signer = await provider.getSigner();
 
-      const contractAddress = FizzRegistryDev;
+      const contractAddress = contractAddresses[this.networkType].fizzRegistry;
       const abi = FizzRegistryAbi;
       const contract = new ethers.Contract(contractAddress, abi, signer);
 
@@ -142,7 +99,7 @@ export class FizzModule {
       const signer = await provider.getSigner();
 
       // Contract address (hardcoded or retrieved from an environment variable)
-      const contractAddress = FizzRegistryDev;
+      const contractAddress = contractAddresses[this.networkType].fizzRegistry;
       const abi = FizzRegistryAbi;
       const contract = new ethers.Contract(contractAddress, abi, signer);
 
@@ -160,7 +117,7 @@ export class FizzModule {
 
   async getFizzById(fizzId: bigint): Promise<unknown> {
     try {
-      const contractAddress = FizzRegistryDev;
+      const contractAddress = contractAddresses[this.networkType].fizzRegistry;
       const contractAbi = FizzRegistryAbi;
 
       const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
@@ -195,7 +152,7 @@ export class FizzModule {
 
   async getFizzNodeByAddress(walletAddress: string) {
     try {
-      const contractAddress = FizzRegistryDev;
+      const contractAddress = contractAddresses[this.networkType].fizzRegistry;
       const contractAbi = FizzRegistryAbi;
 
       const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
@@ -225,7 +182,7 @@ export class FizzModule {
 
   async getAllFizzNodes(): Promise<FizzNode[]> {
     try {
-      const contractAddress = FizzRegistryDev;
+      const contractAddress = contractAddresses[this.networkType].fizzRegistry;
       const contractAbi = FizzRegistryAbi;
 
       const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
@@ -259,7 +216,7 @@ export class FizzModule {
 
       const signer = await provider.getSigner();
 
-      const contractAddress = FizzAttributeRegistryDev;
+      const contractAddress = contractAddresses[this.networkType].fizzAttributeRegistry;
       const contractAbi = FizzAttributeRegistryAbi;
 
       const contract = new ethers.Contract(contractAddress, contractAbi, signer);
@@ -277,7 +234,7 @@ export class FizzModule {
 
   async getAttributes(fizzAddress: string, category: string): Promise<Attribute[]> {
     try {
-      const contractAddress = FizzAttributeRegistryDev;
+      const contractAddress = contractAddresses[this.networkType].fizzAttributeRegistry;
       const contractAbi = FizzAttributeRegistryAbi;
 
       const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
@@ -303,7 +260,7 @@ export class FizzModule {
 
   async getPendingAttributes(fizzAddress: string, category: string): Promise<Attribute[]> {
     try {
-      const contractAddress = FizzAttributeRegistryDev;
+      const contractAddress = contractAddresses[this.networkType].fizzAttributeRegistry;
       const contractAbi = FizzAttributeRegistryAbi;
 
       const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
@@ -328,7 +285,10 @@ export class FizzModule {
   async getResource(resourceID: bigint, category: string): Promise<Resource> {
     try {
       const contractAbi = ResourceRegistryAbi;
-      const contractAddress = category === 'CPU' ? ResourceRegistryCPUDev : ResourceRegistryGPUDev;
+      const contractAddress =
+        category === 'CPU'
+          ? contractAddresses[this.networkType].fizzResourceRegistryCPU
+          : contractAddresses[this.networkType].fizzResourceRegistryGPU;
 
       const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
 
@@ -349,7 +309,7 @@ export class FizzModule {
 
   async getProvider(providerId: bigint): Promise<any> {
     try {
-      const contractAddress = ProviderRegistryDev;
+      const contractAddress = contractAddresses[this.networkType].providerRegistry;
       const contractAbi = ProviderRegistryAbi;
 
       const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
@@ -392,7 +352,7 @@ export class FizzModule {
 
   async getProviderByAddress(walletAddress: string): Promise<any> {
     try {
-      const contractAddress = ProviderRegistryDev;
+      const contractAddress = contractAddresses[this.networkType].providerRegistry;
       const contractAbi = ProviderRegistryAbi;
 
       const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
@@ -435,7 +395,7 @@ export class FizzModule {
 
   async getAllProviders(): Promise<FizzProvider[]> {
     try {
-      const contractAddress = ProviderRegistryDev;
+      const contractAddress = contractAddresses[this.networkType].providerRegistry;
       const contractAbi = ProviderRegistryAbi;
 
       const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
@@ -490,7 +450,7 @@ export class FizzModule {
       const providerData = await this.getProvider(providerId);
       const walletAddress = providerData.walletAddress;
 
-      const leaseContractAddress = ComputeLeaseDev;
+      const leaseContractAddress = contractAddresses[this.networkType].computeLease;
       const leaseContractAbi = ComputeLeaseAbi;
       const leaseContract = new ethers.Contract(
         leaseContractAddress,
@@ -537,16 +497,18 @@ export class FizzModule {
     onFailureCallback: () => void,
     timeoutTime = 60000
   ) {
-    const contractAddress = FizzRegistryDev;
+    const contractAddress = contractAddresses[this.networkType].fizzRegistry;
     const contractAbi = FizzRegistryAbi;
 
     try {
       const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-      const contract = new ethers.Contract(contractAddress, contractAbi, this.webSocketProvider);
+      const webSocketProvider = new ethers.WebSocketProvider(this.rpcProvider.WSS_URL);
+      const contract = new ethers.Contract(contractAddress, contractAbi, webSocketProvider);
 
       return new Promise((resolve, reject) => {
         this.timeoutId = setTimeout(() => {
           contract.off('FizzNodeAdded');
+          webSocketProvider?.destroy();
           onFailureCallback();
           reject({ error: true, msg: 'Fizz creation failed' });
         }, timeoutTime);
@@ -554,7 +516,7 @@ export class FizzModule {
         contract.on('FizzNodeAdded', (fizzId: bigint, walletAddress: string) => {
           if (walletAddress.toString().toLowerCase() === accounts[0].toString().toLowerCase()) {
             onSuccessCallback(fizzId, walletAddress);
-            this.webSocketProvider?.destroy();
+            webSocketProvider?.destroy();
             contract.off('FizzNodeAdded');
             clearTimeout(this.timeoutId as NodeJS.Timeout);
             resolve({ fizzId, walletAddress });
@@ -573,7 +535,7 @@ export class FizzModule {
       await provider.send('eth_requestAccounts', []);
       const signer = await provider.getSigner();
 
-      const contractAddress = FizzRegistryDev;
+      const contractAddress = contractAddresses[this.networkType].fizzRegistry;
       const contractAbi = FizzRegistryAbi;
 
       const contract = new ethers.Contract(contractAddress, contractAbi, signer);
@@ -594,18 +556,20 @@ export class FizzModule {
     onFailureCallback: () => void,
     timeoutTime = 60000
   ) {
-    const contractAddress = FizzRegistryDev;
+    const contractAddress = contractAddresses[this.networkType].fizzRegistry;
     const contractAbi = FizzRegistryAbi;
 
     try {
       const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-      const contract = new ethers.Contract(contractAddress, contractAbi, this.webSocketProvider);
+      const webSocketProvider = new ethers.WebSocketProvider(this.rpcProvider.WSS_URL);
+      const contract = new ethers.Contract(contractAddress, contractAbi, webSocketProvider);
 
       let timeoutId: NodeJS.Timeout | undefined;
 
       return new Promise((resolve, reject) => {
         timeoutId = setTimeout(() => {
           contract.off('FizzNodeSpecUpdated');
+          webSocketProvider?.destroy();
           onFailureCallback();
           reject({ error: true, msg: 'Fizz update failed' });
         }, timeoutTime);
@@ -616,7 +580,7 @@ export class FizzModule {
             fizz.walletAddress.toString().toLowerCase() === accounts[0].toString().toLowerCase()
           ) {
             onSuccessCallback(fizzId, specs, fizz.walletAddress);
-            this.webSocketProvider?.destroy();
+            webSocketProvider?.destroy();
             contract.off('FizzNodeSpecUpdated');
             clearTimeout(timeoutId as NodeJS.Timeout);
             resolve({ fizzId, specs, walletAddress: fizz.walletAddress });
@@ -635,7 +599,7 @@ export class FizzModule {
       await provider.send('eth_requestAccounts', []);
       const signer = await provider.getSigner();
 
-      const contractAddress = FizzRegistryDev;
+      const contractAddress = contractAddresses[this.networkType].fizzRegistry;
       const contractAbi = FizzRegistryAbi;
 
       const contract = new ethers.Contract(contractAddress, contractAbi, signer);
@@ -656,18 +620,20 @@ export class FizzModule {
     onFailureCallback: () => void,
     timeoutTime = 60000
   ) {
-    const contractAddress = FizzRegistryDev;
+    const contractAddress = contractAddresses[this.networkType].fizzRegistry;
     const contractAbi = FizzRegistryAbi;
 
     try {
       const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-      const contract = new ethers.Contract(contractAddress, contractAbi, this.webSocketProvider);
+      const webSocketProvider = new ethers.WebSocketProvider(this.rpcProvider.WSS_URL);
+      const contract = new ethers.Contract(contractAddress, contractAbi, webSocketProvider);
 
       let timeoutId: NodeJS.Timeout | undefined;
 
       return new Promise((resolve, reject) => {
         timeoutId = setTimeout(() => {
           contract.off('FizzNodeRegionUpdated');
+          webSocketProvider?.destroy();
           onFailureCallback();
           reject({ error: true, msg: 'Fizz update failed' });
         }, timeoutTime);
@@ -678,7 +644,7 @@ export class FizzModule {
             fizz.walletAddress.toString().toLowerCase() === accounts[0].toString().toLowerCase()
           ) {
             onSuccessCallback(fizzId, region, fizz.walletAddress);
-            this.webSocketProvider?.destroy();
+            webSocketProvider?.destroy();
             contract.off('FizzNodeRegionUpdated');
             clearTimeout(timeoutId as NodeJS.Timeout);
             resolve({ fizzId, region, walletAddress: fizz.walletAddress });
@@ -697,7 +663,7 @@ export class FizzModule {
       await provider.send('eth_requestAccounts', []);
       const signer = await provider.getSigner();
 
-      const contractAddress = FizzRegistryDev;
+      const contractAddress = contractAddresses[this.networkType].fizzRegistry;
       const contractAbi = FizzRegistryAbi;
 
       const contract = new ethers.Contract(contractAddress, contractAbi, signer);
@@ -718,18 +684,20 @@ export class FizzModule {
     onFailureCallback: () => void,
     timeoutTime = 60000
   ) {
-    const contractAddress = FizzRegistryDev;
+    const contractAddress = contractAddresses[this.networkType].fizzRegistry;
     const contractAbi = FizzRegistryAbi;
 
     try {
       const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-      const contract = new ethers.Contract(contractAddress, contractAbi, this.webSocketProvider);
+      const webSocketProvider = new ethers.WebSocketProvider(this.rpcProvider.WSS_URL);
+      const contract = new ethers.Contract(contractAddress, contractAbi, webSocketProvider);
 
       let timeoutId: NodeJS.Timeout | undefined;
 
       return new Promise((resolve, reject) => {
         timeoutId = setTimeout(() => {
           contract.off('FizzNodeProviderIdUpdated');
+          webSocketProvider?.destroy();
           onFailureCallback();
           reject({ error: true, msg: 'Fizz update failed' });
         }, timeoutTime);
@@ -740,7 +708,7 @@ export class FizzModule {
             fizz.walletAddress.toString().toLowerCase() === accounts[0].toString().toLowerCase()
           ) {
             onSuccessCallback(fizzId, providerId, fizz.walletAddress);
-            this.webSocketProvider?.destroy();
+            webSocketProvider?.destroy();
             contract.off('FizzNodeProviderIdUpdated');
             clearTimeout(timeoutId as NodeJS.Timeout);
             resolve({ fizzId, providerId, walletAddress: fizz.walletAddress });
@@ -759,7 +727,7 @@ export class FizzModule {
       await provider.send('eth_requestAccounts', []);
       const signer = await provider.getSigner();
 
-      const contractAddress = FizzRegistryDev;
+      const contractAddress = contractAddresses[this.networkType].fizzRegistry;
       const contractAbi = FizzRegistryAbi;
 
       const contract = new ethers.Contract(contractAddress, contractAbi, signer);
@@ -780,18 +748,20 @@ export class FizzModule {
     onFailureCallback: () => void,
     timeoutTime = 60000
   ) {
-    const contractAddress = FizzRegistryDev;
+    const contractAddress = contractAddresses[this.networkType].fizzRegistry;
     const contractAbi = FizzRegistryAbi;
 
     try {
       const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-      const contract = new ethers.Contract(contractAddress, contractAbi, this.webSocketProvider);
+      const webSocketProvider = new ethers.WebSocketProvider(this.rpcProvider.WSS_URL);
+      const contract = new ethers.Contract(contractAddress, contractAbi, webSocketProvider);
 
       let timeoutId: NodeJS.Timeout | undefined;
 
       return new Promise((resolve, reject) => {
         timeoutId = setTimeout(() => {
           contract.off('PaymentAdded');
+          webSocketProvider?.destroy();
           onFailureCallback();
           reject({ error: true, msg: 'Fizz update failed' });
         }, timeoutTime);
@@ -802,7 +772,7 @@ export class FizzModule {
             fizz.walletAddress.toString().toLowerCase() === accounts[0].toString().toLowerCase()
           ) {
             onSuccessCallback(fizzId, tokenAddress, fizz.walletAddress);
-            this.webSocketProvider?.destroy();
+            webSocketProvider?.destroy();
             contract.off('PaymentAdded');
             clearTimeout(timeoutId as NodeJS.Timeout);
             resolve({ fizzId, tokenAddress, walletAddress: fizz.walletAddress });
@@ -821,7 +791,7 @@ export class FizzModule {
       await provider.send('eth_requestAccounts', []);
       const signer = await provider.getSigner();
 
-      const contractAddress = FizzRegistryDev;
+      const contractAddress = contractAddresses[this.networkType].fizzRegistry;
       const contractAbi = FizzRegistryAbi;
 
       const contract = new ethers.Contract(contractAddress, contractAbi, signer);
@@ -842,18 +812,20 @@ export class FizzModule {
     onFailureCallback: () => void,
     timeoutTime = 60000
   ) {
-    const contractAddress = FizzRegistryDev;
+    const contractAddress = contractAddresses[this.networkType].fizzRegistry;
     const contractAbi = FizzRegistryAbi;
 
     try {
       const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-      const contract = new ethers.Contract(contractAddress, contractAbi, this.webSocketProvider);
+      const webSocketProvider = new ethers.WebSocketProvider(this.rpcProvider.WSS_URL);
+      const contract = new ethers.Contract(contractAddress, contractAbi, webSocketProvider);
 
       let timeoutId: NodeJS.Timeout | undefined;
 
       return new Promise((resolve, reject) => {
         timeoutId = setTimeout(() => {
           contract.off('PaymentRemoved');
+          webSocketProvider?.destroy();
           onFailureCallback();
           reject({ error: true, msg: 'Fizz update failed' });
         }, timeoutTime);
@@ -864,7 +836,7 @@ export class FizzModule {
             fizz.walletAddress.toString().toLowerCase() === accounts[0].toString().toLowerCase()
           ) {
             onSuccessCallback(fizzId, tokenAddress, fizz.walletAddress);
-            this.webSocketProvider?.destroy();
+            webSocketProvider?.destroy();
             contract.off('PaymentRemoved');
             clearTimeout(timeoutId as NodeJS.Timeout);
             resolve({ fizzId, tokenAddress, walletAddress: fizz.walletAddress });
@@ -883,7 +855,7 @@ export class FizzModule {
       await provider.send('eth_requestAccounts', []);
       const signer = await provider.getSigner();
 
-      const contractAddress = FizzAttributeRegistryDev;
+      const contractAddress = contractAddresses[this.networkType].fizzAttributeRegistry;
       const contractAbi = FizzAttributeRegistryAbi;
 
       const contract = new ethers.Contract(contractAddress, contractAbi, signer);

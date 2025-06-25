@@ -3,7 +3,7 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "_fizzRegistryAddress",
+        "name": "_providerRegistryAddress",
         "type": "address"
       },
       {
@@ -17,22 +17,17 @@
   },
   {
     "inputs": [],
-    "name": "AlreadySet",
-    "type": "error"
-  },
-  {
-    "inputs": [],
     "name": "ArrayMismatch",
     "type": "error"
   },
   {
     "inputs": [],
-    "name": "EmptyArray",
+    "name": "DuplicateId",
     "type": "error"
   },
   {
     "inputs": [],
-    "name": "FizzNodeNotFound",
+    "name": "EmptyArray",
     "type": "error"
   },
   {
@@ -56,12 +51,79 @@
     "type": "error"
   },
   {
+    "inputs": [],
+    "name": "ProviderNotFound",
+    "type": "error"
+  },
+  {
     "anonymous": false,
     "inputs": [
       {
         "indexed": true,
         "internalType": "address",
-        "name": "fizz",
+        "name": "submitter",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "totalProcessed",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "successCount",
+        "type": "uint256"
+      }
+    ],
+    "name": "BatchAttributesSubmitted",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "provider",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "category",
+        "type": "string"
+      },
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "id",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "units",
+            "type": "uint256"
+          }
+        ],
+        "indexed": false,
+        "internalType": "struct ProviderAttributeRegistry.Attribute[]",
+        "name": "attributes",
+        "type": "tuple[]"
+      }
+    ],
+    "name": "ProviderAttributesApproved",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "provider",
         "type": "address"
       },
       {
@@ -71,7 +133,7 @@
         "type": "string"
       }
     ],
-    "name": "AttributesApproved",
+    "name": "ProviderAttributesRemoved",
     "type": "event"
   },
   {
@@ -80,26 +142,7 @@
       {
         "indexed": true,
         "internalType": "address",
-        "name": "fizz",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "string",
-        "name": "category",
-        "type": "string"
-      }
-    ],
-    "name": "AttributesRemoved",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "fizz",
+        "name": "provider",
         "type": "address"
       },
       {
@@ -121,20 +164,7 @@
         "type": "uint256[]"
       }
     ],
-    "name": "AttributesSubmitted",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "bool",
-        "name": "autoApprove",
-        "type": "bool"
-      }
-    ],
-    "name": "AutoApprovalStatedUpdated",
+    "name": "ProviderAttributesSubmitted",
     "type": "event"
   },
   {
@@ -143,20 +173,7 @@
       {
         "indexed": false,
         "internalType": "address",
-        "name": "fizzRegistry",
-        "type": "address"
-      }
-    ],
-    "name": "FizzRegistryUpdated",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "fizzRegistry",
+        "name": "providerRegistry",
         "type": "address"
       }
     ],
@@ -178,6 +195,19 @@
   },
   {
     "inputs": [],
+    "name": "VERIFIER_ROLE",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "accessControl",
     "outputs": [
       {
@@ -193,7 +223,7 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "fizzAddress",
+        "name": "providerAddress",
         "type": "address"
       },
       {
@@ -222,13 +252,13 @@
             "type": "uint256"
           }
         ],
-        "internalType": "struct FizzAttributeRegistry.Attribute[]",
+        "internalType": "struct ProviderAttributeRegistry.Attribute[]",
         "name": "attributes",
         "type": "tuple[]"
       },
       {
         "internalType": "address",
-        "name": "fizz",
+        "name": "provider",
         "type": "address"
       },
       {
@@ -246,7 +276,7 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "fizz",
+        "name": "provider",
         "type": "address"
       },
       {
@@ -263,17 +293,34 @@
   {
     "inputs": [
       {
-        "internalType": "address[]",
-        "name": "fizzes",
-        "type": "address[]"
-      },
-      {
-        "internalType": "string",
-        "name": "category",
-        "type": "string"
+        "components": [
+          {
+            "internalType": "address",
+            "name": "provider",
+            "type": "address"
+          },
+          {
+            "internalType": "string",
+            "name": "category",
+            "type": "string"
+          },
+          {
+            "internalType": "uint256[]",
+            "name": "ids",
+            "type": "uint256[]"
+          },
+          {
+            "internalType": "uint256[]",
+            "name": "units",
+            "type": "uint256[]"
+          }
+        ],
+        "internalType": "struct ProviderAttributeRegistry.BatchAttributeInput[]",
+        "name": "batchData",
+        "type": "tuple[]"
       }
     ],
-    "name": "batchApproveAttributes",
+    "name": "batchSubmitAttributes",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -282,67 +329,7 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "",
-        "type": "address"
-      },
-      {
-        "internalType": "string",
-        "name": "",
-        "type": "string"
-      },
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "name": "fizzAttributes",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "id",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "units",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "fizzRegistry",
-    "outputs": [
-      {
-        "internalType": "contract IFizzRegistry",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "fizzRewardManager",
-    "outputs": [
-      {
-        "internalType": "contract IFizzRewardsManager",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_fizzAddress",
+        "name": "_providerAddress",
         "type": "address"
       },
       {
@@ -366,7 +353,7 @@
             "type": "uint256"
           }
         ],
-        "internalType": "struct FizzAttributeRegistry.Attribute[]",
+        "internalType": "struct ProviderAttributeRegistry.Attribute[]",
         "name": "",
         "type": "tuple[]"
       }
@@ -378,26 +365,7 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "_fizz",
-        "type": "address"
-      }
-    ],
-    "name": "getFizzNodeRewardWalletByAddress",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "rewardWallet",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_fizzAddress",
+        "name": "_providerAddress",
         "type": "address"
       },
       {
@@ -421,9 +389,47 @@
             "type": "uint256"
           }
         ],
-        "internalType": "struct FizzAttributeRegistry.Attribute[]",
+        "internalType": "struct ProviderAttributeRegistry.Attribute[]",
         "name": "",
         "type": "tuple[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "provider",
+        "type": "address"
+      }
+    ],
+    "name": "getProviderRewardWallet",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "rewardWallet",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_walletAddress",
+        "type": "address"
+      }
+    ],
+    "name": "getProviderTrustTier",
+    "outputs": [
+      {
+        "internalType": "enum TrustTier",
+        "name": "tier",
+        "type": "uint8"
       }
     ],
     "stateMutability": "view",
@@ -466,6 +472,66 @@
   {
     "inputs": [
       {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      },
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "providerAttributes",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "id",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "units",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "providerRegistry",
+    "outputs": [
+      {
+        "internalType": "contract IProviderRegistry",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "providerRewardManager",
+    "outputs": [
+      {
+        "internalType": "contract IProviderRewardsManager",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "string",
         "name": "category",
         "type": "string"
@@ -495,32 +561,6 @@
       }
     ],
     "name": "submitAttributes",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "bool",
-        "name": "_autoApprove",
-        "type": "bool"
-      }
-    ],
-    "name": "updateAutoApprovalState",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_fizzRegistry",
-        "type": "address"
-      }
-    ],
-    "name": "updateFizzRegistryAddress",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

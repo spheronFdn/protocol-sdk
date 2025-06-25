@@ -1,20 +1,31 @@
-import { OrderRequestDev as OrderRequest, BidDev as Bid } from '@contracts/addresses';
-import OrderRequestAbi from '@contracts/abis/devnet/OrderRequest.json';
-import BidAbi from '@contracts/abis/devnet/Bid.json';
+import {
+  OrderRequestDev as OrderRequest,
+  BidDev as Bid,
+  contractAddresses,
+} from '@contracts/addresses';
+import OrderRequestAbi from '@contracts/abis/testnet/OrderRequest.json';
+import BidAbi from '@contracts/abis/testnet/Bid.json';
 import { ethers } from 'ethers';
 import { InitialOrder, OrderDetails, Tier } from './types';
 import { getTokenDetails } from '@utils/index';
 import { getOrderStateAsString } from '@utils/order';
+import { NetworkType, RpcProvider } from '@config/index';
 
 export class OrderModule {
   private provider: ethers.Provider;
-  private websocketProvider?: ethers.WebSocketProvider;
   private createTimeoutId: NodeJS.Timeout | null;
   private updateTimeoutId: NodeJS.Timeout | null;
+  private networkType: NetworkType;
+  private rpcProvider: RpcProvider;
 
-  constructor(provider: ethers.Provider, websocketProvider?: ethers.WebSocketProvider) {
+  constructor(
+    provider: ethers.Provider,
+    networkType: NetworkType = 'mainnet',
+    rpcProvider: RpcProvider
+  ) {
+    this.networkType = networkType;
     this.provider = provider;
-    this.websocketProvider = websocketProvider;
+    this.rpcProvider = rpcProvider;
     this.createTimeoutId = null;
     this.updateTimeoutId = null;
   }
@@ -31,7 +42,11 @@ export class OrderModule {
       const provider = new ethers.BrowserProvider(window.ethereum);
       const signer = await provider.getSigner();
 
-      const contract = new ethers.Contract(OrderRequest, OrderRequestAbi, signer);
+      const contract = new ethers.Contract(
+        contractAddresses[this.networkType].orderRequest,
+        OrderRequestAbi,
+        signer
+      );
 
       const tx = await contract.createOrder(orderDetails);
       const receipt = await tx.wait();
@@ -55,7 +70,11 @@ export class OrderModule {
       const provider = new ethers.BrowserProvider(window.ethereum);
       const signer = await provider.getSigner();
 
-      const contract = new ethers.Contract(OrderRequest, OrderRequestAbi, signer);
+      const contract = new ethers.Contract(
+        contractAddresses[this.networkType].orderRequest,
+        OrderRequestAbi,
+        signer
+      );
 
       const tx = await contract.updateInitialOrder(orderId, orderDetails);
 
@@ -71,7 +90,7 @@ export class OrderModule {
 
   async getOrderDetails(leaseId: string) {
     const contractAbi = OrderRequestAbi;
-    const contractAddress = OrderRequest;
+    const contractAddress = contractAddresses[this.networkType].orderRequest;
 
     const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
     const response = await contract.getOrderById(leaseId);
@@ -83,7 +102,7 @@ export class OrderModule {
       tier: response.specs.tier.map((t: bigint) => Number(t)) as Tier[],
     };
 
-    const tokenDetails = getTokenDetails(response.token, 'testnet');
+    const tokenDetails = getTokenDetails(response.token, this.networkType);
     const token = {
       symbol: tokenDetails?.symbol,
       decimal: tokenDetails?.decimal,
@@ -112,19 +131,21 @@ export class OrderModule {
     ) => void,
     onFailureCallback: () => void
   ) {
-    if (!this.websocketProvider) {
+    const webSocketProvider = new ethers.WebSocketProvider(this.rpcProvider.WSS_URL);
+    if (!webSocketProvider) {
       console.log('Please pass websocket provider in constructor');
       return;
     }
     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
     const contractAbi = BidAbi;
-    const contractAddress = Bid;
+    const contractAddress = contractAddresses[this.networkType].bid;
 
-    const contract = new ethers.Contract(contractAddress, contractAbi, this.websocketProvider);
+    const contract = new ethers.Contract(contractAddress, contractAbi, webSocketProvider);
 
     return new Promise((resolve, reject) => {
       this.createTimeoutId = setTimeout(() => {
         contract.off('OrderMatched');
+        webSocketProvider?.destroy();
         onFailureCallback();
         reject({ error: true, msg: 'Order creation Failed' });
       }, timeoutTime);
@@ -140,7 +161,7 @@ export class OrderModule {
         ) => {
           if (creatorAddress.toString().toLowerCase() === accounts[0].toString().toLowerCase()) {
             onSuccessCallback(orderId, providerAddress, providerId, acceptedPrice, creatorAddress);
-            this.websocketProvider?.destroy();
+            webSocketProvider?.destroy();
             contract.off('OrderMatched');
             clearTimeout(this.createTimeoutId as NodeJS.Timeout);
             resolve({ orderId, providerAddress, providerId, acceptedPrice, creatorAddress });
@@ -167,13 +188,15 @@ export class OrderModule {
 
     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
     const contractAbi = BidAbi;
-    const contractAddress = Bid;
+    const contractAddress = contractAddresses[this.networkType].bid;
 
-    const contract = new ethers.Contract(contractAddress, contractAbi, this.websocketProvider);
+    const webSocketProvider = new ethers.WebSocketProvider(this.rpcProvider.WSS_URL);
+    const contract = new ethers.Contract(contractAddress, contractAbi, webSocketProvider);
 
     return new Promise((resolve, reject) => {
       this.updateTimeoutId = setTimeout(() => {
         contract.off('LeaseUpdated');
+        webSocketProvider?.destroy();
         onFailureCallback();
         reject({ error: true, msg: 'Order updation Failed' });
       }, timeoutTime);
@@ -181,7 +204,7 @@ export class OrderModule {
       contract.on('LeaseUpdated', (orderId, providerAddress, tenantAddress, acceptedPrice) => {
         if (tenantAddress.toString().toLowerCase() === accounts[0].toString().toLowerCase()) {
           onSuccessCallback(orderId, providerAddress, tenantAddress, acceptedPrice?.toString());
-          this.websocketProvider?.destroy();
+          webSocketProvider?.destroy();
           contract.off('LeaseUpdated');
           clearTimeout(this.updateTimeoutId as NodeJS.Timeout);
           resolve(orderId);
@@ -202,13 +225,15 @@ export class OrderModule {
 
     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
     const contractAbi = BidAbi;
-    const contractAddress = Bid;
+    const contractAddress = contractAddresses[this.networkType].bid;
 
-    const contract = new ethers.Contract(contractAddress, contractAbi, this.websocketProvider);
+    const webSocketProvider = new ethers.WebSocketProvider(this.rpcProvider.WSS_URL);
+    const contract = new ethers.Contract(contractAddress, contractAbi, webSocketProvider);
 
     return new Promise((resolve, reject) => {
       this.updateTimeoutId = setTimeout(() => {
         contract.off('UpdateRequestAccepted');
+        webSocketProvider?.destroy();
         onFailureCallback();
         reject({ error: true, msg: 'Order updation Failed' });
       }, timeoutTime);
@@ -216,7 +241,7 @@ export class OrderModule {
       contract.on('UpdateRequestAccepted', (orderId, providerAddress, tenantAddress) => {
         if (tenantAddress.toString().toLowerCase() === accounts[0].toString().toLowerCase()) {
           onSuccessCallback(orderId, providerAddress);
-          this.websocketProvider?.destroy();
+          webSocketProvider?.destroy();
           contract.off('UpdateRequestAccepted');
           clearTimeout(this.updateTimeoutId as NodeJS.Timeout);
           resolve(orderId);

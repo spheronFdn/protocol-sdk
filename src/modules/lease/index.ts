@@ -1,11 +1,11 @@
-import ComputeLeaseAbi from '@contracts/abis/devnet/ComputeLease.json';
-import { ComputeLeaseDev as ComputeLease } from '@contracts/addresses';
+import ComputeLeaseAbi from '@contracts/abis/testnet/ComputeLease.json';
+import { ComputeLeaseDev as ComputeLease, contractAddresses } from '@contracts/addresses';
 import { OrderModule } from '@modules/order';
 import { getTokenDetails } from '@utils/index';
 import { ethers } from 'ethers';
 import { Lease, LeaseState, LeaseWithOrderDetails } from './types';
 import { getLeaseStateAsString } from '@utils/lease';
-import { DEFAULT_PAGE_SIZE } from '@config/index';
+import { DEFAULT_PAGE_SIZE, NetworkType, RpcProvider } from '@config/index';
 import { FizzModule } from '@modules/fizz';
 import { decompressOrderSpec, decompressProviderSpec } from '@utils/spec';
 
@@ -13,21 +13,27 @@ export class LeaseModule {
   private provider: ethers.Provider;
   private orderModule: OrderModule;
   private fizzModule: FizzModule;
-  private websocketProvider?: ethers.WebSocketProvider;
   private leaseCloseTimeoutId: NodeJS.Timeout | null;
+  private networkType: NetworkType;
+  private rpcProvider: RpcProvider;
 
-  constructor(provider: ethers.Provider, websocketProvider?: ethers.WebSocketProvider) {
+  constructor(
+    provider: ethers.Provider,
+    networkType: NetworkType = 'mainnet',
+    rpcProvider: RpcProvider
+  ) {
+    this.networkType = networkType;
     this.provider = provider;
-    this.websocketProvider = websocketProvider;
+    this.rpcProvider = rpcProvider;
     this.getLeaseDetails = this.getLeaseDetails.bind(this);
-    this.orderModule = new OrderModule(provider);
-    this.fizzModule = new FizzModule(provider, websocketProvider);
+    this.orderModule = new OrderModule(provider, networkType, rpcProvider);
+    this.fizzModule = new FizzModule(provider, networkType, rpcProvider);
     this.leaseCloseTimeoutId = null;
   }
 
   async getLeaseDetails(leaseId: string) {
     const contractAbi = ComputeLeaseAbi;
-    const contractAddress = ComputeLease;
+    const contractAddress = contractAddresses[this.networkType].computeLease;
 
     const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
     const response = await contract.leases(leaseId);
@@ -62,7 +68,7 @@ export class LeaseModule {
 
   async getLeaseIds(address: string) {
     const contractAbi = ComputeLeaseAbi;
-    const contractAddress = ComputeLease;
+    const contractAddress = contractAddresses[this.networkType].computeLease;
 
     const contract = new ethers.Contract(contractAddress, contractAbi, this.provider);
     const response = await contract.getTenantLeases(address);
@@ -119,7 +125,8 @@ export class LeaseModule {
       filteredLeases.map(async (lease, index) => {
         const order = orderDetails[index];
         let tokenDetails;
-        if (order.token?.address) tokenDetails = getTokenDetails(order.token.address, 'testnet');
+        if (order.token?.address)
+          tokenDetails = getTokenDetails(order.token.address, this.networkType);
 
         let region;
         if (lease.fizzId.toString() !== '0') {
@@ -157,7 +164,7 @@ export class LeaseModule {
 
   async closeLease(leaseId: string) {
     const contractAbi = ComputeLeaseAbi;
-    const contractAddress = ComputeLease;
+    const contractAddress = contractAddresses[this.networkType].computeLease;
     try {
       const provider = new ethers.BrowserProvider(window.ethereum);
       const signer = await provider.getSigner();
@@ -184,19 +191,21 @@ export class LeaseModule {
     onFailureCallback: () => void,
     timeout = 60000
   ) {
-    if (!this.websocketProvider) {
+    const webSocketProvider = new ethers.WebSocketProvider(this.rpcProvider.WSS_URL);
+    if (!webSocketProvider) {
       console.log('Please pass websocket provider in constructor');
       return;
     }
     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
     const contractAbi = ComputeLeaseAbi;
-    const contractAddress = ComputeLease;
+    const contractAddress = contractAddresses[this.networkType].computeLease;
 
-    const contract = new ethers.Contract(contractAddress, contractAbi, this.websocketProvider);
+    const contract = new ethers.Contract(contractAddress, contractAbi, webSocketProvider);
 
     return new Promise((resolve, reject) => {
       this.leaseCloseTimeoutId = setTimeout(() => {
         contract.off('LeaseClosed');
+        webSocketProvider?.destroy();
         onFailureCallback();
         reject({ error: true, msg: 'Order Updation Failed' });
       }, timeout);
@@ -209,7 +218,7 @@ export class LeaseModule {
             tenantAddress.toString().toLowerCase() === accounts[0].toString().toLowerCase()
           ) {
             onSuccessCallback({ orderId, providerAddress, tenantAddress });
-            this.websocketProvider?.destroy();
+            webSocketProvider?.destroy();
             contract.off('LeaseClosed');
             clearTimeout(this.leaseCloseTimeoutId as NodeJS.Timeout);
             resolve({ orderId, providerAddress, tenantAddress });
