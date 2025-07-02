@@ -1,4 +1,5 @@
 import { NetworkType } from '@config/index';
+import { decompressProviderSpec } from './spec';
 
 const SUBGRAPH_URL =
   'https://api.goldsky.com/api/public/project_cm16apa2e540c01wz70x34xzf/subgraphs/sph-base-sepolia-new/1.0.0/gn';
@@ -82,6 +83,7 @@ const getProvidersQuery = `
     providers(first: $first, skip: $skip, orderBy: providerId, orderDirection: asc) {
       id
       providerId
+      spec
       walletAddress
       hostUri
       status
@@ -99,6 +101,7 @@ export const subgraphGetProviders = async (networkType: NetworkType) => {
   const providers: Array<{
     id: string;
     providerId: string;
+    spec: string;
     walletAddress: string;
     hostUri: string;
     status: string;
@@ -116,7 +119,29 @@ export const subgraphGetProviders = async (networkType: NetworkType) => {
 
     if (fetchedProviders.length === 0) break;
 
-    providers.push(...fetchedProviders.map((p: any) => ({ ...p, region: p.region.id })));
+    providers.push(
+      ...fetchedProviders.map((p: any) => {
+        let name, region;
+        try {
+          const { Name, Region } = JSON.parse(p.spec as string);
+          name = Name;
+          region = Region;
+        } catch {
+          try {
+            const { Name, Region } = decompressProviderSpec(p.spec as string) as {
+              Name: string;
+              Region: string;
+            };
+            name = Name;
+            region = Region;
+          } catch {
+            name = '';
+            region = '';
+          }
+        }
+        return { ...p, name, region };
+      })
+    );
     skip += batchSize;
   }
 
