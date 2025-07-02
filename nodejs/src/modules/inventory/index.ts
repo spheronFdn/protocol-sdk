@@ -198,11 +198,19 @@ export class InventoryModule {
         )
       )
         .map((result) => {
-          if (result.status === 'fulfilled')
-            return {
-              ...result.value.response.cluster.inventory.available,
-              walletAddress: result.value.walletAddress.toLowerCase(),
-            };
+          if (result.status === 'fulfilled') {
+            if (
+              result.value.response &&
+              result.value.response.cluster &&
+              result.value.response.cluster.inventory
+            ) {
+              return {
+                ...result.value.response.cluster.inventory.available,
+                walletAddress: result.value.walletAddress.toLowerCase(),
+              };
+            }
+            return null;
+          }
           return null;
         })
         .filter(Boolean);
