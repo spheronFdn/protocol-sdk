@@ -37,7 +37,7 @@ export interface Provider {
   providerId?: bigint;
   name: string;
   region: string;
-  spec?: string;
+  spec: string;
   walletAddress: string;
   paymentsAccepted: string[];
   hostUri: string;

@@ -135,6 +135,7 @@ interface GPUAttributes {
   vendor: {
     [key: string]: GPUModel[];
   };
+  req_vram?: string;
 }
 
 interface GPUInput {
@@ -163,6 +164,13 @@ const convertGpuAttributes = (gpu: GPUInput): ConvertedGPU => {
         Key: key,
         Value: 'true',
       });
+    });
+  }
+
+  if (gpu.attributes?.req_vram) {
+    attributes.push({
+      Key: 'req_vram',
+      Value: gpu.attributes.req_vram,
     });
   }
 
@@ -208,6 +216,7 @@ interface Placement {
     bandwidth?: string;
     provider_exclude?: string;
     fizz_exclude?: string;
+    req_vram?: string;
   };
 }
 
