@@ -104,3 +104,14 @@ export const initializeSigner = async ({ wallet }: { wallet?: ethers.Wallet }) =
 
   return { signer };
 };
+
+export const replaceDomain = (url: string, newDomain: string) => {
+  try {
+    const parsedUrl = new URL(url);
+    const port = parsedUrl.port ? `:${parsedUrl.port}` : '';
+    return `${parsedUrl.protocol}//${newDomain}${port}${parsedUrl.pathname}${parsedUrl.search}${parsedUrl.hash}`;
+  } catch (err) {
+    console.error('Invalid URL:', err);
+    return url;
+  }
+};

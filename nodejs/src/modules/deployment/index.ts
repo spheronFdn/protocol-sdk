@@ -10,7 +10,7 @@ import { ProviderModule } from '@modules/provider';
 import { IProvider } from '@modules/provider/types';
 import { SpheronProviderModule } from '@modules/spheron-provider';
 import { getManifestIcl, yamlToOrderDetails } from '@utils/deployment';
-import { getTokenDetails } from '@utils/index';
+import { getTokenDetails, replaceDomain } from '@utils/index';
 import { createAuthorizationToken } from '@utils/provider-auth';
 import { NetworkType, RpcUrls } from '@config/index';
 import { ethers } from 'ethers';
@@ -243,6 +243,19 @@ export class DeploymentModule {
         authToken,
         leaseId
       );
+
+      const service = leaseInfo?.services || {};
+      const leaseServiceKeys = Object.keys(service);
+      leaseServiceKeys.forEach((serviceName: string) => {
+        let uris: string[] = [];
+        if (service?.[serviceName] && (service?.[serviceName]?.uris || []).length > 0) {
+          (service?.[serviceName]?.uris || []).forEach((url: string) => {
+            url = replaceDomain(url, hostUri);
+            uris.push(url);
+          });
+        }
+        service[serviceName].uris = uris;
+      });
       const forwardedPorts = leaseInfo?.forwarded_ports || {};
       const serviceKeys = Object.keys(forwardedPorts);
       const secureUrls: Record<string, string[]> = {};
@@ -266,6 +279,7 @@ export class DeploymentModule {
       const leaseWithSecureUrls = {
         ...leaseInfo,
         secureUrls,
+        hostUri,
       };
       return leaseWithSecureUrls;
     } catch (error) {
