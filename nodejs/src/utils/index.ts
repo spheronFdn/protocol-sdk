@@ -109,7 +109,17 @@ export const replaceDomain = (url: string, newDomain: string) => {
   try {
     const parsedUrl = new URL(url);
     const port = parsedUrl.port ? `:${parsedUrl.port}` : '';
-    return `${parsedUrl.protocol}//${newDomain}${port}${parsedUrl.pathname}${parsedUrl.search}${parsedUrl.hash}`;
+    let pathname = parsedUrl.pathname;
+
+    if (pathname.endsWith('/') && pathname !== '/') {
+      pathname = pathname.slice(0, -1);
+    }
+
+    if (pathname === '/') {
+      pathname = '';
+    }
+
+    return `${parsedUrl.protocol}//${newDomain}${port}${pathname}${parsedUrl.search}${parsedUrl.hash}`;
   } catch (err) {
     console.error('Invalid URL:', err);
     return url;
