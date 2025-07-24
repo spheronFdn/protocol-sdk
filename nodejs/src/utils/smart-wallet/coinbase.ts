@@ -30,6 +30,7 @@ export const initCoinbaseBundlerClient = async ({
   const account = await toCoinbaseSmartAccount({
     client,
     owners: [owner],
+    version: '1.1',
   });
 
   const paymasterClient = createPaymasterClient({
