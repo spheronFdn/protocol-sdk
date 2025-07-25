@@ -51,14 +51,14 @@ export class SpheronSDK {
       wallet,
       networkType,
       this.smartWalletBundlerClientPromise,
-      rpcUrls,
+      rpcUrls
     );
     this.orders = new OrderModule(
       provider,
       wallet,
       networkType,
       this.smartWalletBundlerClientPromise,
-      rpcUrls,
+      rpcUrls
     );
     this.escrow = new EscrowModule(
       provider,
@@ -73,7 +73,7 @@ export class SpheronSDK {
       wallet,
       networkType,
       this.smartWalletBundlerClientPromise,
-      rpcUrls,
+      rpcUrls
     );
     this.inventory = new InventoryModule(provider, wallet, networkType, rpcUrls);
   }
@@ -84,3 +84,6 @@ export * from '@modules/fizz/types';
 export * from '@modules/lease/types';
 export * from '@modules/order/types';
 export * from '@modules/provider/types';
+
+export * from './utils/cpu-config';
+export * from './utils/gpu-config';

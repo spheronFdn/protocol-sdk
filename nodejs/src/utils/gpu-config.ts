@@ -1,4 +1,30 @@
-const GpuConfig = [
+export interface IGpuConfig {
+  id: number;
+  name: string;
+  tier:
+    | 'Entry 1'
+    | 'Entry 2'
+    | 'Low 1'
+    | 'Low 2'
+    | 'Medium 1'
+    | 'Medium 2'
+    | 'High 1'
+    | 'High 2'
+    | 'Ultra High 1'
+    | 'Ultra High 2'
+    | 'Ultra High 3';
+  shortName: string;
+  multiplier: number;
+  baseFnPoints: number;
+  gpuPricePerHour: number;
+  gpuPricePerMonth: number;
+  cpuPricePerMonth: number;
+  ramPricePerGbPerMonth: number;
+  storagePricePerGbPerMonth: number;
+  vendor: 'nvidia';
+}
+
+export const GpuConfig: IGpuConfig[] = [
   {
     id: 1,
     name: 'NVIDIA T1000',
@@ -917,12 +943,11 @@ const GpuConfig = [
     multiplier: 1,
     baseFnPoints: 500,
     gpuPricePerHour: 0.25,
-    gpuPricePerMonth: 180.0,
+    gpuPricePerMonth: 180,
     cpuPricePerMonth: 0.75,
     ramPricePerGbPerMonth: 0.1,
     storagePricePerGbPerMonth: 0.01,
     vendor: 'nvidia',
-    disabled: false,
   },
   {
     id: 67,
@@ -937,7 +962,6 @@ const GpuConfig = [
     ramPricePerGbPerMonth: 0.1,
     storagePricePerGbPerMonth: 0.01,
     vendor: 'nvidia',
-    disabled: false,
   },
   {
     id: 68,
@@ -947,12 +971,109 @@ const GpuConfig = [
     multiplier: 1,
     baseFnPoints: 500,
     gpuPricePerHour: 0.15,
-    gpuPricePerMonth: 108.0,
+    gpuPricePerMonth: 108,
     cpuPricePerMonth: 0.75,
     ramPricePerGbPerMonth: 0.1,
     storagePricePerGbPerMonth: 0.01,
     vendor: 'nvidia',
-    disabled: false,
+  },
+  {
+    id: 69,
+    name: 'NVIDIA GH200 96 GB',
+    tier: 'Ultra High 2',
+    shortName: 'gh200',
+    multiplier: 12,
+    baseFnPoints: 500,
+    gpuPricePerHour: 0.15,
+    gpuPricePerMonth: 108,
+    cpuPricePerMonth: 0.75,
+    ramPricePerGbPerMonth: 0.1,
+    storagePricePerGbPerMonth: 0.01,
+    vendor: 'nvidia',
+  },
+  {
+    id: 70,
+    name: 'NVIDIA H200 142 GB	',
+    tier: 'Ultra High 3',
+    shortName: 'h200',
+    multiplier: 15,
+    baseFnPoints: 500,
+    gpuPricePerHour: 0.15,
+    gpuPricePerMonth: 108,
+    cpuPricePerMonth: 0.75,
+    ramPricePerGbPerMonth: 0.1,
+    storagePricePerGbPerMonth: 0.01,
+    vendor: 'nvidia',
+  },
+  {
+    id: 71,
+    name: 'NVIDIA B200 192 GB',
+    tier: 'Ultra High 3',
+    shortName: 'b200',
+    multiplier: 15,
+    baseFnPoints: 500,
+    gpuPricePerHour: 0.15,
+    gpuPricePerMonth: 108,
+    cpuPricePerMonth: 0.75,
+    ramPricePerGbPerMonth: 0.1,
+    storagePricePerGbPerMonth: 0.01,
+    vendor: 'nvidia',
+  },
+  {
+    id: 72,
+    name: 'NVIDIA A30',
+    tier: 'Medium 1',
+    shortName: 'a30',
+    multiplier: 1,
+    baseFnPoints: 500,
+    gpuPricePerHour: 0.15,
+    gpuPricePerMonth: 108,
+    cpuPricePerMonth: 0.75,
+    ramPricePerGbPerMonth: 0.1,
+    storagePricePerGbPerMonth: 0.01,
+    vendor: 'nvidia',
+  },
+  {
+    id: 73,
+    name: 'NVIDIA A16',
+    tier: 'Medium 1',
+    shortName: 'a16',
+    multiplier: 1,
+    baseFnPoints: 500,
+    gpuPricePerHour: 0.15,
+    gpuPricePerMonth: 108,
+    cpuPricePerMonth: 0.75,
+    ramPricePerGbPerMonth: 0.1,
+    storagePricePerGbPerMonth: 0.01,
+    vendor: 'nvidia',
+  },
+  {
+    id: 74,
+    name: 'NVIDIA RTX 6000',
+    tier: 'Medium 2',
+    shortName: 'rtx6000',
+    multiplier: 1.5,
+    baseFnPoints: 500,
+    gpuPricePerHour: 0.15,
+    gpuPricePerMonth: 108,
+    cpuPricePerMonth: 0.75,
+    ramPricePerGbPerMonth: 0.1,
+    storagePricePerGbPerMonth: 0.01,
+    vendor: 'nvidia',
+  },
+  {
+    id: 75,
+    name: 'NVIDIA RTX 8000 Ada',
+    tier: 'High 1',
+    shortName: 'rtx8000-ada',
+    multiplier: 2,
+    baseFnPoints: 500,
+    gpuPricePerHour: 0.15,
+    gpuPricePerMonth: 108,
+    cpuPricePerMonth: 0.75,
+    ramPricePerGbPerMonth: 0.1,
+    storagePricePerGbPerMonth: 0.01,
+    vendor: 'nvidia',
   },
   {
     id: 76,
@@ -967,8 +1088,5 @@ const GpuConfig = [
     ramPricePerGbPerMonth: 0.1,
     storagePricePerGbPerMonth: 0.01,
     vendor: 'nvidia',
-    disabled: false,
   },
 ];
-
-export default GpuConfig;
